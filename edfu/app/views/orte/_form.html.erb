@@ -1,0 +1,45 @@
+<%= form_for(@ort) do |f| %>
+  <% if @ort.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ort.errors.count, "error") %> prohibited this ort from being saved:</h2>
+
+      <ul>
+      <% @ort.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :stelle %><br>
+    <%= f.text_field :stelle %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration %><br>
+    <%= f.text_field :transliteration %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration_nosuffix %><br>
+    <%= f.text_field :transliteration_nosuffix %>
+  </div>
+  <div class="field">
+    <%= f.label :ort %><br>
+    <%= f.text_field :ort %>
+  </div>
+  <div class="field">
+    <%= f.label :lokalisation %><br>
+    <%= f.text_field :lokalisation %>
+  </div>
+  <div class="field">
+    <%= f.label :anmerkung %><br>
+    <%= f.text_field :anmerkung %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

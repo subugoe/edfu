@@ -1,0 +1,65 @@
+<%= form_for(@formular) do |f| %>
+  <% if @formular.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@formular.errors.count, "error") %> prohibited this formular from being saved:</h2>
+
+      <ul>
+      <% @formular.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration %><br>
+    <%= f.text_field :transliteration %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration_nosuffix %><br>
+    <%= f.text_field :transliteration_nosuffix %>
+  </div>
+  <div class="field">
+    <%= f.label :uebersetzung %><br>
+    <%= f.text_field :uebersetzung %>
+  </div>
+  <div class="field">
+    <%= f.label :texttyp %><br>
+    <%= f.text_field :texttyp %>
+  </div>
+  <div class="field">
+    <%= f.label :photo %><br>
+    <%= f.text_field :photo %>
+  </div>
+  <div class="field">
+    <%= f.label :photo_pfad %><br>
+    <%= f.text_field :photo_pfad %>
+  </div>
+  <div class="field">
+    <%= f.label :photo_kommentar %><br>
+    <%= f.text_field :photo_kommentar %>
+  </div>
+  <div class="field">
+    <%= f.label :szeneID %><br>
+    <%= f.text_field :szeneID %>
+  </div>
+  <div class="field">
+    <%= f.label :literatur %><br>
+    <%= f.text_field :literatur %>
+  </div>
+  <div class="field">
+    <%= f.label :band %><br>
+    <%= f.text_field :band %>
+  </div>
+  <div class="field">
+    <%= f.label :seitenzeile %><br>
+    <%= f.text_field :seitenzeile %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

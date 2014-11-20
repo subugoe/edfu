@@ -1,0 +1,53 @@
+<%= form_for(@wort) do |f| %>
+  <% if @wort.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@wort.errors.count, "error") %> prohibited this wort from being saved:</h2>
+
+      <ul>
+      <% @wort.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration %><br>
+    <%= f.text_field :transliteration %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration_nosuffix %><br>
+    <%= f.text_field :transliteration_nosuffix %>
+  </div>
+  <div class="field">
+    <%= f.label :uebersetzung %><br>
+    <%= f.text_field :uebersetzung %>
+  </div>
+  <div class="field">
+    <%= f.label :hieroglyph %><br>
+    <%= f.text_field :hieroglyph %>
+  </div>
+  <div class="field">
+    <%= f.label :weiteres %><br>
+    <%= f.text_field :weiteres %>
+  </div>
+  <div class="field">
+    <%= f.label :belegstellenEdfu %><br>
+    <%= f.text_field :belegstellenEdfu %>
+  </div>
+  <div class="field">
+    <%= f.label :belegstellenWb %><br>
+    <%= f.text_field :belegstellenWb %>
+  </div>
+  <div class="field">
+    <%= f.label :anmerkung %><br>
+    <%= f.text_field :anmerkung %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

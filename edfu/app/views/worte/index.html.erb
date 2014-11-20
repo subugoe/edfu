@@ -1,0 +1,41 @@
+<h1>Listing worte</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uid</th>
+      <th>Transliteration</th>
+      <th>Transliteration nosuffix</th>
+      <th>Uebersetzung</th>
+      <th>Hieroglyph</th>
+      <th>Weiteres</th>
+      <th>Belegstellenedfu</th>
+      <th>Belegstellenwb</th>
+      <th>Anmerkung</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @worte.each do |wort| %>
+      <tr>
+        <td><%= wort.uid %></td>
+        <td><%= wort.transliteration %></td>
+        <td><%= wort.transliteration_nosuffix %></td>
+        <td><%= wort.uebersetzung %></td>
+        <td><%= wort.hieroglyph %></td>
+        <td><%= wort.weiteres %></td>
+        <td><%= wort.belegstellenEdfu %></td>
+        <td><%= wort.belegstellenWb %></td>
+        <td><%= wort.anmerkung %></td>
+        <td><%= link_to 'Show', wort %></td>
+        <td><%= link_to 'Edit', edit_wort_path(wort) %></td>
+        <td><%= link_to 'Destroy', wort, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Wort', new_wort_path %>

@@ -1,0 +1,57 @@
+<%= form_for(@gott) do |f| %>
+  <% if @gott.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@gott.errors.count, "error") %> prohibited this gott from being saved:</h2>
+
+      <ul>
+      <% @gott.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration %><br>
+    <%= f.text_field :transliteration %>
+  </div>
+  <div class="field">
+    <%= f.label :transliteration_nosuffix %><br>
+    <%= f.text_field :transliteration_nosuffix %>
+  </div>
+  <div class="field">
+    <%= f.label :ort %><br>
+    <%= f.text_field :ort %>
+  </div>
+  <div class="field">
+    <%= f.label :eponym %><br>
+    <%= f.text_field :eponym %>
+  </div>
+  <div class="field">
+    <%= f.label :beziehung %><br>
+    <%= f.text_field :beziehung %>
+  </div>
+  <div class="field">
+    <%= f.label :funktion %><br>
+    <%= f.text_field :funktion %>
+  </div>
+  <div class="field">
+    <%= f.label :band %><br>
+    <%= f.text_field :band %>
+  </div>
+  <div class="field">
+    <%= f.label :seitenzeile %><br>
+    <%= f.text_field :seitenzeile %>
+  </div>
+  <div class="field">
+    <%= f.label :anmerkung %><br>
+    <%= f.text_field :anmerkung %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

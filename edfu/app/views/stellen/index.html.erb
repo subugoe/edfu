@@ -1,0 +1,53 @@
+<h1>Listing stellen</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uid</th>
+      <th>Tempel</th>
+      <th>Band</th>
+      <th>Bandseite</th>
+      <th>Bandseitezeile</th>
+      <th>Seite start</th>
+      <th>Seite stop</th>
+      <th>Zeile start</th>
+      <th>Zeile stop</th>
+      <th>Stelle anmerkung</th>
+      <th>Stelle unsicher</th>
+      <th>Start</th>
+      <th>Stop</th>
+      <th>Zerstoerung</th>
+      <th>Freigegeben</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @stellen.each do |stelle| %>
+      <tr>
+        <td><%= stelle.uid %></td>
+        <td><%= stelle.tempel %></td>
+        <td><%= stelle.band %></td>
+        <td><%= stelle.bandseite %></td>
+        <td><%= stelle.bandseitezeile %></td>
+        <td><%= stelle.seite_start %></td>
+        <td><%= stelle.seite_stop %></td>
+        <td><%= stelle.zeile_start %></td>
+        <td><%= stelle.zeile_stop %></td>
+        <td><%= stelle.stelle_anmerkung %></td>
+        <td><%= stelle.stelle_unsicher %></td>
+        <td><%= stelle.start %></td>
+        <td><%= stelle.stop %></td>
+        <td><%= stelle.zerstoerung %></td>
+        <td><%= stelle.freigegeben %></td>
+        <td><%= link_to 'Show', stelle %></td>
+        <td><%= link_to 'Edit', edit_stelle_path(stelle) %></td>
+        <td><%= link_to 'Destroy', stelle, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Stelle', new_stelle_path %>

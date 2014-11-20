@@ -1,0 +1,29 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uid: MyString
+  transliteration: MyString
+  transliteration_nosuffix: MyString
+  uebersetzung: MyString
+  texttyp: MyString
+  photo: MyString
+  photo_pfad: MyString
+  photo_kommentar: MyString
+  szeneID: MyString
+  literatur: MyString
+  band: MyString
+  seitenzeile: MyString
+
+two:
+  uid: MyString
+  transliteration: MyString
+  transliteration_nosuffix: MyString
+  uebersetzung: MyString
+  texttyp: MyString
+  photo: MyString
+  photo_pfad: MyString
+  photo_kommentar: MyString
+  szeneID: MyString
+  literatur: MyString
+  band: MyString
+  seitenzeile: MyString

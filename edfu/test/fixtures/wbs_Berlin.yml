@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uid: MyString
+  band: MyString
+  seite_start: MyString
+  seite_stop: MyString
+  zeile_start: MyString
+  zeile_stop: MyString
+  wort_id: 
+
+two:
+  uid: MyString
+  band: MyString
+  seite_start: MyString
+  seite_stop: MyString
+  zeile_start: MyString
+  zeile_stop: MyString
+  wort_id: 

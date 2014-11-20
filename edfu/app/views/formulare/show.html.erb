@@ -1,0 +1,64 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uid:</strong>
+  <%= @formular.uid %>
+</p>
+
+<p>
+  <strong>Transliteration:</strong>
+  <%= @formular.transliteration %>
+</p>
+
+<p>
+  <strong>Transliteration nosuffix:</strong>
+  <%= @formular.transliteration_nosuffix %>
+</p>
+
+<p>
+  <strong>Uebersetzung:</strong>
+  <%= @formular.uebersetzung %>
+</p>
+
+<p>
+  <strong>Texttyp:</strong>
+  <%= @formular.texttyp %>
+</p>
+
+<p>
+  <strong>Photo:</strong>
+  <%= @formular.photo %>
+</p>
+
+<p>
+  <strong>Photo pfad:</strong>
+  <%= @formular.photo_pfad %>
+</p>
+
+<p>
+  <strong>Photo kommentar:</strong>
+  <%= @formular.photo_kommentar %>
+</p>
+
+<p>
+  <strong>Szeneid:</strong>
+  <%= @formular.szeneID %>
+</p>
+
+<p>
+  <strong>Literatur:</strong>
+  <%= @formular.literatur %>
+</p>
+
+<p>
+  <strong>Band:</strong>
+  <%= @formular.band %>
+</p>
+
+<p>
+  <strong>Seitenzeile:</strong>
+  <%= @formular.seitenzeile %>
+</p>
+
+<%= link_to 'Edit', edit_formular_path(@formular) %> |
+<%= link_to 'Back', formulare_path %>

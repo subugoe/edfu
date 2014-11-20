@@ -1,0 +1,77 @@
+<%= form_for(@stelle) do |f| %>
+  <% if @stelle.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@stelle.errors.count, "error") %> prohibited this stelle from being saved:</h2>
+
+      <ul>
+      <% @stelle.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :tempel %><br>
+    <%= f.text_field :tempel %>
+  </div>
+  <div class="field">
+    <%= f.label :band %><br>
+    <%= f.text_field :band %>
+  </div>
+  <div class="field">
+    <%= f.label :bandseite %><br>
+    <%= f.text_field :bandseite %>
+  </div>
+  <div class="field">
+    <%= f.label :bandseitezeile %><br>
+    <%= f.text_field :bandseitezeile %>
+  </div>
+  <div class="field">
+    <%= f.label :seite_start %><br>
+    <%= f.text_field :seite_start %>
+  </div>
+  <div class="field">
+    <%= f.label :seite_stop %><br>
+    <%= f.text_field :seite_stop %>
+  </div>
+  <div class="field">
+    <%= f.label :zeile_start %><br>
+    <%= f.text_field :zeile_start %>
+  </div>
+  <div class="field">
+    <%= f.label :zeile_stop %><br>
+    <%= f.text_field :zeile_stop %>
+  </div>
+  <div class="field">
+    <%= f.label :stelle_anmerkung %><br>
+    <%= f.text_field :stelle_anmerkung %>
+  </div>
+  <div class="field">
+    <%= f.label :stelle_unsicher %><br>
+    <%= f.text_field :stelle_unsicher %>
+  </div>
+  <div class="field">
+    <%= f.label :start %><br>
+    <%= f.text_field :start %>
+  </div>
+  <div class="field">
+    <%= f.label :stop %><br>
+    <%= f.text_field :stop %>
+  </div>
+  <div class="field">
+    <%= f.label :zerstoerung %><br>
+    <%= f.text_field :zerstoerung %>
+  </div>
+  <div class="field">
+    <%= f.label :freigegeben %><br>
+    <%= f.text_field :freigegeben %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

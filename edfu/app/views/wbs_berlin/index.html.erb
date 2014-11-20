@@ -1,0 +1,37 @@
+<h1>Listing wb_berlins</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uid</th>
+      <th>Band</th>
+      <th>Seite start</th>
+      <th>Seite stop</th>
+      <th>Zeile start</th>
+      <th>Zeile stop</th>
+      <th>Wort</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @wb_berlins.each do |wb_berlin| %>
+      <tr>
+        <td><%= wb_berlin.uid %></td>
+        <td><%= wb_berlin.band %></td>
+        <td><%= wb_berlin.seite_start %></td>
+        <td><%= wb_berlin.seite_stop %></td>
+        <td><%= wb_berlin.zeile_start %></td>
+        <td><%= wb_berlin.zeile_stop %></td>
+        <td><%= wb_berlin.wort %></td>
+        <td><%= link_to 'Show', wb_berlin %></td>
+        <td><%= link_to 'Edit', edit_wb_berlin_path(wb_berlin) %></td>
+        <td><%= link_to 'Destroy', wb_berlin, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Wb berlin', new_wb_berlin_path %>

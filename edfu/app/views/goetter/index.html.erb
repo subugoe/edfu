@@ -1,0 +1,43 @@
+<h1>Listing goetter</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uid</th>
+      <th>Transliteration</th>
+      <th>Transliteration nosuffix</th>
+      <th>Ort</th>
+      <th>Eponym</th>
+      <th>Beziehung</th>
+      <th>Funktion</th>
+      <th>Band</th>
+      <th>Seitenzeile</th>
+      <th>Anmerkung</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @goetter.each do |gott| %>
+      <tr>
+        <td><%= gott.uid %></td>
+        <td><%= gott.transliteration %></td>
+        <td><%= gott.transliteration_nosuffix %></td>
+        <td><%= gott.ort %></td>
+        <td><%= gott.eponym %></td>
+        <td><%= gott.beziehung %></td>
+        <td><%= gott.funktion %></td>
+        <td><%= gott.band %></td>
+        <td><%= gott.seitenzeile %></td>
+        <td><%= gott.anmerkung %></td>
+        <td><%= link_to 'Show', gott %></td>
+        <td><%= link_to 'Edit', edit_gott_path(gott) %></td>
+        <td><%= link_to 'Destroy', gott, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Gott', new_gott_path %>

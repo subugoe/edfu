@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uid: MyString
+  stelle: MyString
+  transliteration: MyString
+  transliteration_nosuffix: MyString
+  ort: MyString
+  lokalisation: MyString
+  anmerkung: MyString
+
+two:
+  uid: MyString
+  stelle: MyString
+  transliteration: MyString
+  transliteration_nosuffix: MyString
+  ort: MyString
+  lokalisation: MyString
+  anmerkung: MyString

@@ -1,0 +1,49 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uid:</strong>
+  <%= @wort.uid %>
+</p>
+
+<p>
+  <strong>Transliteration:</strong>
+  <%= @wort.transliteration %>
+</p>
+
+<p>
+  <strong>Transliteration nosuffix:</strong>
+  <%= @wort.transliteration_nosuffix %>
+</p>
+
+<p>
+  <strong>Uebersetzung:</strong>
+  <%= @wort.uebersetzung %>
+</p>
+
+<p>
+  <strong>Hieroglyph:</strong>
+  <%= @wort.hieroglyph %>
+</p>
+
+<p>
+  <strong>Weiteres:</strong>
+  <%= @wort.weiteres %>
+</p>
+
+<p>
+  <strong>Belegstellenedfu:</strong>
+  <%= @wort.belegstellenEdfu %>
+</p>
+
+<p>
+  <strong>Belegstellenwb:</strong>
+  <%= @wort.belegstellenWb %>
+</p>
+
+<p>
+  <strong>Anmerkung:</strong>
+  <%= @wort.anmerkung %>
+</p>
+
+<%= link_to 'Edit', edit_wort_path(@wort) %> |
+<%= link_to 'Back', worte_path %>
