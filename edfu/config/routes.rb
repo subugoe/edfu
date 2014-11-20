@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :uploads
+
   resources :stellen
 
   resources :wb_berlins

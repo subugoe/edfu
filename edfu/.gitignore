@@ -14,3 +14,10 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+# Ignore IDE files
+/.idea/*
+/atlassian-ide-plugin.xml
+
+# System files
+/.DS_Store

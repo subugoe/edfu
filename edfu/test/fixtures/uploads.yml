@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  formular: MyString
+  ort: MyString
+  gott: MyString
+  wort: MyString
+
+two:
+  formular: MyString
+  ort: MyString
+  gott: MyString
+  wort: MyString

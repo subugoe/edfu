@@ -59,6 +59,7 @@ GEM
     mime-types (2.4.3)
     minitest (5.4.3)
     multi_json (1.10.1)
+    nokogiri (1.6.4.1-java)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -80,6 +81,12 @@ GEM
     rake (10.3.2)
     rdoc (4.1.2)
       json (~> 1.4)
+    roo (1.13.2)
+      nokogiri
+      rubyzip
+      spreadsheet (> 0.6.4)
+    ruby-ole (1.2.11.7)
+    rubyzip (1.1.6)
     sass (3.2.19)
     sass-rails (4.0.4)
       railties (>= 4.0.0, < 5.0)
@@ -89,6 +96,8 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
+    spreadsheet (1.0.0)
+      ruby-ole (>= 1.0)
     sprockets (2.11.3)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -123,6 +132,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   rails (= 4.1.8)
+  roo (~> 1.13.2)
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
   therubyrhino
