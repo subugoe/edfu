@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  resources :uploads
+  #resources :uploads
 
   resources :stellen
 
@@ -17,11 +17,13 @@ Rails.application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  # You can have the root of your site routed with "root"
-  # root 'welcome#index'
 
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
+  root 'uploads#new'
+
+  get 'uploads/', to: 'uploads#new'
+  post 'uploads/', to: 'uploads#create'
+
+  get 'uploads/new/', to: 'uploads#new'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase

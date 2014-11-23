@@ -80,10 +80,6 @@ ActiveRecord::Schema.define(version: 20141120161729) do
   end
 
   create_table "uploads", force: true do |t|
-    t.string   "formular"
-    t.string   "ort"
-    t.string   "gott"
-    t.string   "wort"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
