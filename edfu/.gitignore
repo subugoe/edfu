@@ -19,5 +19,8 @@
 /.idea/*
 /atlassian-ide-plugin.xml
 
+# Ignore test data
+/edfu-data/*
+
 # System files
 /.DS_Store
