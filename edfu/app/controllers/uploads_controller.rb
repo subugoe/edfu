@@ -5,6 +5,10 @@ class UploadsController < ApplicationController
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
 
 
+  # todo add multifile upload
+  # todo add email for notification
+  # todo add worker queue/thread for async processing
+
   # GET /uploads/new
   def new
     @upload = Upload.new
@@ -67,28 +71,29 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==15
+      break if i==20
 
       Formular.where(uid: Integer(row[9])).update_or_create(
 
-
-        transliteration: row[0],
-        band: Integer(row[1]),
-        seitenzeile: row[2],
-        transliteration_nosuffix: row[3],
-        uebersetzung: row[4],
-        texttyp: row[5],
-        photo: row[6],
-        photo_pfad: [],
-        photo_kommentar: Array.new,
-        szeneID: Integer(row[7]),
-        literatur: row[8],
-        uid: Integer(row[9])
-
+          transliteration: row[0] || '',
+          band: row[1] || '',
+          seitenzeile: row[2] || '',
+          transliteration_nosuffix: row[3] || '',
+          uebersetzung: row[4] || '',
+          texttyp: row[5] || '',
+          photo: row[6] || '',
+          photo_pfad: '',
+          photo_kommentar: '',
+          szeneID: row[7] || '',
+          literatur: row[8] || '',
+          uid: row[9] || ''
 
       )
+
+
       i += 1
     end
+
 
     return true
 

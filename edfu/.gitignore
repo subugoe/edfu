@@ -17,6 +17,7 @@
 
 # Ignore IDE files
 /.idea/*.*
+.idea/*.*
 /atlassian-ide-plugin.xml
 
 # Ignore test data
