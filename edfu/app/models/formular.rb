@@ -89,6 +89,8 @@ class Formular < ActiveRecord::Base
   private
 
 
+  # todo aufräumen, d.h. code in module/helper
+
   # todo in ein Modul packen und in Modell-Klassen wiederverwenden
   def self.update_or_create(attributes)
     assign_or_new(attributes).save
@@ -132,14 +134,19 @@ class Formular < ActiveRecord::Base
   def check_data
 
     check_uebersetzung_re_1
+    logger.info "\t[FL] re_1"
 
     check_uebersetzung_re_2
+    logger.info "\t[FL] re_2"
 
     check_transliteration_re_3
+    logger.info "\t[FL] re_3"
 
     check_photo_re_4
+    logger.info "\t[FL] re_4"
 
     check_photo_re_5
+    logger.info "\t[FL] re_5"
 
   end
 
@@ -170,8 +177,9 @@ class Formular < ActiveRecord::Base
     re101 = Regexp.new('\wZ')
     re102 = Regexp.new('\w\?\w')
 
-    # if self[:uebersetzung].match (/\wZ/) or self[:uebersetzung].match (/\w\?\w/)
-    if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
+    #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
+    # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
+    if self[:uebersetzung].match re101 or self[:uebersetzung].match re102
       logger.warn "\t[FL] uid: #{self[:uid]} Vermutlich kaputte Akzente, übersetzung: #{self[:uebersetzung]}"
     end
 
@@ -185,6 +193,7 @@ class Formular < ActiveRecord::Base
   def check_photo_re_4
 
     photo = self[:photo]
+
 
     case photo
       # 263
@@ -254,6 +263,7 @@ class Formular < ActiveRecord::Base
 
     end
 
+
     # 4772-4795
     self[:photo].gsub(/D05_1061:/, 'D05_1061,')
     # 4817-4823
@@ -309,241 +319,269 @@ class Formular < ActiveRecord::Base
     if photo != self[:photo]
       logger.info "\t[FL] #{self[:uid]} Photo String veraendert, orginal: #{self[:photo]} neu: #{self[:photo]}"
     end
+  end
 
-    # Sonderfälle
-    def check_photo_re_5
+  # Sonderfälle
+  def check_photo_re_5
 
-      photosDict = {}
-      photo = []
-      photo_typ = []
-      photoTypDict = {
-          'alt' => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
-          'D03' => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
-          'D05' => {'uid' => 2, 'name' => '2005', 'jahr' => 2005},
-          'e' => {'uid' => 3, 'name' => 'e', 'jahr' => 1900},
-          'G' => {'uid' => 4, 'name' => 'G', 'jahr' => 1950},
-          'e-o' => {'uid' => 5, 'name' => 'e-o', 'jahr' => 1960},
-          'Labrique, Stylistique' => {'uid' => 6, 'name' => 'Labrique, Stylistique', 'jahr' => 1912},
-          'E. XIII' => {'uid' => 7, 'name' => 'Edfou XIII', 'jahr' => 1913},
-          'E. XIV' => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
-      }
+    photosDict = {}
+    photo = []
+    photo_typ = []
+    photoTypDict = {
+        'alt' => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
+        'D03' => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
+        'D05' => {'uid' => 2, 'name' => '2005', 'jahr' => 2005},
+        'e' => {'uid' => 3, 'name' => 'e', 'jahr' => 1900},
+        'G' => {'uid' => 4, 'name' => 'G', 'jahr' => 1950},
+        'e-o' => {'uid' => 5, 'name' => 'e-o', 'jahr' => 1960},
+        'Labrique, Stylistique' => {'uid' => 6, 'name' => 'Labrique, Stylistique', 'jahr' => 1912},
+        'E. XIII' => {'uid' => 7, 'name' => 'Edfou XIII', 'jahr' => 1913},
+        'E. XIV' => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
+    }
 
-      re1 = Regexp.new('[0-9]+a*')
-      re2 = Regexp.new(r 'D03_[0-9]+')
-      re3 = Regexp.new(r 'D05_[0-9]+a*')
-      re4 = Regexp.new(r 'e[0-9]+')
-      re5 = Regexp.new(r '(E. [XVI]+), (pl. [DCLXVI0-9]+)')
-      re6 = Regexp.new(r '\([^)]*\)(\s*\**)')
-      re7 = Regexp.new(r '[DCLXVI]+')
-      re8 = Regexp.new(r '\)\s*\**')
-      re9 = Regexp.new(r '(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
-      re10 = Regexp.new(r 'e-onr-[0-9]+')
-      re11 = Regexp.new(r ';*\s*Labrique, Stylistique, (pl. [0-9.]*)')
-      re12 = Regexp.new(r '\s*\*') # beginnt mit *
-      re13 = Regexp.new(r '\s*\(teilweise\)')
-      re14 = Regexp.new(r '([^)]*)\s*(\(E. [IVX]+, [0-9]+, [-0-9]+\))(.*)')
-      re15 = Regexp.new(r '[^(]*\((E.[^)]*)')
-
-
-      bildString = self[:photo]
-      klammern = false
-      stern = false
-
-      while bildString.size > 0
-
-        name = ''
-        typ = '---'
+    re1 = Regexp.new('[0-9]+a*')
+    re2 = Regexp.new('D03_[0-9]+')
+    re3 = Regexp.new('D05_[0-9]+a*')
+    re4 = Regexp.new('e[0-9]+')
+    re5 = Regexp.new('(E. [XVI]+), (pl. [DCLXVI0-9]+)')
+    re6 = Regexp.new('\([^)]*\)(\s*\**)')
+    re7 = Regexp.new('[DCLXVI]+')
+    re8 = Regexp.new('\)\s*\**')
+    re9 = Regexp.new('(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
+    re10 = Regexp.new('e-onr-[0-9]+')
+    re11 = Regexp.new(';*\s*Labrique, Stylistique, (pl. [0-9.]*)')
+    re12 = Regexp.new('\s*\*') # beginnt mit *
+    re13 = Regexp.new('\s*\(teilweise\)')
+    re14 = Regexp.new('([^)]*)\s*(\(E. [IVX]+, [0-9]+, [-0-9]+\))(.*)')
+    re15 = Regexp.new('[^(]*\((E.[^)]*)')
 
 
-        if self[:uid] == 9562
-          if bildString.match('VIII')
-            m15 = re15.match(bildString)
-            kommentar = m15[1]
-          else
-            kommentar = ''
-          end
-        end
-
-        if  re6.match(bildString)
-
-          # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
-
-          # Klammern auf, ggf mit einem Stern hinter der schließenden Klammer
-          klammern = true
-
-          # gematched bei 'einem' Stern hinter der schließenden Klammer
-          if (re6.match(bildString))[1] == '*'
-            stern = true
-          end
+    bildString = self[:photo]
+    klammern = false
+    stern = false
 
 
-          # öffnende Klammer (am Anfang) weg
-          bildString = bildString[1..-1]
-
-          # Spezielfälle mit Kommentaren
-
-          m14 = re14.match(bildString)
-
-          if m14 and self[:uid] < 9000
-            # 6344-6356
-            bildString = m14[1] + m14[3]
-            kommentar = m14[2]
-
-          elsif self[:uid] == 9834
-            bildString = '3911 )*'
-            kommentar = 'E. VIII, 108, nach 3'
-
-          elsif self[:uid] == 9951
-            bildString = '2374, 2375, 2376 )*'
-            kommentar = 'E VIII, 122, 5 - 124, 18'
-
-          elsif self[:uid] == 9562 and bildString.match('VIII')
-            # hinter schließenden klammer weiter
-            bildString = bildString[(bildString.index(')') + 1)..-1]
-            klammern = false
-
-          elsif self[:uid] == 9671
-            kommentar = 'E. VIII, 87, 5'
-            bildString = '141, 142, E. XIV, pl. DCLXIX, DCLXX )*'
-
-          elsif self[:uid] == 9870
-            kommentar = 'E. VIII, 111, 16'
-            bildString = '114, 115, 116, 117)*'
-
-          elsif re8.match(bildString)
-            # Klammer zu
-            klammern = false
-            bildString = bildString[((re8.match(bildString)[0]).length)..-1]
-
-          elsif re1.match(bildString)
-            # Fall 1: Dateiname nur aus Ziffern
-            name = re1.match(bildString)[0]
-            typ = 'alt'
-            bildString = bildString[(name.length)..-1]
-
-          elsif re2.match(bildString)
-            # Fall 2: Dateiname der Form D03_XXXXX
-            name = re2.match(bildString)[0]
-            typ = 'D03'
-            bildString = bildString[(name.length)..-1]
-
-          elsif re3.match(bildString)
-            # Fall 3: Dateiname der Form D05_XXXXX
-            name = re3.match(bildString)[0]
-            typ = 'D05'
-            bildString = bildString[(name.length)..-1]
-
-          elsif re4.match(bildString)
-            # Fall 4: Dateiname der Form eXXX
-            name = re4.match(bildString)[0]
-            typ = 'e'
-            bildString = bildString[(name.length)..-1]
-
-          elsif re9.match(bildString)
-            # Fall 5: Name der Form GXXX [ff.]
-            name = re9.match(bildString)[1]
-            typ = 'G'
-            kommentar = re9.match(bildString)[2]
-            bildString = bildString[((re9.match(bildString)[0]).length)..-1]
-
-          elsif re10.match(bildString)
-            # Fall 6: Name der Form e-onr-XXX
-            name = re10.match(bildString)[0]
-            typ = 'e-o'
-            bildString = bildString[(name.length)..-1]
-
-          elsif re11.match(bildString)
-            # Fall 7: Labrique, Stylistique
-            name = re11.match(bildString)[1]
-            typ = 'Labrique, Stylistique'
-            bildString = bildString[((re11.match(bildString)[0]).length)..-1]
-
-          elsif re5.match(bildString)
-            # Fall (n+1): Verweis auf Tafeln im Edfou Buch
-            m = re5.match(bildString)
-            typ = m[1]
-            name = m[2]
-            # rest = m.group(3)
-
-            # kombi aus strip & führendes/endende Komma abschneiden
-            bildString = bildString[((m[0]).length)..-1].match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
-
-            if re7.match(bildString)
-              # Es kommt noch ein Edfou Bild
-              bildString = typ + ', pl. ' + bildString
-
-            else
-              logger.info "\t[FL] uid: #{self[:uid]} UNKLAR:  #{:bildString}"
-              bildString = ''
-
-              if (name.length) > 0
-
-                if re12.match(bildString)
-                  # ist gefolgt von *
-                  stern = true
-                  bildString = bildString[((re12.match(bildString))[0]).length..-1]
-
-                  if re13.match(bildString)
-                    kommentar = 'teilweise'
-                    bildString = bildString[(re13.match(bildString)[0]).length..-1]
+    while bildString.size > 0
 
 
-                    if self[:uid] == 9910 and bildString.match('103')
-                      kommentar = 'E. VIII, 118, 7'
-                      bildString = ''
-
-                      photoID = typ + '-' + name
-                      myPhoto = {}
-                      if photosDict.has_key(photoID)
-                        myPhoto = photosDict[photoID]
-                        myPhoto['count'] += 1
-                      else
-                        if typ == 'D05' or typ == 'D03' or typ == 'alt'
-                          pfad = typ + '/' + name + '.jpg'
-                        else
-                          pfad = ''
-
-                          myPhoto = {
-                              'uid' => photosDict.length,
-                              'photo_typ_uid' => photoTypDict[typ]['uid'],
-                              'name' => name,
-                              'count' => 1
-                          }
-                          photosDict[photoID] = myPhoto
-
-                          # todo nur für Normalisierung?
-                          collection['items'] += [photoID]
-                          collection['klammern'] = klammern
-                          collection['stern'] = stern
-                          collection['kommentar'] = kommentar
-
-                          key = self[:uid] + '-' + myPhoto['uid'].to_s
-
-                          # todo Relation formular_has_photoDict entfernt
-
-                          # kombi aus strip & führendes/endende Komma abschneiden
-                          bildString = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
-
-                          # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
-                          # finishCollection(PRIMARY)
-
-                        end
-
-                        # todo und self zurückschreiben !!!
-
-                      end
+      name = ''
+      typ = '---'
 
 
-                    end
-
-                  end
-                end
-              end
-            end
-          end
+      if self[:uid] == 9562
+        if bildString.match('VIII')
+          m15 = re15.match(bildString)
+          kommentar = m15[1]
+        else
+          kommentar = ''
         end
       end
+
+      if  re6.match(bildString)
+
+        logger.info "\t[FL] match re6"
+
+        # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
+
+        # Klammern auf, ggf mit einem Stern hinter der schließenden Klammer
+        klammern = true
+
+        # gematched bei 'einem' Stern hinter der schließenden Klammer
+        if (re6.match(bildString))[1] == '*'
+          stern = true
+        end
+
+
+        # öffnende Klammer (am Anfang) weg
+        bildString = bildString[1..-1]
+
+        # Spezielfälle mit Kommentieren
+
+        m14 = re14.match(bildString)
+
+        if m14 and self[:uid] < 9000
+          # 6344-6356
+          bildString = m14[1] + m14[3]
+          kommentar = m14[2]
+
+        elsif self[:uid] == 9834
+          bildString = '3911 )*'
+          kommentar = 'E. VIII, 108, nach 3'
+
+        elsif self[:uid] == 9951
+          bildString = '2374, 2375, 2376 )*'
+          kommentar = 'E VIII, 122, 5 - 124, 18'
+
+        elsif self[:uid] == 9562 and bildString.match('VIII')
+          # hinter schließenden klammer weiter
+          bildString = bildString[(bildString.index(')') + 1)..-1]
+          klammern = false
+
+        elsif self[:uid] == 9671
+          kommentar = 'E. VIII, 87, 5'
+          bildString = '141, 142, E. XIV, pl. DCLXIX, DCLXX )*'
+
+        elsif self[:uid] == 9870
+          kommentar = 'E. VIII, 111, 16'
+          bildString = '114, 115, 116, 117)*'
+
+        end
+
+      elsif re8.match(bildString)
+        # Klammer zu
+        klammern = false
+        bildString = bildString[((re8.match(bildString)[0]).length)..-1]
+
+      elsif re1.match(bildString)
+        # Fall 1: Dateiname nur aus Ziffern
+        name = re1.match(bildString)[0]
+        typ = 'alt'
+        bildString = bildString[(name.length)..-1]
+
+      elsif re2.match(bildString)
+        # Fall 2: Dateiname der Form D03_XXXXX
+        name = re2.match(bildString)[0]
+        typ = 'D03'
+        bildString = bildString[(name.length)..-1]
+
+      elsif re3.match(bildString)
+        # Fall 3: Dateiname der Form D05_XXXXX
+        name = re3.match(bildString)[0]
+        typ = 'D05'
+        bildString = bildString[(name.length)..-1]
+
+      elsif re4.match(bildString)
+        # Fall 4: Dateiname der Form eXXX
+        name = re4.match(bildString)[0]
+        typ = 'e'
+        bildString = bildString[(name.length)..-1]
+
+      elsif re9.match(bildString)
+        # Fall 5: Name der Form GXXX [ff.]
+        name = re9.match(bildString)[1]
+        typ = 'G'
+        kommentar = re9.match(bildString)[2]
+        bildString = bildString[((re9.match(bildString)[0]).length)..-1]
+
+      elsif re10.match(bildString)
+        # Fall 6: Name der Form e-onr-XXX
+        name = re10.match(bildString)[0]
+        typ = 'e-o'
+        bildString = bildString[(name.length)..-1]
+
+      elsif re11.match(bildString)
+        # Fall 7: Labrique, Stylistique
+        name = re11.match(bildString)[1]
+        typ = 'Labrique, Stylistique'
+        bildString = bildString[((re11.match(bildString)[0]).length)..-1]
+
+      elsif re5.match(bildString)
+        # Fall (n+1): Verweis auf Tafeln im Edfou Buch
+        m = re5.match(bildString)
+        typ = m[1]
+        name = m[2]
+        # rest = m.group(3)
+
+        # kombi aus strip & führendes/endende Komma abschneiden
+        bildString = bildString[((m[0]).length)..-1].match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
+
+        if re7.match(bildString)
+          # Es kommt noch ein Edfou Bild
+          bildString = typ + ', pl. ' + bildString
+        end
+      else
+        logger.warn "\t[FL] uid: #{self[:uid]} unklarer String:  #{:bildString}"
+        bildString = ''
+      end
+
+      if (name.length) > 0
+
+        if re12.match(bildString)
+          # ist gefolgt von *
+          stern = true
+          bildString = bildString[((re12.match(bildString))[0]).length..-1]
+        end
+
+        if re13.match(bildString)
+          kommentar = 'teilweise'
+          bildString = bildString[(re13.match(bildString)[0]).length..-1]
+        end
+
+        if self[:uid] == 9910 and bildString.match('103')
+          kommentar = 'E. VIII, 118, 7'
+          bildString = ''
+        end
+
+        photoID = typ + '-' + name
+        myPhoto = {}
+
+        if photosDict.has_key?(photoID)
+          myPhoto = photosDict[photoID]
+          myPhoto['count'] += 1
+        else
+          if typ == 'D05' or typ == 'D03' or typ == 'alt'
+            pfad = typ + '/' + name + '.jpg'
+          else
+            pfad = ''
+          end
+
+          myPhoto = {
+              'uid' => photosDict.length,
+              'photo_typ_uid' => photoTypDict[typ]['uid'],
+              'name' => name,
+              'count' => 1
+          }
+          photosDict[photoID] = myPhoto
+
+        end
+
+        # todo nur für Normalisierung?
+        #collection['items'] += [photoID]
+        #collection['klammern'] = klammern
+        #collection['stern'] = stern
+        #collection['kommentar'] = kommentar
+
+
+        key = self[:uid].to_s + '-' + myPhoto['uid'].to_s
+
+        # todo Relation formular_has_photoDict entfernt
+        # if not formular_has_photoDict.has_key?(key)
+        #   formular_has_photoDict[key] = {
+        #       'uid_local' => self[:uid],
+        #       'uid_foreign' => myPhoto['uid'],
+        #       'kommentar' => kommentar
+        #   }
+        # end
+
+      end
+
+
+      puts  bildString
+      # kombi aus strip & führendes/endende Komma abschneiden
+      m = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)
+      if m
+        bildString = m[2]
+      else
+        # todo wirklich - testen
+        bildString = ''
+      end
+
+      logger.info "\t[FL] while ende, bildString: #{bildString}  bildString.length=#{bildString.length} "
+
     end
+
+    puts self[:photo]
+
+    # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
+    # finishCollection(PRIMARY)
+
   end
+
+  # todo und self zurückschreiben !!!
+
 end
+
+
+
+
 
