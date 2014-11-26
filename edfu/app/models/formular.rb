@@ -23,7 +23,7 @@ class Formular < ActiveRecord::Base
     integer :szeneID, stored: true
     text :literatur, stored: true
     integer :band, stored: true
-    text :seitenzeile, stored: true
+    text :seitezeile, stored: true
     # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
     # todo id hinzufügen, typ hinzufügen,
 
@@ -81,8 +81,8 @@ class Formular < ActiveRecord::Base
   # end
   #
   # # set default value if nil
-  # def seitenzeile
-  #   self[:seitenzeile] || ''
+  # def seitezeile
+  #   self[:seitezeile] || ''
   # end
 
 
@@ -107,7 +107,7 @@ class Formular < ActiveRecord::Base
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[---] after update: #{id}"
+    logger.info "[INFO]  after update: #{id}"
   end
 
 
@@ -115,7 +115,7 @@ class Formular < ActiveRecord::Base
   # todo log created
   def log_created
 
-    logger.info "[---] before save: #{id}"
+    logger.info "[INFO]  before save: #{id}"
 
   end
 
@@ -157,7 +157,7 @@ class Formular < ActiveRecord::Base
     .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  str != self[:uebersetzung]
-      logger.info "\t[FL] uid: #{self[:uid]} String der Übersetzung verändert, von: #{self[:uebersetzung]} auf: #{str}"
+      logger.info "\t[INFO]  [FL] uid: #{self[:uid]} String der Übersetzung verändert, von: #{self[:uebersetzung]} auf: #{str}"
       self[:uebersetzung] = str
     end
 
@@ -172,7 +172,7 @@ class Formular < ActiveRecord::Base
     #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
     # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
     if self[:uebersetzung].match re101 or self[:uebersetzung].match re102
-      logger.warn "\t[FL] uid: #{self[:uid]} Vermutlich kaputte Akzente, übersetzung: #{self[:uebersetzung]}"
+      logger.warn "\t[WARN]  [FL] uid: #{self[:uid]} Vermutlich kaputte Akzente, übersetzung: #{self[:uebersetzung]}"
     end
 
   end
@@ -309,7 +309,7 @@ class Formular < ActiveRecord::Base
     self[:photo].gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if photo != self[:photo]
-      logger.info "\t[FL] #{self[:uid]} Photo String veraendert, orginal: #{self[:photo]} neu: #{self[:photo]}"
+      logger.info "\t[INFO]  [FL] #{self[:uid]} Photo String veraendert, orginal: #{self[:photo]} neu: #{self[:photo]}"
     end
   end
 
@@ -371,7 +371,7 @@ class Formular < ActiveRecord::Base
 
       if  re6.match(bildString)
 
-        logger.info "\t[FL] match re6"
+        logger.info "\t[INFO]  [FL] match re6"
 
         # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
 
@@ -482,7 +482,7 @@ class Formular < ActiveRecord::Base
           bildString = typ + ', pl. ' + bildString
         end
       else
-        logger.warn "\t[FL] uid: #{self[:uid]} unklarer String:  #{:bildString}"
+        logger.warn "\t[WARN]  [FL] uid: #{self[:uid]} unklarer String:  #{:bildString}"
         bildString = ''
       end
 
@@ -548,7 +548,7 @@ class Formular < ActiveRecord::Base
       end
 
 
-      puts  bildString
+      puts bildString
       # kombi aus strip & führendes/endende Komma abschneiden
       m = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)
       if m
@@ -558,7 +558,7 @@ class Formular < ActiveRecord::Base
         bildString = ''
       end
 
-      logger.info "\t[FL] while ende, bildString: #{bildString}  bildString.length=#{bildString.length} "
+      logger.info "\t[INFO]  [FL] while ende, bildString: #{bildString}  bildString.length=#{bildString.length} "
 
     end
 
@@ -571,8 +571,151 @@ class Formular < ActiveRecord::Base
 
   def check_textposition_re_6
 
+    # Einträge für die 8 Chassinat Bände.
+    bandDict = {
+        1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
+              'tempel_uid' => 0},
+        2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
+              'tempel_uid' => 0},
+        3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
+              'tempel_uid' => 0},
+        4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
+              'tempel_uid' => 0},
+        5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
+              'tempel_uid' => 0},
+        6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
+              'tempel_uid' => 0},
+        7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
+              'tempel_uid' => 0},
+        8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
+              'tempel_uid' => 0}
+    }
+    band = []
 
+    # Textposition
 
+    # todo Konversion absichern Integer("1")
+
+    myStelle = {}
+    # todo entfernen? Gehört zur Normalisierung
+    myStelle['band_uid'] = bandDict[Integer(self[:band])]['nummer']
+
+    ## Sonderfälle
+    szOriginal = self[:seitezeile]
+    if self[:uid] == 3416
+      self[:seitezeile] = "011, 09 - 012, 01"
+    end
+    if self[:uid] == 9583
+      self[:seitezeile] = "078, 14 / Kol. 1"
+    end
+    if self[:uid] == 9584
+      self[:seitezeile]= "078, 14 / Kol. 2"
+    end
+
+    kommentar = []
+
+    if self[:seitezeile].find('nach ') == 0
+      kommentar += ['nach']
+      self[:seitezeile] = self[:seitezeile].gsub('nach ', '')
+    end
+    if self[:seitezeile].match(', Z')
+      kommentar += [self[:seitezeile][self[:seitezeile].index(', Z') + 2..-1]]
+      self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(', Z')]
+    end
+    if self[:seitezeile].match(' / Z')
+      kommentar += [self[:seitezeile][self[:seitezeile].index(' / Z') + 3..-1]]
+     self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(' / Z')]
+    end
+    if self[:seitezeile].match(', Kol')
+      kommentar += [self[:seitezeile][self[:seitezeile].index(', Kol') + 2..-1]]
+      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(', Kol')]
+    end
+    if self[:seitezeile].match(' / kol')
+      kommentar += [self[:seitezeile][self[:seitezeile].index(' / kol') + 3..-1]]
+      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(' / kol')]
+    end
+    if self[:seitezeile].match(' / ')
+      kommentar += [self[:seitezeile][self[:seitezeile].index(' / ') + 3..-1]]
+      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(' / ')]
+    end
+
+    if szOriginal != self[:seitezeile]
+      logger.info "\t[INFO]  [FL] uid: #{self[:uid]} Aenderung SEITEZEILE, Original: #{szOriginal} neu: #{self[:seitezeile]}"
+    end
+    if (kommentar.length) > 0
+      logger.info "\t[INFO]  [FL] uid: #{self[:uid]} SEITEZEILE + Kommentar: #{kommentar}"
+    end
+    if (re.findall("[^0-9, -]", self[:seitezeile])).length > 0
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
+    end
+
+    myStelle['anmerkung'] = "; #{kommentar}"
+
+    result = []
+    if self[:seitezeile].match(' - ')
+      # Form »002, 06 - 003, 02«
+      szParts = self[:seitezeile].split(' - ')
+      result << szSplit(szParts[0])
+      result << szSplit(szParts[1])
+    elsif self[:seitezeile].match(',')
+      parts = self[:seitezeile].split(',')
+      seite = parts[0]
+      if parts[1].match('-')
+        zeilen = parts[1].split('-')
+        result = [[seite, Integer(zeilen[0])], [seite, int(zeilen[1])]]
+      else
+        zeile = Integer(parts[1])
+        result = [[seite, zeile], [seite, zeile]]
+      end
+    else
+      result = [[0, 0], [0, 0]]
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
+    end
+
+    if result[0][0] > result[1][0]
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler , SEITEN absteigend,  #{self[:seitezeile]}"
+    end
+
+    if result[0][0] == result[1][0] and result[0][1] > result[1][1]
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler, ZEILEN absteigend,  #{self[:seitezeile]}"
+    end
+
+    myStelle['seite_start'] = result[0][0]
+    myStelle['zeile_start'] = result[0][1]
+    myStelle['seite_stop'] = result[1][0]
+    myStelle['zeile_stop'] = result[1][1]
+
+    if myStelle['zeile_start'] > 30
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler, zeile_start > 30,  #{self[:seitezeile]}"
+    end
+
+    if myStelle['zeile_stop'] > 30
+      logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler, zeile_stop > 30,  #{self[:seitezeile]}"
+    end
+
+    myStelle['stop_unsicher'] = false
+    myStelle['zerstoerung'] = false
+
+    # todo Teil der Normalisierung ?
+    myStelle['uid'] = stelle.length
+    myFormular['stelle_uid'] = stelle.length
+
+    stelle += [myStelle]
+    formularDict[myFormular['uid']] = myFormular
+
+  end
+
+  def szSplit(s)
+    parts = s.gsub(' ', '').split(',')
+
+    begin
+      parts = [int(parts[0]), int(parts[1])]
+    rescue ArgumentError
+
+      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
+
+    end
+    return parts
   end
 
 end

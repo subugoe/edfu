@@ -46,7 +46,7 @@ class Stelle < ActiveRecord::Base
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[---] after update: #{id}"
+    logger.info "[INFO]  after update: #{id}"
   end
 
 
@@ -54,7 +54,7 @@ class Stelle < ActiveRecord::Base
   # todo log created
   def log_created
 
-    logger.info "[---] before save: #{id}"
+    logger.info "[INFO]  before save: #{id}"
 
   end
 

@@ -8,7 +8,7 @@ class Upload < ActiveRecord::Base
 
 
   def log_saved
-    logger.info "[---] after save: #{id}"
+    logger.info "[INFO]  after save: #{id}"
   end
 
 

@@ -14,7 +14,7 @@ class Gott < ActiveRecord::Base
     text :beziehung, stored: true
     text :funktion, stored: true
     integer :band, stored: true
-    text :seitenzeile, stored: true  # todo wirklich in den index?
+    text :seitezeile, stored: true  # todo wirklich in den index?
     text :anmerkung, stored: true
     # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
     # todo id hinzufügen, typ hinzufügen,
@@ -42,7 +42,7 @@ class Gott < ActiveRecord::Base
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[---] after update: #{id}"
+    logger.info "[INFO]  after update: #{id}"
   end
 
 
@@ -50,7 +50,7 @@ class Gott < ActiveRecord::Base
   # todo log created
   def log_created
 
-    logger.info "[---] before save: #{id}"
+    logger.info "[INFO]  before save: #{id}"
 
   end
 

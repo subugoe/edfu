@@ -88,7 +88,7 @@ class UploadsController < ApplicationController
 
           transliteration: row[0] || '',
           band: row[1] || '',
-          seitenzeile: row[2] || '',
+          seitezeile: row[2] || '',
           transliteration_nosuffix: row[3] || '',
           uebersetzung: row[4] || '',
           texttyp: row[5] || '',
@@ -173,7 +173,7 @@ class UploadsController < ApplicationController
           beziehung: row[4] || '',
           funktion: row[5] || '',
           band: row[6] || '',
-          seitenzeile: row[7] || '', # todo wirklich in den index?
+          seitezeile: row[7] || '', # todo wirklich in den index?
           anmerkung: row[8] || '',
 
       )
