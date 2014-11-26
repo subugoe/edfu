@@ -57,6 +57,17 @@ class UploadsController < ApplicationController
 
   def process_files
 
+    process_formular
+    #process_ort
+    #process_gott
+    #process_wort
+
+  end
+
+
+  # todo move to Formular/Helper (Formular.xls)
+  def process_formular
+
     excel = Roo::Excel.new("edfu-data/Formular.xls")
 
     excel.default_sheet = excel.sheets.first
@@ -94,32 +105,122 @@ class UploadsController < ApplicationController
       i += 1
     end
 
+  end
 
-    return true
+  # todo move to Ort-Model/Helper (Topo.xls)
+  def process_ort
+
+    excel = Roo::Excel.new("edfu-data/Topo.xls")
+
+    excel.default_sheet = excel.sheets.first
+
+    i = 1
+    excel.each do |row|
+
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
+
+      # todo replace this
+      break if i==20
+
+      Ort.where(uid: Integer(row[5])).update_or_create(
+
+          uid: row[5] || '',
+          stelle: row[0] || '',
+          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
+          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          ort: row[2] || '',
+          lokalisation: row[3] || '',
+          anmerkung: row[4] || ''
+
+      )
 
 
-    # xls = Roo::Spreadsheet.open('./edfu-data/Formular.xls')
-    #
-    # i = 1
-    # arr = Array.new
-    # xls.each(:uid => "uniqueID", :bd => 'BAND') { |hash|
-    #
-    #   if i==1
-    #     i += 1
-    #     next
-    #   end
-    #
-    #   # todo replace this
-    #   break if i==10
-    #
-    #
-    #   arr << hash
-    #   puts arr
-    #
-    #   i += 1
-    # }
+      i += 1
+    end
 
   end
 
+  # todo move to Gott-Model/Helper (Gods.xls)
+  def process_gott
+
+    excel = Roo::Excel.new("edfu-data/Formular.xls")
+
+    excel.default_sheet = excel.sheets.first
+
+    i = 1
+    excel.each do |row|
+
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
+
+      # todo replace this
+      break if i==20
+
+      Gott.where(uid: Integer(row[9])).update_or_create(
+
+          uid: row[9] || '',
+          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
+          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          ort: row[2] || '',
+          eponym: row[3] || '',
+          beziehung: row[4] || '',
+          funktion: row[5] || '',
+          band: row[6] || '',
+          seitenzeile: row[7] || '', # todo wirklich in den index?
+          anmerkung: row[8] || '',
+
+      )
+
+
+      i += 1
+    end
+
+  end
+
+  # todo move to Wort-Model/Helper (WL.xls)
+  def process_wort
+
+    excel = Roo::Excel.new("edfu-data/WL.xlsx")
+
+    excel.default_sheet = excel.sheets.first
+
+    i = 1
+    excel.each do |row|
+
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
+
+      # todo replace this
+      break if i==20
+
+      Wort.where(uid: Integer(row[7])).update_or_create(
+
+          uid: row[7] || '',
+          transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
+          transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
+          uebersetzung: row[1] || '',
+          hieroglyph: row[2] || '',
+          weiteres: row[3] || '',
+          belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
+          belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
+          anmerkung: row[6] || ''
+
+      )
+
+
+      i += 1
+    end
+
+  end
 
 end

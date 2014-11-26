@@ -134,19 +134,11 @@ class Formular < ActiveRecord::Base
   def check_data
 
     check_uebersetzung_re_1
-    logger.info "\t[FL] re_1"
-
     check_uebersetzung_re_2
-    logger.info "\t[FL] re_2"
-
     check_transliteration_re_3
-    logger.info "\t[FL] re_3"
-
     check_photo_re_4
-    logger.info "\t[FL] re_4"
-
     check_photo_re_5
-    logger.info "\t[FL] re_5"
+    check_textposition_re_6
 
   end
 
@@ -577,7 +569,11 @@ class Formular < ActiveRecord::Base
 
   end
 
-  # todo und self zurückschreiben !!!
+  def check_textposition_re_6
+
+
+
+  end
 
 end
 
