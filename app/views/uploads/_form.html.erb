@@ -1,4 +1,4 @@
-<%= form_for(@upload) do |f| %>
+<%= bootstrap_form_for(@upload, layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-10") do |f| %>
     <% if @upload.errors.any? %>
         <div id="error_explanation">
             <h2><%= pluralize(@upload.errors.count, "error") %> prohibited this upload from being saved:</h2>
@@ -11,21 +11,15 @@
         </div>
     <% end %>
 
-    <%= label_tag(:formular, "Formular:") %>
-    <%= f.file_field(:formular) %>
+    <%= f.file_field(:formular, label: "Formular:") %>
 
-    <%= label_tag(:ort, "Ort:") %>
-    <%= f.file_field(:ort) %>
+    <%= f.file_field(:ort, label: "Ort:") %>
 
-    <%= label_tag(:gott, "Gott:") %>
-    <%= f.file_field(:gott) %>
+    <%= f.file_field(:gott, label: "Gott:") %>
 
-    <%= label_tag(:wort, "Wort:") %>
-    <%= f.file_field(:wort) %>
+    <%= f.file_field(:wort, label: "Wort:") %>
 
-    <%= label_tag(:email, "email:") %>
-    <%= f.text_field(:email) %>
-
+    <%= f.text_field(:email, label: "E-Mail") %>
 
     <div class="actions form-group">
         <%= f.submit "Upload" %>
