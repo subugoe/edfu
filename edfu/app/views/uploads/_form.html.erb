@@ -11,12 +11,20 @@
         </div>
     <% end %>
 
-    <%= f.file_field :formular %>
-    <%= f.file_field :ort %>
-    <%= f.file_field :gott %>
-    <%= f.file_field :wort %>
+    <%= label_tag(:formular, "Formular:") %>
+    <%= f.file_field(:formular) %>
 
-    <%= f.text_field :email %>
+    <%= label_tag(:ort, "Ort:") %>
+    <%= f.file_field(:ort) %>
+
+    <%= label_tag(:gott, "Gott:") %>
+    <%= f.file_field(:gott) %>
+
+    <%= label_tag(:wort, "Wort:") %>
+    <%= f.file_field(:wort) %>
+
+    <%= label_tag(:email, "email:") %>
+    <%= f.text_field(:email) %>
 
 
     <div class="actions form-group">

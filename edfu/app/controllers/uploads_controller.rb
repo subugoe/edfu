@@ -20,6 +20,31 @@ class UploadsController < ApplicationController
   def create
     @upload = Upload.new(upload_params)
 
+    uploaded_formular = params[:upload][:formular]
+    uploaded_ort = params[:upload][:ort]
+    uploaded_gott = params[:upload][:gott]
+    uploaded_wort = params[:upload][:wort]
+    email = params[:email]
+
+
+    logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
+      file.write(uploaded_formular.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
+      file.write(uploaded_ort.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
+      file.write(uploaded_gott.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
+      file.write(uploaded_wort.read)
+    end
+
     processed = process_files
 
     respond_to do |format|
@@ -34,15 +59,15 @@ class UploadsController < ApplicationController
   end
 
 
-  # DELETE /uploads/1
-  # DELETE /uploads/1.json
-  def destroy
-    @upload.destroy
-    respond_to do |format|
-      format.html { redirect_to uploads_url, notice: 'Upload was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
+  # # DELETE /uploads/1
+  # # DELETE /uploads/1.json
+  # def destroy
+  #   @upload.destroy
+  #   respond_to do |format|
+  #     format.html { redirect_to uploads_url, notice: 'Upload was successfully destroyed.' }
+  #     format.json { head :no_content }
+  #   end
+  # end
 
   private
 
@@ -69,7 +94,13 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
-    excel = Roo::Excel.new("edfu-data/Formular.xls")
+    logger.info "\t[INFO]  [Upload] #{Rails.root.join('public', 'uploads','Formular.xls')}"
+
+    file = Rails.root.join('public', 'uploads','Formular.xls')
+
+    #excel = Roo::Excel.new(file.to_s)
+    excel = Roo::Excel.new("public/uploads/Formular.xls")
+
 
     excel.default_sheet = excel.sheets.first
 
@@ -148,7 +179,7 @@ class UploadsController < ApplicationController
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
-    excel = Roo::Excel.new("edfu-data/Formular.xls")
+    excel = Roo::Excel.new("edfu-data/Gott.xls")
 
     excel.default_sheet = excel.sheets.first
 
