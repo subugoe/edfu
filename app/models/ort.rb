@@ -1,3 +1,5 @@
+# encoding: utf-8 
+
 class Ort < ActiveRecord::Base
   has_many :stellen, as: :zugehoerigZu
 
