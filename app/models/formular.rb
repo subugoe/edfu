@@ -1,7 +1,11 @@
 # encoding: utf-8
 
+require 'lib/edfu_model_helper'
 
 class Formular < ActiveRecord::Base
+  extend EdfuModelHelper
+
+
   has_many :stellen, as: :zugehoerigZu
 
   # after_update :log_updated
@@ -9,86 +13,27 @@ class Formular < ActiveRecord::Base
   before_validation :check_data
 
 
-  searchable do
-
-    integer :uid, stored: true
-    text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-    text :transliteration_nosuffix, stored: true
-    text :uebersetzung, stored: true
-    text :texttyp, stored: true
-    text :photo, stored: true # todo photo_highlight hinzufügen
-    text :photo_pfad, stored: true
-    text :photo_kommentar, stored: true
-    integer :szeneID, stored: true
-    text :literatur, stored: true
-    integer :band, stored: true
-    text :seitezeile, stored: true
-    # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    # todo id hinzufügen, typ hinzufügen,
-
-  end
-
-
-  # # set default value if nil
-  # def transliteration
-  #   self[:transliteration] || ''
-  # end
+  # searchable do
   #
-  # # set default value if nil
-  # def transliteration_nosuffix
-  #   self[:transliteration_nosuffix] || ''
-  # end
+  #   integer :uid, stored: true
+  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
+  #   text :transliteration_nosuffix, stored: true
+  #   text :uebersetzung, stored: true
+  #   text :texttyp, stored: true
+  #   text :photo, stored: true # todo photo_highlight hinzufügen
+  #   text :photo_pfad, stored: true
+  #   text :photo_kommentar, stored: true
+  #   integer :szeneID, stored: true
+  #   text :literatur, stored: true
+  #   integer :band, stored: true
+  #   text :seitezeile, stored: true
+  #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+  #   # todo id hinzufügen, typ hinzufügen,
   #
-  # # set default value if nil
-  # def uebersetzung
-  #   self[:uebersetzung] || ''
-  # end
-  #
-  # # set default value if nil
-  # def texttyp
-  #   self[:texttyp] || ''
-  # end
-  #
-  # # set default value if nil
-  # def photo
-  #   self[:photo] || ''
-  # end
-  #
-  # # set default value if nil
-  # def photo_pfad
-  #   self[:photo_pfad] || ''
-  # end
-  #
-  # # set default value if nil
-  # def photo_kommentar
-  #   self[:photo_kommentar] || ''
-  # end
-  #
-  # # set default value if nil
-  # def szeneID
-  #   self[:szeneID] || -1
-  # end
-  #
-  # # set default value if nil
-  # def literatur
-  #   self[:literatur] || ''
-  # end
-  #
-  # # set default value if nil
-  # def band
-  #   self[:band] || -1
-  # end
-  #
-  # # set default value if nil
-  # def seitezeile
-  #   self[:seitezeile] || ''
   # end
 
 
   private
-
-
-  # todo aufräumen, d.h. code in module/helper
 
 
   def check_data
@@ -108,18 +53,6 @@ class Formular < ActiveRecord::Base
 
   end
 
-
-  # todo in ein Modul packen und in Modell-Klassen wiederverwenden
-  def self.update_or_create(attributes)
-    assign_or_new(attributes).save
-  end
-
-  # todo in ein Modul packen und in Modell-Klassen wiederverwenden
-  def self.assign_or_new(attributes)
-    obj = first || new
-    obj.assign_attributes(attributes)
-    obj
-  end
 
 
   # todo update solr doc
@@ -309,9 +242,11 @@ class Formular < ActiveRecord::Base
   # Sonderfälle
   def check_photo_re_5
 
+    photo_name = Array.new
+    photo_pfad = Array.new
+    photo_kommentar = Array.new
+
     photosDict = {}
-    photo = []
-    photo_typ = []
     photoTypDict = {
         'alt' => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
         'D03' => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
@@ -498,21 +433,29 @@ class Formular < ActiveRecord::Base
         photoID = typ + '-' + name
         myPhoto = {}
 
-        if photosDict.has_key?(photoID)
+        if photosDict.include?(photoID)
           myPhoto = photosDict[photoID]
-          myPhoto['count'] += 1
+          #myPhoto['count'] += 1
         else
+          # pfad in model übernommen
           if typ == 'D05' or typ == 'D03' or typ == 'alt'
             pfad = typ + '/' + name + '.jpg'
           else
             pfad = ''
           end
 
+
+          puts name || '---'
+          puts typ || '---'
+          puts kommentar || '---'
+
           myPhoto = {
               'uid' => photosDict.length,
               'photo_typ_uid' => photoTypDict[typ]['uid'],
               'name' => name,
-              'count' => 1
+              #'count' => 1,
+              'typ' => typ,
+              'kommentar' => kommentar
           }
           photosDict[photoID] = myPhoto
 
@@ -525,9 +468,10 @@ class Formular < ActiveRecord::Base
         #collection['kommentar'] = kommentar
 
 
-        key = self[:uid].to_s + '-' + myPhoto['uid'].to_s
-
         # todo Relation formular_has_photoDict entfernt
+        # key = self[:uid].to_s + '-' + myPhoto['uid'].to_s
+        #
+        #
         # if not formular_has_photoDict.has_key?(key)
         #   formular_has_photoDict[key] = {
         #       'uid_local' => self[:uid],
@@ -539,22 +483,27 @@ class Formular < ActiveRecord::Base
       end
 
 
-
       # kombi aus strip & führendes/endende Komma abschneiden
       m = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)
 
       if m
         bildString = m[2]
-      else
-        # todo wirklich - testen
-        bildString = ''
       end
-
-      logger.info "\t[INFO]  [FL] while ende, bildString: #{bildString}  bildString.length=#{bildString.length} "
 
     end
 
 
+    photosDict.each { |k, myPhoto|
+
+      photo_name += ["#{myPhoto['name']}"]
+      photo_pfad += ["#{myPhoto['typ']}/#{myPhoto['name']}"]
+      photo_kommentar += ["#{myPhoto['kommentar'] || ''}"]
+
+    }
+
+    self[:photo] = photo_name
+    self[:photo_pfad] = photo_pfad
+    self[:photo_kommentar] = photo_kommentar
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
@@ -582,6 +531,7 @@ class Formular < ActiveRecord::Base
         8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
               'tempel_uid' => 0}
     }
+
     band = []
     stelle = []
 
