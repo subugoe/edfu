@@ -22,6 +22,7 @@ atlassian-ide-plugin.xml
 
 # Ignore test data
 edfu-data/
+public/uploads/*.*
 
 # System files
 .DS_Store
