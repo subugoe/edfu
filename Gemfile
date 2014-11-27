@@ -6,9 +6,9 @@ source 'https://rubygems.org'
 gem 'roo', '~> 1.13.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.8'
+gem 'rails', '~> 4.1.8'
 # Use jdbcsqlite3 as the database for Active Record
-gem 'activerecord-jdbcsqlite3-adapter'
+gem 'activerecord-jdbcsqlite3-adapter', '~>1.3.13'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
