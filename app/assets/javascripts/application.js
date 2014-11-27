@@ -10,7 +10,7 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require ../../../../../.rvm/gems/jruby-1.7.3/gems/jquery-rails-3.1.2/vendor/assets/javascripts/jquery.js
+//= require jquery.js
 //= require jquery_ujs
 //= require turbolinks
 //= require bootstrap-sprockets

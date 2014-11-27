@@ -11,7 +11,6 @@ class Formular < ActiveRecord::Base
 
   searchable do
 
-
     integer :uid, stored: true
     text :transliteration, stored: true # todo transliteration_highlight hinzufügen
     text :transliteration_nosuffix, stored: true
@@ -92,20 +91,20 @@ class Formular < ActiveRecord::Base
   # todo aufräumen, d.h. code in module/helper
 
 
-
-
-
   def check_data
 
     @myFormular = Hash.new
     @formularDict = Hash.new
 
-    check_uebersetzung_re_1
-    check_uebersetzung_re_2
-    check_transliteration_re_3
-    check_photo_re_4
-    check_photo_re_5
-    check_textposition_re_6
+    @myFormular['uid'] = Integer(self[:uid])
+    @myFormular['texttyp'] = self[:texttyp]
+
+    self.check_uebersetzung_re_1
+    self.check_uebersetzung_re_2
+    self.check_transliteration_re_3
+    self.check_photo_re_4
+    self.check_photo_re_5
+    self.check_textposition_re_6
 
   end
 
@@ -133,32 +132,11 @@ class Formular < ActiveRecord::Base
   # todo add doc to solr
   # todo log created
   def log_created
-
     logger.info "[INFO]  before save: #{id}"
-
   end
 
 
-  # todo
-  def create_photo_pfad(photo)
-
-  end
-
-  # todo
-  def create_photo_commentar(photo)
-
-  end
-
-
-
-  # bekannte Fehler in uebersetzung und Änderung loggen
   def check_uebersetzung_re_1
-
-    @myFormular['uid'] = Integer(self[:uid])
-
-    # Felder
-    @myFormular['texttyp'] = self[:texttyp]
-
 
     @myFormular['uebersetzung'] = self[:uebersetzung].strip
     .gsub(/dZtruit/, 'détruit')
@@ -644,7 +622,7 @@ class Formular < ActiveRecord::Base
     end
     if self[:seitezeile].match(' / Z')
       kommentar += [self[:seitezeile][self[:seitezeile].index(' / Z') + 3..-1]]
-     self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(' / Z')]
+      self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(' / Z')]
     end
     if self[:seitezeile].match(', Kol')
       kommentar += [self[:seitezeile][self[:seitezeile].index(', Kol') + 2..-1]]
@@ -681,7 +659,7 @@ class Formular < ActiveRecord::Base
       parts = self[:seitezeile].split(',')
       seite = parts[0]
       if parts[1].match('-')
-        zeilen = parts[1].split('-')   # match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
+        zeilen = parts[1].split('-') # match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
         result = [[seite, Integer(zeilen[0].to_i)], [seite, Integer(zeilen[1].to_i)]]
       else
         zeile = Integer(parts[1])
@@ -733,7 +711,7 @@ class Formular < ActiveRecord::Base
       parts = [Integer(parts[0]), Integer(parts[1])]
     rescue ArgumentError
       logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
-end
+    end
 
     return parts
   end
