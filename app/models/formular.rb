@@ -99,12 +99,12 @@ class Formular < ActiveRecord::Base
     @myFormular['uid'] = Integer(self[:uid])
     @myFormular['texttyp'] = self[:texttyp]
 
-    self.check_uebersetzung_re_1
-    self.check_uebersetzung_re_2
-    self.check_transliteration_re_3
-    self.check_photo_re_4
-    self.check_photo_re_5
-    self.check_textposition_re_6
+    check_uebersetzung_re_1
+    check_uebersetzung_re_2
+    check_transliteration_re_3
+    check_photo_re_4
+    check_photo_re_5
+    check_textposition_re_6
 
   end
 
@@ -250,13 +250,13 @@ class Formular < ActiveRecord::Base
 
 
     # 4772-4795
-    self[:photo].gsub(/D05_1061:/, 'D05_1061,')
+    self[:photo] = self[:photo].gsub(/D05_1061:/, 'D05_1061,')
     # 4817-4823
-    self[:photo].gsub(/D05-0933/, 'D05_0933')
+    self[:photo] = self[:photo].gsub(/D05-0933/, 'D05_0933')
     # 9316-9323
-    self[:photo].gsub(/2314 - 2316/, '2314, 2315, 2316')
+    self[:photo] = self[:photo].gsub(/2314 - 2316/, '2314, 2315, 2316')
     # 9332
-    self[:photo].gsub(/2320 - 2322/, '2320, 2321, 2322')
+    self[:photo] = self[:photo].gsub(/2320 - 2322/, '2320, 2321, 2322')
 
     #elif Photo == '103, 105, 111, 112, 2372, 2387, 2560 ( 103 - 105, 2387 - 2390, E XIV, pl. DCLXXIV )*':
 
@@ -268,7 +268,7 @@ class Formular < ActiveRecord::Base
 
     # 9741-9773
     if self[:photo].match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
-      self[:photo].gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
+      self[:photo] = self[:photo].gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
                         '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
       self[:photo_kommentar] = 'E. VIII, 96, 3 - 99, 3'
     end
@@ -281,25 +281,25 @@ class Formular < ActiveRecord::Base
 
     # 9950
     if self[:uid] == 9950
-      self[:photo].gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
+      self[:photo] = self[:photo].gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
       self[:photo_kommentar] = 'E VIII, 122, 5 - 124, 18'
     end
 
     # 5629-5650, 6135
-    self[:photo].gsub(/E. E. /, 'E. ')
+    self[:photo] = self[:photo].gsub(/E. E. /, 'E. ')
 
     # 6249, 6371-6373
-    self[:photo].gsub(/E. XIV. /, 'E. XIV, ')
+    self[:photo] = self[:photo].gsub(/E. XIV. /, 'E. XIV, ')
 
     # 10339, 10340
-    self[:photo].gsub(/E. XIV /, 'E. XIV, ')
+    self[:photo] = self[:photo].gsub(/E. XIV /, 'E. XIV, ')
 
 
     # einige mit vergessenem . hinter dem E, z.B. 10203ff
-    self[:photo].gsub(/E X/, 'E. X')
+    self[:photo] = self[:photo].gsub(/E X/, 'E. X')
 
     # 10348-10372
-    self[:photo].gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
+    self[:photo] = self[:photo].gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if photo != self[:photo]
       logger.info "\t[INFO]  [FL] #{self[:uid]} Photo String veraendert, orginal: #{self[:photo]} neu: #{self[:photo]}"
@@ -363,8 +363,6 @@ class Formular < ActiveRecord::Base
       end
 
       if  re6.match(bildString)
-
-        logger.info "\t[INFO]  [FL] match re6"
 
         # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
 
@@ -541,9 +539,10 @@ class Formular < ActiveRecord::Base
       end
 
 
-      puts bildString
+
       # kombi aus strip & führendes/endende Komma abschneiden
       m = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)
+
       if m
         bildString = m[2]
       else
@@ -555,7 +554,7 @@ class Formular < ActiveRecord::Base
 
     end
 
-    puts self[:photo]
+
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
