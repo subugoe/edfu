@@ -27,7 +27,6 @@ public/uploads/*
 
 lib/
 log/
-bin/
 
 *.rbc
 capybara-*.html
