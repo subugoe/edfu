@@ -5,24 +5,23 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
-/.bundle
+.bundle
 
 # Ignore the default SQLite database.
-/db/*.sqlite3
-/db/*.sqlite3-journal
+db/*.sqlite3
+db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
-/log/*.log
-/tmp
+log/*.log
+tmp
 
 # Ignore IDE files
-/.idea/*.*
-.idea/*.*
+.idea/
 *.iml
-/atlassian-ide-plugin.xml
+atlassian-ide-plugin.xml
 
 # Ignore test data
-/edfu-data/*.*
+edfu-data/
 
 # System files
-/.DS_Store
+.DS_Store
