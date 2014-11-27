@@ -12,5 +12,15 @@
  *
  */
 // "bootstrap-sprockets" must be imported before "bootstrap" and "bootstrap/variables"
+
 @import "bootstrap-sprockets";
+
+$navbar-default-bg: #ac001e;
+$text-color: #222;
+$navbar-default-color: $text-color;
+$navbar-default-link-color: #fff;
+$border-radius-base: 0;
+$navbar-default-link-active-color: #fff;
+$navbar-default-link-hover-color: #eee;
+
 @import "bootstrap";
