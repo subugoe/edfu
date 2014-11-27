@@ -4,10 +4,12 @@ class CreateUploads < ActiveRecord::Migration
 
       # todo add email for notification
 
-      # t.string :formular
-      # t.string :ort
-      # t.string :gott
-      # t.string :wort
+      t.string :formular
+      t.string :ort
+      t.string :gott
+      t.string :wort
+
+      t.string :email
 
       t.timestamps
     end

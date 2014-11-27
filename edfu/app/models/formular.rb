@@ -91,6 +91,25 @@ class Formular < ActiveRecord::Base
 
   # todo aufräumen, d.h. code in module/helper
 
+
+
+
+
+  def check_data
+
+    @myFormular = Hash.new
+    @formularDict = Hash.new
+
+    check_uebersetzung_re_1
+    check_uebersetzung_re_2
+    check_transliteration_re_3
+    check_photo_re_4
+    check_photo_re_5
+    check_textposition_re_6
+
+  end
+
+
   # todo in ein Modul packen und in Modell-Klassen wiederverwenden
   def self.update_or_create(attributes)
     assign_or_new(attributes).save
@@ -131,21 +150,17 @@ class Formular < ActiveRecord::Base
   end
 
 
-  def check_data
-
-    check_uebersetzung_re_1
-    check_uebersetzung_re_2
-    check_transliteration_re_3
-    check_photo_re_4
-    check_photo_re_5
-    check_textposition_re_6
-
-  end
 
   # bekannte Fehler in uebersetzung und Änderung loggen
   def check_uebersetzung_re_1
 
-    str = self[:uebersetzung].strip
+    @myFormular['uid'] = Integer(self[:uid])
+
+    # Felder
+    @myFormular['texttyp'] = self[:texttyp]
+
+
+    @myFormular['uebersetzung'] = self[:uebersetzung].strip
     .gsub(/dZtruit/, 'détruit')
     .gsub(/enti\?rement/, 'entièrement')
     .gsub(/moitiZ/, 'moitié')
@@ -156,9 +171,9 @@ class Formular < ActiveRecord::Base
     .gsub(/fen\?tre/, 'fenêtre')
     .gsub(/ZtZ gravZe/, 'été gravée')
 
-    if  str != self[:uebersetzung]
-      logger.info "\t[INFO]  [FL] uid: #{self[:uid]} String der Übersetzung verändert, von: #{self[:uebersetzung]} auf: #{str}"
-      self[:uebersetzung] = str
+    if  @myFormular['uebersetzung'] != self[:uebersetzung]
+      logger.info "\t[INFO]  [FL] uid: #{self[:uid]} String der Übersetzung verändert, von: #{self[:uebersetzung]} auf: #{@myFormular['uebersetzung']}"
+      self[:uebersetzung] = @myFormular['uebersetzung']
     end
 
   end
@@ -591,6 +606,11 @@ class Formular < ActiveRecord::Base
               'tempel_uid' => 0}
     }
     band = []
+    stelle = []
+
+
+    # Felder
+    @myFormular['texttyp'] = self[:texttyp]
 
     # Textposition
 
@@ -614,7 +634,7 @@ class Formular < ActiveRecord::Base
 
     kommentar = []
 
-    if self[:seitezeile].find('nach ') == 0
+    if self[:seitezeile].index('nach ') == 0
       kommentar += ['nach']
       self[:seitezeile] = self[:seitezeile].gsub('nach ', '')
     end
@@ -645,7 +665,7 @@ class Formular < ActiveRecord::Base
     if (kommentar.length) > 0
       logger.info "\t[INFO]  [FL] uid: #{self[:uid]} SEITEZEILE + Kommentar: #{kommentar}"
     end
-    if (re.findall("[^0-9, -]", self[:seitezeile])).length > 0
+    if (self[:seitezeile].scan(/[^0-9, -]/)).length > 0
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
     end
 
@@ -661,8 +681,8 @@ class Formular < ActiveRecord::Base
       parts = self[:seitezeile].split(',')
       seite = parts[0]
       if parts[1].match('-')
-        zeilen = parts[1].split('-')
-        result = [[seite, Integer(zeilen[0])], [seite, int(zeilen[1])]]
+        zeilen = parts[1].split('-')   # match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
+        result = [[seite, Integer(zeilen[0].to_i)], [seite, Integer(zeilen[1].to_i)]]
       else
         zeile = Integer(parts[1])
         result = [[seite, zeile], [seite, zeile]]
@@ -698,23 +718,23 @@ class Formular < ActiveRecord::Base
 
     # todo Teil der Normalisierung ?
     myStelle['uid'] = stelle.length
-    myFormular['stelle_uid'] = stelle.length
+    @myFormular['stelle_uid'] = stelle.length
 
-    stelle += [myStelle]
-    formularDict[myFormular['uid']] = myFormular
+    stelle << [myStelle]
+    @formularDict[@myFormular['uid']] = @myFormular
 
   end
 
+  # todo in module auslagern
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
 
     begin
-      parts = [int(parts[0]), int(parts[1])]
+      parts = [Integer(parts[0]), Integer(parts[1])]
     rescue ArgumentError
-
       logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
+end
 
-    end
     return parts
   end
 

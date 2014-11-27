@@ -9,7 +9,7 @@ class CreateGoetter < ActiveRecord::Migration
       t.string :beziehung
       t.string :funktion
       t.string :band
-      t.string :seitenzeile
+      t.string :seitezeile
       t.string :anmerkung
 
       t.timestamps

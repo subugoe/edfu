@@ -12,7 +12,7 @@ class CreateFormulare < ActiveRecord::Migration
       t.string :szeneID
       t.string :literatur
       t.string :band
-      t.string :seitenzeile
+      t.string :seitezeile
 
       t.timestamps
     end

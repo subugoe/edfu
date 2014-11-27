@@ -45,6 +45,7 @@ class UploadsController < ApplicationController
   end
 
   private
+
   # Use callbacks to share common setup or constraints between actions.
   def set_upload
     @upload = Upload.find(params[:id])
@@ -87,7 +88,7 @@ class UploadsController < ApplicationController
       Formular.where(uid: Integer(row[9])).update_or_create(
 
           transliteration: row[0] || '',
-          band: row[1] || '',
+          band: Integer(row[1]) || -1,
           seitezeile: row[2] || '',
           transliteration_nosuffix: row[3] || '',
           uebersetzung: row[4] || '',
@@ -95,9 +96,9 @@ class UploadsController < ApplicationController
           photo: row[6] || '',
           photo_pfad: '',
           photo_kommentar: '',
-          szeneID: row[7] || '',
+          szeneID: Integer(row[7]) || -1,
           literatur: row[8] || '',
-          uid: row[9] || ''
+          uid: Integer(row[9]) || -1
 
       )
 
