@@ -24,6 +24,9 @@ $navbar-default-link-color: #fff;
 $border-radius-base: 0;
 $navbar-default-link-active-color: #fff;
 $navbar-default-link-hover-color: #eee;
+body {
+	background-image: image-url("noise.png");
+}
 
 @import "bootstrap";
 
