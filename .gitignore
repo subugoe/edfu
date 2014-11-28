@@ -25,7 +25,9 @@ public/uploads/*
 .DS_Store
 
 
-lib/
+lib/assets
+lib/tasks
+
 log/
 *.log
 

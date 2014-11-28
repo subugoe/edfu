@@ -114,7 +114,9 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==20
+      break if i==3
+
+
 
       Formular.where(uid: Integer(row[9])).update_or_create(
 

@@ -28,7 +28,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 
 
-gem 'sunspot_rails'
+# gem 'sunspot_rails'
 gem 'progress_bar'
 
 gem 'activeadmin', github: 'activeadmin'

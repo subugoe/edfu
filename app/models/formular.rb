@@ -352,8 +352,11 @@ class Formular < ActiveRecord::Base
 
       elsif re1.match(bildString)
         # Fall 1: Dateiname nur aus Ziffern
+        # dieses matching prüfen !!!
         name = re1.match(bildString)[0]
         typ = 'alt'
+        # schneidet aktuelle zahl vorn ab
+        # problem, wenn , 1845, dann ist 18 nächst zahl !!!
         bildString = bildString[(name.length)..-1]
 
       elsif re2.match(bildString)
@@ -416,6 +419,7 @@ class Formular < ActiveRecord::Base
 
         if re12.match(bildString)
           # ist gefolgt von *
+          # prüfen, matched auch ohne *
           stern = true
           bildString = bildString[((re12.match(bildString))[0]).length..-1]
         end
@@ -445,9 +449,9 @@ class Formular < ActiveRecord::Base
           end
 
 
-          puts name || '---'
-          puts typ || '---'
-          puts kommentar || '---'
+          puts "name: #{name || '---'}"
+          puts "typ:   #{typ || '---'}"
+          puts "kommentar:   #{kommentar || '---'}"
 
           myPhoto = {
               'uid' => photosDict.length,
