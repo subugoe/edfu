@@ -1,4 +1,4 @@
-ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.16.1'
+#ruby=jruby-1.7.16.1
 
 source 'https://rubygems.org'
 
@@ -26,7 +26,7 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
-
+gem 'warbler'
 
 # gem 'sunspot_rails'
 gem 'progress_bar'
@@ -39,16 +39,3 @@ gem 'bootstrap-sass', '~> 3.3.1'
 gem 'autoprefixer-rails'
 
 gem 'bootstrap_form'
-
-
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
-
-

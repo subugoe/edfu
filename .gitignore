@@ -28,8 +28,11 @@ public/uploads/*
 lib/assets
 lib/tasks
 
+
 log/
 *.log
+
+*.lock
 
 *.rbc
 capybara-*.html
@@ -65,3 +68,4 @@ config/secrets.yml
 bower.json
 
 .idea
+edfu.war
