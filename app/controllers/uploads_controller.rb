@@ -26,8 +26,7 @@ class UploadsController < ApplicationController
     uploaded_wort = params[:upload][:wort]
     email = params[:upload][:email]
 
-
-    logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
+    logger.info "[Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
 
     File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
       file.write(uploaded_formular.read)
@@ -50,10 +49,9 @@ class UploadsController < ApplicationController
     respond_to do |format|
       #if @upload.save
       if processed
-        format.html { redirect_to uploads_path, notice: 'Upload was successfully created.' }
+        format.html {redirect_to uploads_path, notice: "Upload was successfully created."}
       else
-        format.html { redirect_to uploads_path, notice: 'Upload not created.' }
-
+        format.html {redirect_to uploads_path, alert: "Upload not created!"}
       end
     end
   end
@@ -94,9 +92,9 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
-    logger.info "\t[INFO]  [Upload] #{Rails.root.join('public', 'uploads','Formular.xls')}"
+    logger.info "[Upload] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
-    file = Rails.root.join('public', 'uploads','Formular.xls')
+    file = Rails.root.join('public', 'uploads', 'Formular.xls')
 
     #excel = Roo::Excel.new(file.to_s)
     excel = Roo::Excel.new("public/uploads/Formular.xls")
