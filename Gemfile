@@ -28,7 +28,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'warbler'
 
-# gem 'sunspot_rails'
+gem 'sunspot_rails'
+gem 'sunspot_solr'
+
 gem 'progress_bar'
 
 gem 'activeadmin', github: 'activeadmin'
