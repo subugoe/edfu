@@ -41,3 +41,5 @@ gem 'bootstrap-sass', '~> 3.3.1'
 gem 'autoprefixer-rails'
 
 gem 'bootstrap_form'
+
+gem 'jquery-datatables-rails', '~> 3.1.0'
