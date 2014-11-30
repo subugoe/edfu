@@ -7,6 +7,8 @@ class Formular < ActiveRecord::Base
 
 
   has_many :stellen, as: :zugehoerigZu
+  has_and_belongs_to_many :photos
+  has_and_belongs_to_many :literaturen
 
   # after_update :log_updated
   # after_create :log_created
@@ -33,6 +35,39 @@ class Formular < ActiveRecord::Base
   # end
 
 
+  def to_s
+
+    p = Hash.new
+    p[:name] = Array.new
+    p[:typ] = Array.new
+    p[:pfad] = Array.new
+    p[:kommentar] = Array.new
+
+
+    self.photos.each { |pp|
+      p[:name] << pp.name || ''
+      p[:typ] << pp.typ || ''
+      p[:pfad] << pp.pfad || ''
+      p[:kommentar] << pp.kommentar || ''
+    }
+
+    puts "
+         uid: #{uid} #{uid.class}
+         transliteration: #{transliteration} #{transliteration.class}
+         transliteration_nosuffix: #{transliteration_nosuffix} #{transliteration_nosuffix.class}
+         uebersetzung: #{uebersetzung} #{uebersetzung.class}
+         texttyp: #{texttyp} #{texttyp.class}
+         photo: #{p[:name]}
+         photo_pfad: #{p[:pfad]}
+         photo_kommentar: #{p[:kommentar]}
+         szeneID: #{szeneID} #{szeneID.class}
+         literatur: #{literatur} #{literatur.class}
+         band: #{band} #{band.class}
+         seitezeile: #{seitezeile} #{seitezeile.class}
+         "
+
+  end
+
   private
 
 
@@ -51,8 +86,10 @@ class Formular < ActiveRecord::Base
     check_photo_re_5
     check_textposition_re_6
 
-  end
+    # todo replace this
+    puts self.to_s
 
+  end
 
 
   # todo update solr doc
@@ -202,7 +239,7 @@ class Formular < ActiveRecord::Base
     # 9741-9773
     if self[:photo].match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
       self[:photo] = self[:photo].gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
-                        '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
+                                       '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
       self[:photo_kommentar] = 'E. VIII, 96, 3 - 99, 3'
     end
 
@@ -243,6 +280,7 @@ class Formular < ActiveRecord::Base
   def check_photo_re_5
 
     photo_name = Array.new
+    photo_typ = Array.new
     photo_pfad = Array.new
     photo_kommentar = Array.new
 
@@ -270,7 +308,7 @@ class Formular < ActiveRecord::Base
     re9 = Regexp.new('(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
     re10 = Regexp.new('e-onr-[0-9]+')
     re11 = Regexp.new(';*\s*Labrique, Stylistique, (pl. [0-9.]*)')
-    re12 = Regexp.new('\s*\*') # beginnt mit *
+    re12 = Regexp.new('\s*\*') # beginnt mit beliebiege whitesp. und '*'
     re13 = Regexp.new('\s*\(teilweise\)')
     re14 = Regexp.new('([^)]*)\s*(\(E. [IVX]+, [0-9]+, [-0-9]+\))(.*)')
     re15 = Regexp.new('[^(]*\((E.[^)]*)')
@@ -286,7 +324,8 @@ class Formular < ActiveRecord::Base
 
       name = ''
       typ = '---'
-
+      pfad = ''
+      kommentar = ''
 
       if self[:uid] == 9562
         if bildString.match('VIII')
@@ -351,12 +390,12 @@ class Formular < ActiveRecord::Base
         bildString = bildString[((re8.match(bildString)[0]).length)..-1]
 
       elsif re1.match(bildString)
-        # Fall 1: Dateiname nur aus Ziffern
-        # dieses matching prüfen !!!
+        # Fall 1: Dateiname nur aus Ziffern (am Ende beliebig viele 'a')
+        # name = erstes Auftreten des match
         name = re1.match(bildString)[0]
         typ = 'alt'
         # schneidet aktuelle zahl vorn ab
-        # problem, wenn , 1845, dann ist 18 nächst zahl !!!
+        #
         bildString = bildString[(name.length)..-1]
 
       elsif re2.match(bildString)
@@ -404,7 +443,7 @@ class Formular < ActiveRecord::Base
         # rest = m.group(3)
 
         # kombi aus strip & führendes/endende Komma abschneiden
-        bildString = bildString[((m[0]).length)..-1].match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
+        bildString = bildString[((m[0]).length)..-1].strip.sub(',', '').strip #match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
 
         if re7.match(bildString)
           # Es kommt noch ein Edfou Bild
@@ -434,80 +473,111 @@ class Formular < ActiveRecord::Base
           bildString = ''
         end
 
-        photoID = typ + '-' + name
-        myPhoto = {}
+        # photoID = typ + '-' + name
+        # myPhoto = {}
 
-        if photosDict.include?(photoID)
-          myPhoto = photosDict[photoID]
-          #myPhoto['count'] += 1
-        else
-          # pfad in model übernommen
-          if typ == 'D05' or typ == 'D03' or typ == 'alt'
-            pfad = typ + '/' + name + '.jpg'
+        # if photosDict.include?(photoID)
+        #   myPhoto = photosDict[photoID]
+        #   #myPhoto['count'] += 1
+        # else
+        #   # pfad in model übernommen
+        #   if typ == 'D05' or typ == 'D03' or typ == 'alt'
+        #     pfad = typ + '/' + name + '.jpg'
+        #   else
+        #     pfad = ''
+        #   end
+
+
+
+
+          # myPhoto = {
+          #     'uid' => photosDict.length,
+          #     'photo_typ_uid' => photoTypDict[typ]['uid'],
+          #     'name' => name,
+          #     #'count' => 1,
+          #     'typ' => typ,
+          #     'kommentar' => kommentar
+          # }
+         # photosDict[photoID] = myPhoto
+         # ---
+         #  name = myPhoto['name']
+         #  typ = myPhoto['typ']
+          pfad = "#{typ}/#{name}"
+          # kommentar = 'aaa'
+
+          p = Photo.find_by(name: name, typ: typ)
+          if p
+            if p.kommentar != kommentar
+              # weitere KOmmentare durch :&: angezeigt
+              p.kommentar += " :&: #{kommentar}"
+              logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
+              p.save
+            end
           else
-            pfad = ''
-          end
-
-
-          puts "name: #{name || '---'}"
-          puts "typ:   #{typ || '---'}"
-          puts "kommentar:   #{kommentar || '---'}"
-
-          myPhoto = {
-              'uid' => photosDict.length,
-              'photo_typ_uid' => photoTypDict[typ]['uid'],
-              'name' => name,
-              #'count' => 1,
-              'typ' => typ,
-              'kommentar' => kommentar
-          }
-          photosDict[photoID] = myPhoto
-
+            p = Photo.create(
+                name: name,
+                typ: typ,
+                pfad: pfad,
+                kommentar: kommentar
+            )
+            self.photos << p
         end
 
-        # todo nur für Normalisierung?
-        #collection['items'] += [photoID]
-        #collection['klammern'] = klammern
-        #collection['stern'] = stern
-        #collection['kommentar'] = kommentar
 
-
-        # todo Relation formular_has_photoDict entfernt
-        # key = self[:uid].to_s + '-' + myPhoto['uid'].to_s
-        #
-        #
-        # if not formular_has_photoDict.has_key?(key)
-        #   formular_has_photoDict[key] = {
-        #       'uid_local' => self[:uid],
-        #       'uid_foreign' => myPhoto['uid'],
-        #       'kommentar' => kommentar
-        #   }
-        # end
 
       end
 
 
       # kombi aus strip & führendes/endende Komma abschneiden
-      m = bildString.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)
+      #m = bildString.match(/(^\w*,\w*)(.*)(\w*,\w*$)/)
 
-      if m
-        bildString = m[2]
-      end
+      #if m
+      bildString = bildString.strip.sub(',', '').strip # m[2]
+      #end
 
     end
 
 
-    photosDict.each { |k, myPhoto|
+    # photosDict.each { |k, myPhoto|
+    #
+    #   name = myPhoto['name']
+    #   typ = myPhoto['typ']
+    #   pfad = "#{myPhoto['typ']}/#{myPhoto['name']}"
+    #   kommentar = "..." #myPhoto['kommentar'] || ''
+    #
+    #   p = Photo.find_by(name: name, typ: typ)
+    #   if p
+    #     if p.kommentar != kommentar
+    #       # weitere KOmmentare durch :&: angezeigt
+    #       p.kommentar += " :&: #{kommentar}"
+    #       logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
+    #       p.save
+    #     end
+    #   else
+    #     p = Photo.create(
+    #         name: name,
+    #         typ: typ,
+    #         pfad: pfad,
+    #         kommentar: kommentar
+    #     )
+    #     self.photos << p
+    #   end
+    #
+    #
+    #   # if photo_kommentar != p.kommentar
+    #   #   p.kommentar << ", #{photo_kommentar}"
+    #   #   logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
+    #   #   p.save
+    #   # end
+    #
+    #
+    #
+    #
+    # }
 
-      photo_name += ["#{myPhoto['name']}"]
-      photo_pfad += ["#{myPhoto['typ']}/#{myPhoto['name']}"]
-      photo_kommentar += ["#{myPhoto['kommentar'] || ''}"]
-
-    }
-
-    self[:photo] = photo_name
-    self[:photo_pfad] = photo_pfad
-    self[:photo_kommentar] = photo_kommentar
+    # self[:photos] = photo_name
+    # self[:photo_pfad] = photo_pfad
+    # self[:photo_kommentar] = photo_kommentar
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)

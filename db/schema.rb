@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141126211306) do
+ActiveRecord::Schema.define(version: 20141130103239) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -63,6 +63,26 @@ ActiveRecord::Schema.define(version: 20141126211306) do
     t.datetime "updated_at"
   end
 
+  create_table "formulare_literaturen", id: false, force: true do |t|
+    t.integer  "formular_id"
+    t.integer  "literatur_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "formulare_literaturen", ["formular_id"], name: "index_formulare_literaturen_on_formular_id"
+  add_index "formulare_literaturen", ["literatur_id"], name: "index_formulare_literaturen_on_literatur_id"
+
+  create_table "formulare_photos", id: false, force: true do |t|
+    t.integer  "formular_id"
+    t.integer  "photo_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "formulare_photos", ["formular_id"], name: "index_formulare_photos_on_formular_id"
+  add_index "formulare_photos", ["photo_id"], name: "index_formulare_photos_on_photo_id"
+
   create_table "goetter", force: true do |t|
     t.string   "uid"
     t.string   "transliteration"
@@ -78,6 +98,13 @@ ActiveRecord::Schema.define(version: 20141126211306) do
     t.datetime "updated_at"
   end
 
+  create_table "literaturen", force: true do |t|
+    t.string   "beschreibung"
+    t.string   "detail"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "orte", force: true do |t|
     t.string   "uid"
     t.string   "stelle"
@@ -86,6 +113,15 @@ ActiveRecord::Schema.define(version: 20141126211306) do
     t.string   "ort"
     t.string   "lokalisation"
     t.string   "anmerkung"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "photos", force: true do |t|
+    t.string   "name"
+    t.string   "typ"
+    t.string   "pfad"
+    t.text     "kommentar"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -23,4 +23,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'WbBerlin', 'WbsBerlin'
   inflect.irregular 'Wort', 'Worte'
   inflect.irregular 'Szene', 'Szenen'
+  inflect.irregular 'Photo', 'Photos'
+  inflect.irregular 'Literatur', 'Literaturen'
+
 end
