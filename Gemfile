@@ -28,7 +28,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'warbler'
 
-# gem 'sunspot_rails'
+gem 'sunspot_rails'
+gem 'sunspot_solr'
+
 gem 'progress_bar'
 
 gem 'activeadmin', github: 'activeadmin'
@@ -39,3 +41,5 @@ gem 'bootstrap-sass', '~> 3.3.1'
 gem 'autoprefixer-rails'
 
 gem 'bootstrap_form'
+
+gem 'jquery-datatables-rails', '~> 3.1.0'

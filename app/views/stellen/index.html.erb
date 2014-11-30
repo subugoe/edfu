@@ -1,6 +1,6 @@
 <h1>Listing stellen</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Uid</th>
@@ -18,7 +18,7 @@
       <th>Stop</th>
       <th>Zerstoerung</th>
       <th>Freigegeben</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -41,13 +41,7 @@
         <td><%= stelle.zerstoerung %></td>
         <td><%= stelle.freigegeben %></td>
         <td><%= link_to 'Show', stelle %></td>
-        <td><%= link_to 'Edit', edit_stelle_path(stelle) %></td>
-        <td><%= link_to 'Destroy', stelle, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Stelle', new_stelle_path %>

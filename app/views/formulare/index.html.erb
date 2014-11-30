@@ -1,6 +1,6 @@
-<h1>Listing formulare</h1>
+<h1>Formular</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Uid</th>
@@ -15,7 +15,7 @@
       <th>Literatur</th>
       <th>Band</th>
       <th>Seitezeile</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -35,13 +35,7 @@
         <td><%= formular.band %></td>
         <td><%= formular.seitezeile %></td>
         <td><%= link_to 'Show', formular %></td>
-        <td><%= link_to 'Edit', edit_formular_path(formular) %></td>
-        <td><%= link_to 'Destroy', formular, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Formular', new_formular_path %>

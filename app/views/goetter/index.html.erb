@@ -1,6 +1,6 @@
 <h1>Listing goetter</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Uid</th>
@@ -13,7 +13,7 @@
       <th>Band</th>
       <th>Seitezeile</th>
       <th>Anmerkung</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -31,13 +31,7 @@
         <td><%= gott.seitezeile %></td>
         <td><%= gott.anmerkung %></td>
         <td><%= link_to 'Show', gott %></td>
-        <td><%= link_to 'Edit', edit_gott_path(gott) %></td>
-        <td><%= link_to 'Destroy', gott, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Gott', new_gott_path %>

@@ -30,3 +30,6 @@ body {
 
 @import "bootstrap";
 
+.alert-notice {
+	@extend .alert-success;
+}

@@ -1,6 +1,6 @@
-<h1>Listing wb_berlins</h1>
+<h1>WB Berlin</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Uid</th>
@@ -10,7 +10,7 @@
       <th>Zeile start</th>
       <th>Zeile stop</th>
       <th>Wort</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -25,13 +25,7 @@
         <td><%= wb_berlin.zeile_stop %></td>
         <td><%= wb_berlin.wort %></td>
         <td><%= link_to 'Show', wb_berlin %></td>
-        <td><%= link_to 'Edit', edit_wb_berlin_path(wb_berlin) %></td>
-        <td><%= link_to 'Destroy', wb_berlin, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Wb berlin', new_wb_berlin_path %>

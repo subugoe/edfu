@@ -1,4 +1,7 @@
 <h1>Datei Upload</h1>
-<p id="notice"><%= notice %></p>
+
+<% flash.each do |name, msg| -%>
+    <%= content_tag :div, msg, class: 'alert alert-' + name %>
+<% end -%>
 
 <%= render 'form' %>
