@@ -11,26 +11,28 @@ class Stelle < ActiveRecord::Base
   after_update :log_updated
   after_create :log_created
 
-  searchable do
-
-    integer :uid, stored: true
-    text :tempel, stored: true
-    integer :band, stored: true
-    integer :seite_start, stored: true
-    integer :seite_stop, stored: true
-    integer :zeile_start, stored: true
-    integer :zeile_stop, stored: true
-    text :stelle_anmerkung, stored: true
-    boolean :stelle_unsicher, stored: true
-    integer :start, stored: true
-    integer :stop, stored: true
-    boolean :zerstoerung, stored: true
-    boolean :freigegeben, stored: true
-    # t.references :zugehoerigZu, polymorphic: true
-    # todo besitzer hinzufügen, id hinzufügen, typ hinzufügen
-
-
-  end
+  # searchable do
+  #
+  #   # integer :uid, stored: true
+  #   text :tempel, stored: true
+  #   integer :band, stored: true
+  #   integer :bandseite, stored: true
+  #   integer :bandseitezeile, stored: true
+  #   integer :seite_start, stored: true
+  #   integer :seite_stop, stored: true
+  #   integer :zeile_start, stored: true
+  #   integer :zeile_stop, stored: true
+  #   text :stelle_anmerkung, stored: true
+  #   boolean :stelle_unsicher, stored: true
+  #   integer :start, stored: true
+  #   integer :stop, stored: true
+  #   boolean :zerstoerung, stored: true
+  #   boolean :freigegeben, stored: true
+  #   # t.references :zugehoerigZu, polymorphic: true
+  #   # todo besitzer hinzufügen, id hinzufügen, typ hinzufügen
+  #
+  #
+  # end
 
 
   private

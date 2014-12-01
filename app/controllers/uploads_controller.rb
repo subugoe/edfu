@@ -48,32 +48,7 @@ class UploadsController < ApplicationController
     #   file.write(uploaded_wort.read)
     # end
 
-    # AND REMOVE THIS
-    # START
-    uploaded_formular = params[:upload][:formular]
-    uploaded_ort = params[:upload][:ort]
-    uploaded_gott = params[:upload][:gott]
-    uploaded_wort = params[:upload][:wort]
-    email = params[:upload][:email]
 
-    logger.info "[Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
-
-    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
-      file.write(uploaded_formular.read)
-    end
-
-    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
-      file.write(uploaded_ort.read)
-    end
-
-    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
-      file.write(uploaded_gott.read)
-    end
-
-    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
-      file.write(uploaded_wort.read)
-    end
-    # END
 
     processed = process_files
 
@@ -112,9 +87,9 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    process_formular
+    #process_formular
     #process_ort
-    #process_gott
+    process_gott
     #process_wort
 
   end
@@ -172,7 +147,8 @@ class UploadsController < ApplicationController
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
 
-    excel = Roo::Excel.new("edfu-data/Topo.xls")
+    # todo replace this with uploaded file
+    excel = Roo::Excel.new("public/uploads/Topo.xls")
 
     excel.default_sheet = excel.sheets.first
 
@@ -186,11 +162,11 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==20
+      break if i==7
 
       Ort.where(uid: Integer(row[5])).update_or_create(
 
-          uid: row[5] || '',
+          uid: Integer(row[5]) || '',
           stelle: row[0] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
@@ -209,7 +185,7 @@ class UploadsController < ApplicationController
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
-    excel = Roo::Excel.new("edfu-data/Gott.xls")
+    excel = Roo::Excel.new("public/uploads/Gods.xls")
 
     excel.default_sheet = excel.sheets.first
 
@@ -223,11 +199,11 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==20
+      break if i==5
 
       Gott.where(uid: Integer(row[9])).update_or_create(
 
-          uid: row[9] || '',
+          uid: Integer(row[9]) || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
           ort: row[2] || '',

@@ -52,11 +52,7 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.string   "transliteration_nosuffix"
     t.string   "uebersetzung"
     t.string   "texttyp"
-    t.string   "photo"
-    t.string   "photo_pfad"
-    t.string   "photo_kommentar"
     t.string   "szeneID"
-    t.string   "literatur"
     t.string   "band"
     t.string   "seitezeile"
     t.datetime "created_at"
@@ -70,7 +66,9 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.datetime "updated_at"
   end
 
+  add_index "formulare_literaturen", ["formular_id", "literatur_id"], name: "index_formulare_literaturen_on_formular_id_and_literatur_id", unique: true
   add_index "formulare_literaturen", ["formular_id"], name: "index_formulare_literaturen_on_formular_id"
+  add_index "formulare_literaturen", ["literatur_id", "formular_id"], name: "index_formulare_literaturen_on_literatur_id_and_formular_id", unique: true
   add_index "formulare_literaturen", ["literatur_id"], name: "index_formulare_literaturen_on_literatur_id"
 
   create_table "formulare_photos", id: false, force: true do |t|
@@ -80,13 +78,14 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.datetime "updated_at"
   end
 
+  add_index "formulare_photos", ["formular_id", "photo_id"], name: "index_formulare_photos_on_formular_id_and_photo_id", unique: true
   add_index "formulare_photos", ["formular_id"], name: "index_formulare_photos_on_formular_id"
+  add_index "formulare_photos", ["photo_id", "formular_id"], name: "index_formulare_photos_on_photo_id_and_formular_id", unique: true
   add_index "formulare_photos", ["photo_id"], name: "index_formulare_photos_on_photo_id"
 
   create_table "goetter", force: true do |t|
     t.string   "uid"
     t.string   "transliteration"
-    t.string   "transliteration_nosuffix"
     t.string   "ort"
     t.string   "eponym"
     t.string   "beziehung"
@@ -107,9 +106,7 @@ ActiveRecord::Schema.define(version: 20141130103239) do
 
   create_table "orte", force: true do |t|
     t.string   "uid"
-    t.string   "stelle"
     t.string   "transliteration"
-    t.string   "transliteration_nosuffix"
     t.string   "ort"
     t.string   "lokalisation"
     t.string   "anmerkung"
@@ -127,7 +124,6 @@ ActiveRecord::Schema.define(version: 20141130103239) do
   end
 
   create_table "stellen", force: true do |t|
-    t.string   "uid"
     t.string   "tempel"
     t.string   "band"
     t.string   "bandseite"

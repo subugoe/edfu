@@ -1,10 +1,14 @@
 # encoding: utf-8
 
 require 'lib/edfu_model_helper'
+require 'lib/edfu_numerics_conversion_helper'
+
 
 class Formular < ActiveRecord::Base
+  include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
+  attr_accessor :photo, :photo_pfad, :photo_kommentar, :literatur
 
   has_many :stellen, as: :zugehoerigZu
   has_and_belongs_to_many :photos
@@ -37,6 +41,7 @@ class Formular < ActiveRecord::Base
 
   def to_s
 
+    # photos
     p = Hash.new
     p[:name] = Array.new
     p[:typ] = Array.new
@@ -51,6 +56,19 @@ class Formular < ActiveRecord::Base
       p[:kommentar] << pp.kommentar || ''
     }
 
+    # literaturen
+
+
+    l = Array.new
+    self.literaturen.each { |lit|
+      if lit.beschreibung
+        l << "#{lit.beschreibung} : #{lit.detail}"
+      else
+        l << ''
+      end
+    }
+
+
     puts "
          uid: #{uid} #{uid.class}
          transliteration: #{transliteration} #{transliteration.class}
@@ -61,7 +79,7 @@ class Formular < ActiveRecord::Base
          photo_pfad: #{p[:pfad]}
          photo_kommentar: #{p[:kommentar]}
          szeneID: #{szeneID} #{szeneID.class}
-         literatur: #{literatur} #{literatur.class}
+         literatur: #{l}
          band: #{band} #{band.class}
          seitezeile: #{seitezeile} #{seitezeile.class}
          "
@@ -79,12 +97,17 @@ class Formular < ActiveRecord::Base
     @myFormular['uid'] = Integer(self[:uid])
     @myFormular['texttyp'] = self[:texttyp]
 
-    check_uebersetzung_re_1
-    check_uebersetzung_re_2
+
+    check_uebersetzungs_string
+
+
+    check_and_add_photo_string
+
+    find_or_create_stelle
+
     check_transliteration_re_3
-    check_photo_re_4
-    check_photo_re_5
-    check_textposition_re_6
+
+    find_or_create_literatur
 
     # todo replace this
     puts self.to_s
@@ -106,7 +129,9 @@ class Formular < ActiveRecord::Base
   end
 
 
-  def check_uebersetzung_re_1
+  # korrigiert bekannte Fehler
+  def check_uebersetzungs_string
+
 
     @myFormular['uebersetzung'] = self[:uebersetzung].strip
     .gsub(/dZtruit/, 'détruit')
@@ -124,10 +149,7 @@ class Formular < ActiveRecord::Base
       self[:uebersetzung] = @myFormular['uebersetzung']
     end
 
-  end
-
-  # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
-  def check_uebersetzung_re_2
+    # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
 
     re101 = Regexp.new('\wZ')
     re102 = Regexp.new('\w\?\w')
@@ -140,144 +162,145 @@ class Formular < ActiveRecord::Base
 
   end
 
-  # todo was ist beabsichtigt im concert.py
-  def check_transliteration_re_3
+  def check_and_add_photo_string
+
+    check_photo_string
+    add_photo_string
 
   end
 
-  def check_photo_re_4
+  def check_photo_string
 
-    photo = self[:photo]
-
+    photo = self.photo
 
     case photo
       # 263
       when 'D05_5503, D05_5504, D05_5509, D05_5510, D05_5511, D05_5512: D05_5513, D05_5514, ( 2982, 2983, 2984, 2985 )*'
-        self[:photo] = 'D05_5503, D05_5504, D05_5509, D05_5510, D05_5511, D05_5512, D05_5513, D05_5514, ( 2982, 2983, 2984, 2985 )*'
+        self.photo = 'D05_5503, D05_5504, D05_5509, D05_5510, D05_5511, D05_5512, D05_5513, D05_5514, ( 2982, 2983, 2984, 2985 )*'
       # 409
       when 'D05_6555, D06_6556, D05_6557, D05_6558, D05_6559, D05_6560, D05_6561, ( 1605, 1606 )*'
-        self[:photo] = 'D05_6555, D05_6556, D05_6557, D05_6558, D05_6559, D05_6560, D05_6561, ( 1605, 1606 )*'
+        self.photo = 'D05_6555, D05_6556, D05_6557, D05_6558, D05_6559, D05_6560, D05_6561, ( 1605, 1606 )*'
       # 1137-1138
       when 'D05_4151, D05_4152, D05_4153, D05_4160: D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05_4167, D05_4168, D05_4169, ( 1615, 1616 )*'
-        self[:photo] = 'D05_4151, D05_4152, D05_4153, D05_4160, D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05_4167, D05_4168, D05_4169, ( 1615, 1616 )*'
+        self.photo = 'D05_4151, D05_4152, D05_4153, D05_4160, D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05_4167, D05_4168, D05_4169, ( 1615, 1616 )*'
       # 1155-1156
       when 'D05_3779, D05_3780, D05_3787, D05_3788, D05_3789, D05_3790, D05_3791, D05_3792, D05_3793, D05_3794, D05_3795, D05_3796, D05_4094, D05_:4095, D05_4102, D05_4103, D05_4104: D05_4105, D05_4106, D05_4107, D05_4108, D05_4109, ( 1616, 1617 )*'
-        self[:photo] = 'D05_3779, D05_3780, D05_3787, D05_3788, D05_3789, D05_3790, D05_3791, D05_3792, D05_3793, D05_3794, D05_3795, D05_3796, D05_4094, D05_4095, D05_4102, D05_4103, D05_4104, D05_4105, D05_4106, D05_4107, D05_4108, D05_4109, ( 1616, 1617 )*'
+        self.photo = 'D05_3779, D05_3780, D05_3787, D05_3788, D05_3789, D05_3790, D05_3791, D05_3792, D05_3793, D05_3794, D05_3795, D05_3796, D05_4094, D05_4095, D05_4102, D05_4103, D05_4104, D05_4105, D05_4106, D05_4107, D05_4108, D05_4109, ( 1616, 1617 )*'
       # 1157-1159
       when 'D05_3771, D05_3772, D05_3773, D05_3774, D05-3775, D05_3776, D05_3777, D05_3778, D05_3779, D05_3780, D05_3783, D05_3784, D05_3786, D05_4085, D05_4086, D05_4087, D05_4088, D05_4089, D05_4090, D05_4091, D05_4092, D05_4093, D05_4094, D05_4095, D05_4099, D05_4100, D05_4101, ( 1616, 1617 )*'
-        self[:photo] = 'D05_3771, D05_3772, D05_3773, D05_3774, D05_3775, D05_3776, D05_3777, D05_3778, D05_3779, D05_3780, D05_3783, D05_3784, D05_3786, D05_4085, D05_4086, D05_4087, D05_4088, D05_4089, D05_4090, D05_4091, D05_4092, D05_4093, D05_4094, D05_4095, D05_4099, D05_4100, D05_4101, ( 1616, 1617 )*'
+        self.photo = 'D05_3771, D05_3772, D05_3773, D05_3774, D05_3775, D05_3776, D05_3777, D05_3778, D05_3779, D05_3780, D05_3783, D05_3784, D05_3786, D05_4085, D05_4086, D05_4087, D05_4088, D05_4089, D05_4090, D05_4091, D05_4092, D05_4093, D05_4094, D05_4095, D05_4099, D05_4100, D05_4101, ( 1616, 1617 )*'
       # 1163-1165
       when 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D04_4074, D05_4075, D05_4076, D05_4077, D05_4078, D05_4079, D05_4080, D05_4081, D05_4082, D05_4083, D05_4084, ( 1617, 1618, 1619 )*'
-        self[:photo] = 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D05_4074, D05_4075, D05_4076, D05_4077, D05_4078, D05_4079, D05_4080, D05_4081, D05_4082, D05_4083, D05_4084, ( 1617, 1618, 1619 )*'
+        self.photo = 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D05_4074, D05_4075, D05_4076, D05_4077, D05_4078, D05_4079, D05_4080, D05_4081, D05_4082, D05_4083, D05_4084, ( 1617, 1618, 1619 )*'
       # 1167-1169
       when 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D04_4074, D05_4075, ( 1618, 1619, 1620 )*'
-        self[:photo] = 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D05_4074, D05_4075, ( 1618, 1619, 1620 )*'
+        self.photo = 'D05_3764, D05_3765, D05_3766, D05_3767, D05_3768, D05_3769, D05_3770, D05_4068, D05_4069, D05_4070, D05_4071, D05_4072, D05_4073, D05_4074, D05_4075, ( 1618, 1619, 1620 )*'
       # 1381-1382
       when 'D05_3678, D05_3822, D05_3823, D05_3824, D05_3825, D05_3826, D05_3827, D05_3828, D05_3829, D05_3830, D05_3831, D05_3832, D05_3833, D05_4297, D05_4298, D05_4299, D05_4300, D05_4301, D05_4302, D05_4560, D05_4561, D05-4562, D05_4563, D05_4564, D05_4565, ( 3471, 3474 )*'
-        self[:photo] = 'D05_3678, D05_3822, D05_3823, D05_3824, D05_3825, D05_3826, D05_3827, D05_3828, D05_3829, D05_3830, D05_3831, D05_3832, D05_3833, D05_4297, D05_4298, D05_4299, D05_4300, D05_4301, D05_4302, D05_4560, D05_4561, D05_4562, D05_4563, D05_4564, D05_4565, ( 3471, 3474 )*'
+        self.photo = 'D05_3678, D05_3822, D05_3823, D05_3824, D05_3825, D05_3826, D05_3827, D05_3828, D05_3829, D05_3830, D05_3831, D05_3832, D05_3833, D05_4297, D05_4298, D05_4299, D05_4300, D05_4301, D05_4302, D05_4560, D05_4561, D05_4562, D05_4563, D05_4564, D05_4565, ( 3471, 3474 )*'
       # 1435
       when 'D05_5391, D05_5395, D05_5396, D05-5397, D05_5398, D05_5399, D05_5400, ( 3112 )*'
-        self[:photo] = 'D05_5391, D05_5395, D05_5396, D05_5397, D05_5398, D05_5399, D05_5400, ( 3112 )*'
+        self.photo = 'D05_5391, D05_5395, D05_5396, D05_5397, D05_5398, D05_5399, D05_5400, ( 3112 )*'
       # 1711-1713
       when 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983 (Z 6), D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        self[:photo] = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        self[:photo_kommentar] = 'D05_4983 (Z 6)'
+        self.photo = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
+        self.photo_kommentar = 'D05_4983 (Z 6)'
       # 1818-1820
       when 'D05_6097, D05_6098, D05_6100, D05_6101, D06_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
-        self[:photo] = 'D05_6097, D05_6098, D05_6100, D05_6101, D05_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
+        self.photo = 'D05_6097, D05_6098, D05_6100, D05_6101, D05_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
       # 1837,1839
       when 'D05_6052, D05_6053, D05_6054, D05_6055, D06_6056, D05_6057, D05_6058, D05_6059, D06_6060, D05_6068, D05_6069, D05_6070, D05_6287'
-        self[:photo] = 'D05_6052, D05_6053, D05_6054, D05_6055, D05_6056, D05_6057, D05_6058, D05_6059, D05_6060, D05_6068, D05_6069, D05_6070, D05_6287'
+        self.photo = 'D05_6052, D05_6053, D05_6054, D05_6055, D05_6056, D05_6057, D05_6058, D05_6059, D05_6060, D05_6068, D05_6069, D05_6070, D05_6287'
       # 1838
       when 'D05_6052, D05_6053, D05_6054, D05_6055, D06_6056, D05_6057, D05_6058, D05_6059, D06_6060, D05_6068, D05_6069, D05_6070, D05_6287, 3846, 3847, 3848'
-        self[:photo] = 'D05_6052, D05_6053, D05_6054, D05_6055, D05_6056, D05_6057, D05_6058, D05_6059, D05_6060, D05_6068, D05_6069, D05_6070, D05_6287, 3846, 3847, 3848'
+        self.photo = 'D05_6052, D05_6053, D05_6054, D05_6055, D05_6056, D05_6057, D05_6058, D05_6059, D05_6060, D05_6068, D05_6069, D05_6070, D05_6287, 3846, 3847, 3848'
       # 1867-1869
       when 'D05_6017+, D05_6018, D05_6019, D05_6020, D05_6021, D05_6022, D05_6025, D05_6284+, D05_6285+, ( 1650 )*'
-        self[:photo] = 'D05_6017, D05_6018, D05_6019, D05_6020, D05_6021, D05_6022, D05_6025, D05_6284, D05_6285, ( 1650 )*'
+        self.photo = 'D05_6017, D05_6018, D05_6019, D05_6020, D05_6021, D05_6022, D05_6025, D05_6284, D05_6285, ( 1650 )*'
       # 3097-3099
       when 'D05_4160, D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05, 4167, D05_4168, D05_4169'
-        self[:photo] = 'D05_4160, D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05_4167, D05_4168, D05_4169'
+        self.photo = 'D05_4160, D05_4161, D05_4162, D05_4163, D05_4164, D05_4165, D05_4166, D05_4167, D05_4168, D05_4169'
       # 3745
       when 'D03_0772, D03_0791, D03_0792, 1146, 1147, e015 ( 1145, 1340, 1341, E. XIII, pl. CCCCXCIV - CCCCXCVI )*'
-        self[:photo] = 'D03_0772, D03_0791, D03_0792, 1146, 1147, e015 ( 1145, 1340, 1341, E. XIII, pl. CCCCXCIV, CCCCXCV, CCCXCVI )*'
+        self.photo = 'D03_0772, D03_0791, D03_0792, 1146, 1147, e015 ( 1145, 1340, 1341, E. XIII, pl. CCCCXCIV, CCCCXCV, CCCXCVI )*'
       # 4077
       when 'D05_0388, D05_0389, D05_0390, D05_0391, D05_0392, D05_0393, D05_0394, D05-0395, D03_0622, D03_0623, D03_0624, D03_0625, D03_0618, D03_0619, D03_0620, D03_0621, 1446, 1447 (E. XIV, pl. DLII )*'
-        self[:photo] = 'D05_0388, D05_0389, D05_0390, D05_0391, D05_0392, D05_0393, D05_0394, D05_0395, D03_0622, D03_0623, D03_0624, D03_0625, D03_0618, D03_0619, D03_0620, D03_0621, 1446, 1447 (E. XIV, pl. DLII )*'
+        self.photo = 'D05_0388, D05_0389, D05_0390, D05_0391, D05_0392, D05_0393, D05_0394, D05_0395, D03_0622, D03_0623, D03_0624, D03_0625, D03_0618, D03_0619, D03_0620, D03_0621, 1446, 1447 (E. XIV, pl. DLII )*'
       # 4127
       when 'D05_0539, D05_0540, D05_0541, D05_0542¸ D05_0543, D05_0544, D05_0545, D05_0546, D05_0553, D05_0554, D05_0555, 1449, 1450, e021'
-        self[:photo] = 'D05_0539, D05_0540, D05_0541, D05_0542, D05_0543, D05_0544, D05_0545, D05_0546, D05_0553, D05_0554, D05_0555, 1449, 1450, e021'
+        self.photo = 'D05_0539, D05_0540, D05_0541, D05_0542, D05_0543, D05_0544, D05_0545, D05_0546, D05_0553, D05_0554, D05_0555, 1449, 1450, e021'
       # 4202
       when 'D05_1876, D05-1877, D05_1878, D05_1893, 1418, 1419, 1420, e087 ( 1415, 1416, 1417, E. XIII, pl. DXX, DXXI )*'
-        self[:photo] = 'D05_1876, D05_1877, D05_1878, D05_1893, 1418, 1419, 1420, e087 ( 1415, 1416, 1417, E. XIII, pl. DXX, DXXI )*'
+        self.photo = 'D05_1876, D05_1877, D05_1878, D05_1893, 1418, 1419, 1420, e087 ( 1415, 1416, 1417, E. XIII, pl. DXX, DXXI )*'
       # 4227
       when 'D05_1954, D05_1955, D05_1962, D05_1963, 1409, 1408, e083 (E. XIII, DXXIV, DXXV )*'
-        self[:photo] = 'D05_1954, D05_1955, D05_1962, D05_1963, 1409, 1408, e083 (E. XIII, pl. DXXIV, DXXV )*'
+        self.photo = 'D05_1954, D05_1955, D05_1962, D05_1963, 1409, 1408, e083 (E. XIII, pl. DXXIV, DXXV )*'
       # 4420
       when 'D05_1824, D05_1825, D05_1826, D05_1827, D05_1830, D05_1831, D05_1832, D05_1833, D05-1834, D05_1835, D05_1836, D05_1837, 1425, 1426, 1427, e090 (E. XIII, pl. DXXXVI )*'
-        self[:photo] = 'D05_1824, D05_1825, D05_1826, D05_1827, D05_1830, D05_1831, D05_1832, D05_1833, D05_1834, D05_1835, D05_1836, D05_1837, 1425, 1426, 1427, e090 (E. XIII, pl. DXXXVI )*'
+        self.photo = 'D05_1824, D05_1825, D05_1826, D05_1827, D05_1830, D05_1831, D05_1832, D05_1833, D05_1834, D05_1835, D05_1836, D05_1837, 1425, 1426, 1427, e090 (E. XIII, pl. DXXXVI )*'
 
     end
 
 
     # 4772-4795
-    self[:photo] = self[:photo].gsub(/D05_1061:/, 'D05_1061,')
+    self.photo = self.photo.gsub(/D05_1061:/, 'D05_1061,')
     # 4817-4823
-    self[:photo] = self[:photo].gsub(/D05-0933/, 'D05_0933')
+    self.photo = self.photo.gsub(/D05-0933/, 'D05_0933')
     # 9316-9323
-    self[:photo] = self[:photo].gsub(/2314 - 2316/, '2314, 2315, 2316')
+    self.photo = self.photo.gsub(/2314 - 2316/, '2314, 2315, 2316')
     # 9332
-    self[:photo] = self[:photo].gsub(/2320 - 2322/, '2320, 2321, 2322')
+    self.photo = self.photo.gsub(/2320 - 2322/, '2320, 2321, 2322')
 
     #elif Photo == '103, 105, 111, 112, 2372, 2387, 2560 ( 103 - 105, 2387 - 2390, E XIV, pl. DCLXXIV )*':
 
     # todo prüfen ob uid korrekt ist?
     # 10021
     if self[:uid] == 10021
-      self[:photo] = '103, 105, 111, 112, 2372, 2387, 2560 ( 103, 104, 105, 2387, 2388, 2389, 2390, E. XIV, pl. DCLXXIV )*'
+      self.photo = '103, 105, 111, 112, 2372, 2387, 2560 ( 103, 104, 105, 2387, 2388, 2389, 2390, E. XIV, pl. DCLXXIV )*'
     end
 
     # 9741-9773
-    if self[:photo].match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
-      self[:photo] = self[:photo].gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
-                                       '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
-      self[:photo_kommentar] = 'E. VIII, 96, 3 - 99, 3'
+    if self.photo.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
+      self.photo = self.photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
+                                   '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
+      self.photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
     # 8399, 9011, 9012
     if self[:uid] == 8399 or self[:uid] == 9011 or self[:uid] == 9012
-      self[:photo] = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
-      self[:photo_kommentar] = 'E. VII, 252, 5'
+      self.photo = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
+      self.photo_kommentar = 'E. VII, 252, 5'
     end
 
     # 9950
     if self[:uid] == 9950
-      self[:photo] = self[:photo].gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
-      self[:photo_kommentar] = 'E VIII, 122, 5 - 124, 18'
+      self.photo = self.photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
+      self.photo_kommentar = 'E VIII, 122, 5 - 124, 18'
     end
 
     # 5629-5650, 6135
-    self[:photo] = self[:photo].gsub(/E. E. /, 'E. ')
+    self.photo = self.photo.gsub(/E. E. /, 'E. ')
 
     # 6249, 6371-6373
-    self[:photo] = self[:photo].gsub(/E. XIV. /, 'E. XIV, ')
+    self.photo = self.photo.gsub(/E. XIV. /, 'E. XIV, ')
 
     # 10339, 10340
-    self[:photo] = self[:photo].gsub(/E. XIV /, 'E. XIV, ')
+    self.photo = self.photo.gsub(/E. XIV /, 'E. XIV, ')
 
 
     # einige mit vergessenem . hinter dem E, z.B. 10203ff
-    self[:photo] = self[:photo].gsub(/E X/, 'E. X')
+    self.photo = self.photo.gsub(/E X/, 'E. X')
 
     # 10348-10372
-    self[:photo] = self[:photo].gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
+    self.photo = self.photo.gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
-    if photo != self[:photo]
-      logger.info "\t[INFO]  [FL] #{self[:uid]} Photo String veraendert, orginal: #{self[:photo]} neu: #{self[:photo]}"
+    if photo != self.photo
+      logger.info "\t[INFO]  [FL] #{self[:uid]} Photo String veraendert, orginal: #{self.photo} neu: #{self.photo}"
     end
   end
 
   # Sonderfälle
-  def check_photo_re_5
+  def add_photo_string
 
     photo_name = Array.new
     photo_typ = Array.new
@@ -314,7 +337,7 @@ class Formular < ActiveRecord::Base
     re15 = Regexp.new('[^(]*\((E.[^)]*)')
 
 
-    bildString = self[:photo]
+    bildString = self.photo
     klammern = false
     stern = false
 
@@ -488,42 +511,38 @@ class Formular < ActiveRecord::Base
         #   end
 
 
+        # myPhoto = {
+        #     'uid' => photosDict.length,
+        #     'photo_typ_uid' => photoTypDict[typ]['uid'],
+        #     'name' => name,
+        #     #'count' => 1,
+        #     'typ' => typ,
+        #     'kommentar' => kommentar
+        # }
+        # photosDict[photoID] = myPhoto
+        # ---
+        #  name = myPhoto['name']
+        #  typ = myPhoto['typ']
+        pfad = "#{typ}/#{name}"
+        # kommentar = 'aaa'
 
-
-          # myPhoto = {
-          #     'uid' => photosDict.length,
-          #     'photo_typ_uid' => photoTypDict[typ]['uid'],
-          #     'name' => name,
-          #     #'count' => 1,
-          #     'typ' => typ,
-          #     'kommentar' => kommentar
-          # }
-         # photosDict[photoID] = myPhoto
-         # ---
-         #  name = myPhoto['name']
-         #  typ = myPhoto['typ']
-          pfad = "#{typ}/#{name}"
-          # kommentar = 'aaa'
-
-          p = Photo.find_by(name: name, typ: typ)
-          if p
-            if p.kommentar != kommentar
-              # weitere KOmmentare durch :&: angezeigt
-              p.kommentar += " :&: #{kommentar}"
-              logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
-              p.save
-            end
-          else
-            p = Photo.create(
-                name: name,
-                typ: typ,
-                pfad: pfad,
-                kommentar: kommentar
-            )
-            self.photos << p
-        end
-
-
+        # p = Photo.find_by(name: name, typ: typ)
+        # if p
+        #   if p.kommentar != kommentar
+        #     # weitere Kommentare durch :&: angezeigt
+        #     p.kommentar += " :&: #{kommentar}"
+        #     logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
+        #     p.save
+        #   end
+        # else
+        p = Photo.find_or_create_by(
+            name: name,
+            typ: typ,
+            pfad: pfad,
+            kommentar: kommentar
+        )
+        # end
+        self.photos << p unless self.photos.include? p
 
       end
 
@@ -576,16 +595,17 @@ class Formular < ActiveRecord::Base
     # }
 
     # self[:photos] = photo_name
-    # self[:photo_pfad] = photo_pfad
-    # self[:photo_kommentar] = photo_kommentar
+    # self.photo_pfad = photo_pfad
+    # self.photo_kommentar = photo_kommentar
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
 
   end
 
-  def check_textposition_re_6
+  def find_or_create_stelle
 
+    # todo extract to module
     # Einträge für die 8 Chassinat Bände.
     bandDict = {
         1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
@@ -611,7 +631,7 @@ class Formular < ActiveRecord::Base
 
 
     # Felder
-    @myFormular['texttyp'] = self[:texttyp]
+    #@myFormular['texttyp'] = self[:texttyp]
 
     # Textposition
 
@@ -619,7 +639,8 @@ class Formular < ActiveRecord::Base
 
     myStelle = {}
     # todo entfernen? Gehört zur Normalisierung
-    myStelle['band_uid'] = bandDict[Integer(self[:band])]['nummer']
+    myStelle['band_uid'] = self[:band] #bandDict[Integer(self[:band])]['nummer']
+    myStelle['freigegeben'] = bandDict[Integer(self[:band])]['freigegeben']
 
     ## Sonderfälle
     szOriginal = self[:seitezeile]
@@ -639,25 +660,30 @@ class Formular < ActiveRecord::Base
       kommentar += ['nach']
       self[:seitezeile] = self[:seitezeile].gsub('nach ', '')
     end
-    if self[:seitezeile].match(', Z')
+
+    if self[:seitezeile].index(', Z') != nil
       kommentar += [self[:seitezeile][self[:seitezeile].index(', Z') + 2..-1]]
-      self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(', Z')]
+      self[:seitezeile] = self[:seitezeile][0..self[:seitezeile].index(', Z')]
     end
-    if self[:seitezeile].match(' / Z')
+
+    if self[:seitezeile].index(' / Z') != nil
       kommentar += [self[:seitezeile][self[:seitezeile].index(' / Z') + 3..-1]]
-      self[:seitezeile] = self[:seitezeile][self[:seitezeile].index(' / Z')]
+      self[:seitezeile] = self[:seitezeile][0..self[:seitezeile].index(' / Z')]
     end
-    if self[:seitezeile].match(', Kol')
+
+    if self[:seitezeile].index(', Kol') != nil
       kommentar += [self[:seitezeile][self[:seitezeile].index(', Kol') + 2..-1]]
-      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(', Kol')]
+      self[:seitezeile]= self[:seitezeile][0..self[:seitezeile].index(', Kol')]
     end
-    if self[:seitezeile].match(' / kol')
+
+    if self[:seitezeile].index(' / kol') != nil
       kommentar += [self[:seitezeile][self[:seitezeile].index(' / kol') + 3..-1]]
-      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(' / kol')]
+      self[:seitezeile]= self[:seitezeile][0..self[:seitezeile].index(' / kol')]
     end
-    if self[:seitezeile].match(' / ')
+
+    if self[:seitezeile].index(' / ') != nil
       kommentar += [self[:seitezeile][self[:seitezeile].index(' / ') + 3..-1]]
-      self[:seitezeile]= self[:seitezeile][self[:seitezeile].index(' / ')]
+      self[:seitezeile]= self[:seitezeile][0..self[:seitezeile].index(' / ')]
     end
 
     if szOriginal != self[:seitezeile]
@@ -670,28 +696,54 @@ class Formular < ActiveRecord::Base
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
     end
 
-    myStelle['anmerkung'] = "; #{kommentar}"
+    if myStelle['anmerkung'] == nil
+      myStelle['anmerkung'] = "#{kommentar}"
+    else
+      myStelle['anmerkung'] = "; #{kommentar}"
+    end
 
     result = []
-    if self[:seitezeile].match(' - ')
-      # Form »002, 06 - 003, 02«
-      szParts = self[:seitezeile].split(' - ')
-      result << szSplit(szParts[0])
-      result << szSplit(szParts[1])
-    elsif self[:seitezeile].match(',')
-      parts = self[:seitezeile].split(',')
-      seite = parts[0]
-      if parts[1].match('-')
-        zeilen = parts[1].split('-') # match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
-        result = [[seite, Integer(zeilen[0].to_i)], [seite, Integer(zeilen[1].to_i)]]
+
+    myStelle['seitezeile'] = self[:seitezeile]
+    band_roemisch = dezimal_nach_roemisch(self[:band])
+
+
+    if self[:seitezeile].index(' - ') != nil # mit leerzeichen  bsp: 002, 06 - 003, 02
+      szParts = self[:seitezeile].split(' - ') # ["002, 06", "003, 02"]
+      result << szSplit(szParts[0]) # ["002, 06"]
+      result << szSplit(szParts[1]) # ["003, 02"]
+    elsif self[:seitezeile].index(',') != nil # ohne leerzeichen  bsp: 008, 08-09
+      parts = self[:seitezeile].split(',') # ["008", " 08-09"]
+      seite = (parts[0]).to_i # 008
+      if parts[1].index('-') != nil
+        zeilen = parts[1].split('-') # ["08","09"]
+        result = [[seite, (zeilen[0]).to_i], [seite, (zeilen[1]).to_i]] # [[008,08],[008,09]]
       else
-        zeile = Integer(parts[1])
+        zeile = (parts[1]).to_i
         result = [[seite, zeile], [seite, zeile]]
       end
     else
       result = [[0, 0], [0, 0]]
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
     end
+
+    # eine seite  (drei ziffern: 007 oder 012)
+    if result[0][0] == result[1][0]
+      # eine zeile (zwei ziffern: 04 oder 12)
+      if result[0][1] == result[1][1]
+        myStelle['bandseitezeile'] = "#{band_roemisch}, #{'%03i' % (result[0][0])}, #{'%02i' % (result[0][1])}"
+      else
+        myStelle['bandseitezeile'] = "#{band_roemisch}, #{'%03i' % (result[0][0])}, #{'%02i' % (result[0][1])}-#{'%02i' % (result[1][1])}"
+      end
+    else
+      myStelle['bandseitezeile'] = "#{band_roemisch}, #{'%03i' % (result[0][0])}, #{'%02i' % (result[0][1])} - #{'%03i' % (result[1][0])}, #{'%02i' % (result[1][1])}"
+    end
+
+    # todo führende Nulle einfügen 001011002
+    myStelle['start'] = "#{self[:band]}#{'%03i' % (result[0][0])}#{'%03i' % (result[0][1])}"
+    myStelle['stop'] = "#{self[:band]}#{'%03i' % (result[1][0])}#{'%03i' % (result[1][1])}"
+
+    myStelle['bandseite'] = "#{band_roemisch}, #{'%03i' % (result[0][0])}"
 
     if result[0][0] > result[1][0]
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler , SEITEN absteigend,  #{self[:seitezeile]}"
@@ -714,24 +766,102 @@ class Formular < ActiveRecord::Base
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler, zeile_stop > 30,  #{self[:seitezeile]}"
     end
 
+
     myStelle['stop_unsicher'] = false
     myStelle['zerstoerung'] = false
 
-    # todo Teil der Normalisierung ?
-    myStelle['uid'] = stelle.length
-    @myFormular['stelle_uid'] = stelle.length
+    # # todo Teil der Normalisierung ?
+    # myStelle['uid'] = stelle.length
+    # @myFormular['stelle_uid'] = stelle.length
 
-    stelle << [myStelle]
-    @formularDict[@myFormular['uid']] = @myFormular
+    # stelle << [myStelle]
+    # @formularDict[@myFormular['uid']] = @myFormular
+
+    stelle = Stelle.find_or_create_by(
+        :tempel => 'Edfu',
+        :band => myStelle['band_uid'],
+        :bandseite => myStelle['bandseite'],
+        :bandseitezeile => myStelle['bandseitezeile'],
+        :seite_start => myStelle['seite_start'],
+        :seite_stop => myStelle['seite_stop'],
+        :zeile_start => myStelle['zeile_start'],
+        :zeile_stop => myStelle['zeile_stop'],
+        :stelle_anmerkung => myStelle['anmerkung'],
+        :stelle_unsicher => myStelle['stop_unsicher'],
+        :start => myStelle['start'],
+        :stop => myStelle['stop'],
+        :zerstoerung => myStelle['zerstoerung'],
+        :freigegeben => myStelle['freigegeben']
+    )
+
+    self.stellen << stelle unless self.stellen.include? stelle
+  end
+
+
+  # todo was ist beabsichtigt im concert.py
+  def check_transliteration_re_3
 
   end
+
+
+  def find_or_create_literatur
+
+    literatur_beschreibung_hash = {
+        1 => 'Bedier, in: GM 162, 1998',
+        2 => 'Budde/Kurth, in: EB 4, 1994',
+        3 => 'Labrique, Stylistique',
+        4 => 'Aufrère, L’univers minéral I',
+        5 => 'Aufrère, L’univers minéral II'
+    }
+
+    formular_literatur_relation_hash = {
+        1 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        2 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        3 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        4 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
+        5 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        6 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
+              {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        7 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        8 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        9 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        10 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        11 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        12 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        13 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        14 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        15 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        16 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
+    }
+
+    if arr = formular_literatur_relation_hash[self[:uid]]
+      arr.each { |hash|
+        lit = Literatur.find_or_create_by(
+            beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
+            detail: hash['detail'],
+        )
+        self.literaturen << lit unless self.literaturen.include? lit
+      }
+    end
+
+  end
+
 
   # todo in module auslagern
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
 
     begin
-      parts = [Integer(parts[0]), Integer(parts[1])]
+      parts = [(parts[0]).to_i, (parts[1]).to_i]
     rescue ArgumentError
       logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
     end
@@ -740,6 +870,7 @@ class Formular < ActiveRecord::Base
   end
 
 end
+
 
 
 

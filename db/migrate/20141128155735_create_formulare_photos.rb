@@ -6,5 +6,8 @@ class CreateFormularePhotos < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :formulare_photos, [:formular_id, :photo_id], unique: true
+    add_index :formulare_photos, [:photo_id, :formular_id], unique: true
+
   end
 end

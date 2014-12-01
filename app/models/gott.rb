@@ -1,34 +1,37 @@
 # encoding: utf-8 
 
 require 'lib/edfu_model_helper'
+require 'lib/edfu_numerics_conversion_helper'
 
 class Gott < ActiveRecord::Base
+  include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
   has_many :stellen, as: :zugehoerigZu
 
+  attr_accessor :stelle, :transliteration_nosuffix
 
   # after_update :log_updated
   # after_create :log_created
   before_validation :check_data
 
 
-  searchable do
-
-    integer :uid, stored: true
-    text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-    text :transliteration_nosuffix, stored: true
-    text :ort, stored: true
-    text :eponym, stored: true
-    text :beziehung, stored: true
-    text :funktion, stored: true
-    integer :band, stored: true
-    text :seitezeile, stored: true # todo wirklich in den index?
-    text :anmerkung, stored: true
-    # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    # todo id hinzufügen, typ hinzufügen,
-
-  end
+  # searchable do
+  #
+  #   integer :uid, stored: true
+  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
+  #   text :transliteration_nosuffix, stored: true
+  #   text :ort, stored: true
+  #   text :eponym, stored: true
+  #   text :beziehung, stored: true
+  #   text :funktion, stored: true
+  #   integer :band, stored: true
+  #   text :seitezeile, stored: true # todo wirklich in den index?
+  #   text :anmerkung, stored: true
+  #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+  #   # todo id hinzufügen, typ hinzufügen,
+  #
+  # end
 
 
   private
@@ -39,7 +42,6 @@ class Gott < ActiveRecord::Base
     check_seitezeile_re_1
 
   end
-
 
 
   # todo update solr doc
@@ -57,243 +59,276 @@ class Gott < ActiveRecord::Base
 
   def check_seitezeile_re_1
 
+    # todo extract to module
+    # Einträge für die 8 Chassinat Bände.
+    bandDict = {
+        1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
+              'tempel_uid' => 0},
+        2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
+              'tempel_uid' => 0},
+        3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
+              'tempel_uid' => 0},
+        4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
+              'tempel_uid' => 0},
+        5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
+              'tempel_uid' => 0},
+        6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
+              'tempel_uid' => 0},
+        7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
+              'tempel_uid' => 0},
+        8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
+              'tempel_uid' => 0}
+    }
+
 
     gott = []
     gott_has_stelle = []
 
     # Tabelle GL
 
-    re3 = Regexp.new(r '^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9/ -]*)\s*(.*)$')
+    re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
 
-    originalSEITEZEILE = self[:seitenzeile]
+    originalSEITEZEILE = self[:seitezeile]
     stelleAnmerkung = ''
 
-    if self[:seitenzeile] == '066, 011ff,;'
+    if self[:seitezeile] == '066, 011ff,;'
       # 84
-      self[:seitenzeile] = '066, 011ff'
-    elsif self[:seitenzeile] == '264-269;'
+      self[:seitezeile] = '066, 011ff'
+    elsif self[:seitezeile] == '264-269;'
       # 1551
-      self[:seitenzeile] = '264, 0 - 269, 30;'
-    elsif self[:seitenzeile] == '2,7?'
+      self[:seitezeile] = '264, 0 - 269, 30;'
+    elsif self[:seitezeile] == '2,7?'
       # 1178
-      self[:seitenzeile] = '2, 7'
+      self[:seitezeile] = '2, 7'
       stelleAnmerkung = '2,7?'
-    elsif self[:seitenzeile] == '052, 006 und 008;'
+    elsif self[:seitezeile] == '052, 006 und 008;'
       # 2376
-      self[:seitenzeile] = '052, 6-8'
-    elsif self[:seitenzeile] == '215, 11 (2x)-216, 1 (1'
+      self[:seitezeile] = '052, 6-8'
+    elsif self[:seitezeile] == '215, 11 (2x)-216, 1 (1'
       # 2463
-      self[:seitenzeile] = '215, 11 - 216, 1'
-    elsif self[:seitenzeile] == '159'
+      self[:seitezeile] = '215, 11 - 216, 1'
+    elsif self[:seitezeile] == '159'
       # 3266
-      self[:seitenzeile] = '159, 0'
-    elsif self[:seitenzeile] == '149, 3:'
+      self[:seitezeile] = '159, 0'
+    elsif self[:seitezeile] == '149, 3:'
       # 3654
-      self[:seitenzeile] = '149, 3'
-    elsif self[:seitenzeile] == '90, 3 (25);'
+      self[:seitezeile] = '149, 3'
+    elsif self[:seitezeile] == '90, 3 (25);'
       # 4093
-      self[:seitenzeile] = '90, 3;'
+      self[:seitezeile] = '90, 3;'
       stelleAnmerkung = '(25)'
-    elsif self[:seitenzeile] == '39, 11/f.'
+    elsif self[:seitezeile] == '39, 11/f.'
       # 5487
-      self[:seitenzeile] = '39, 11f.'
-    elsif self[:seitenzeile] == '90,3 (36)'
+      self[:seitezeile] = '39, 11f.'
+    elsif self[:seitezeile] == '90,3 (36)'
       # 5758
-      self[:seitenzeile] = '90,3'
+      self[:seitezeile] = '90,3'
       stelleAnmerkung = '(36)'
-    elsif self[:seitenzeile] == '33,14 33,14'
+    elsif self[:seitezeile] == '33,14 33,14'
       # 5791
-      self[:seitenzeile] = '33, 14'
+      self[:seitezeile] = '33, 14'
     elsif self[:uid] == 6335
-      self[:band] = '7'
-    elsif self[:seitenzeile] == '331,6 und 332,1'
+      self[:band] = 'VII'  # 7'
+    elsif self[:seitezeile] == '331,6 und 332,1'
       # 6420
-      self[:seitenzeile] = '331, 6 - 332, 1'
-    elsif self[:seitenzeile] == '331,9 und 332,5'
+      self[:seitezeile] = '331, 6 - 332, 1'
+    elsif self[:seitezeile] == '331,9 und 332,5'
       # 6421
-      self[:seitenzeile] = '331, 9 - 332, 5'
-    elsif self[:seitenzeile] == '114,4 114,7                                                114,4'
+      self[:seitezeile] = '331, 9 - 332, 5'
+    elsif self[:seitezeile] == '114,4 114,7                                                114,4'
       # 7603
-      self[:seitenzeile] = '114, 4-7'
-    elsif self[:seitenzeile] == '47,5 47,5- 47,5'
+      self[:seitezeile] = '114, 4-7'
+    elsif self[:seitezeile] == '47,5 47,5- 47,5'
       # 7616
-      self[:seitenzeile] = '47, 5'
-    elsif self[:seitenzeile] == '24;4'
+      self[:seitezeile] = '47, 5'
+    elsif self[:seitezeile] == '24;4'
       # 7693
-      self[:seitenzeile] = '24, 4'
-    elsif self[:seitenzeile] == '75,13 75,13 75,13'
+      self[:seitezeile] = '24, 4'
+    elsif self[:seitezeile] == '75,13 75,13 75,13'
       # 7875
-      self[:seitenzeile] = '75, 13'
-    elsif self[:seitenzeile] == '54;3'
+      self[:seitezeile] = '75, 13'
+    elsif self[:seitezeile] == '54;3'
       # 8222
-      self[:seitenzeile] = '54, 3'
-    elsif self[:seitenzeile] == '137, 008-138'
+      self[:seitezeile] = '54, 3'
+    elsif self[:seitezeile] == '137, 008-138'
       # 8337
-      self[:seitenzeile] = '137, 008 - 138, 10'
-    elsif self[:seitenzeile] == '201; 008'
+      self[:seitezeile] = '137, 008 - 138, 10'
+    elsif self[:seitezeile] == '201; 008'
       # 8853
-      self[:seitenzeile] = '201, 008'
-    elsif self[:seitenzeile] == '067; 004'
+      self[:seitezeile] = '201, 008'
+    elsif self[:seitezeile] == '067; 004'
       # 8918
-      self[:seitenzeile] = '067, 004'
-    elsif self[:seitenzeile] == '018; 009'
+      self[:seitezeile] = '067, 004'
+    elsif self[:seitezeile] == '018; 009'
       # 8939
-      self[:seitenzeile] = '018, 009'
+      self[:seitezeile] = '018, 009'
     elsif self[:uid] == 9165
-      self[:band] = '5'
+      self[:band] = 'V' # '5'
     end
 
-    myGott = {
-        'uid' => self[:uid],
-        #'id' => self[:uid],
-        'transliteration' => self[:transliteration],
-        'ort' => self[:ort],
-        'eponym' => self[:eponym],
-        'beziehung' => self[:beziehung],
-        'funktion' => self[:funktion],
-        'anmerkung' => self[:anmerkung]
-    }
-    gott += [myGott]
+    # myGott = {
+    #     'uid' => self[:uid],
+    #     #'id' => self[:uid],
+    #     'transliteration' => self[:transliteration],
+    #     'ort' => self[:ort],
+    #     'eponym' => self[:eponym],
+    #     'beziehung' => self[:beziehung],
+    #     'funktion' => self[:funktion],
+    #     'anmerkung' => self[:anmerkung]
+    # }
+    # gott += [myGott]
 
     # gelegentlich ist der Inhalt doppelt vorhanden
-    szsz = self[:seitenzeile].gsub(' ', '')
-    halbeLaenge = Integer(round(szsz.length / 2))
+    szsz = self[:seitezeile].gsub(' ', '')
+    halbeLaenge = Integer(szsz.length / 2)
     halberString = szsz[halbeLaenge..-1]
     if (halberString + halberString) == szsz
-      self[:seitenzeile] = halberString
+      self[:seitezeile] = halberString
     end
 
-    self[:seitenzeile] = self[:seitenzeile].gsub('.09999999999999', ', 1')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.300000000000001', ', 3')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.30000000000001', ', 3')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.40000000000001', ', 4')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.59999999999999', ', 6')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.699999999999999', ', 7')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.69999999999999', ', 7')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.90000000000001', ', 9')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.109999999999999', ', 11')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.119999999999999', ', 12')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.140000000000001', ', 14')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.14000000000001', ', 14')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.15000000000001', ', 15')
-    self[:seitenzeile] = self[:seitenzeile].gsub('.18000000000001', ', 18')
+    self[:seitezeile] = self[:seitezeile].gsub('.09999999999999', ', 1')
+    self[:seitezeile] = self[:seitezeile].gsub('.300000000000001', ', 3')
+    self[:seitezeile] = self[:seitezeile].gsub('.30000000000001', ', 3')
+    self[:seitezeile] = self[:seitezeile].gsub('.40000000000001', ', 4')
+    self[:seitezeile] = self[:seitezeile].gsub('.59999999999999', ', 6')
+    self[:seitezeile] = self[:seitezeile].gsub('.699999999999999', ', 7')
+    self[:seitezeile] = self[:seitezeile].gsub('.69999999999999', ', 7')
+    self[:seitezeile] = self[:seitezeile].gsub('.90000000000001', ', 9')
+    self[:seitezeile] = self[:seitezeile].gsub('.109999999999999', ', 11')
+    self[:seitezeile] = self[:seitezeile].gsub('.119999999999999', ', 12')
+    self[:seitezeile] = self[:seitezeile].gsub('.140000000000001', ', 14')
+    self[:seitezeile] = self[:seitezeile].gsub('.14000000000001', ', 14')
+    self[:seitezeile] = self[:seitezeile].gsub('.15000000000001', ', 15')
+    self[:seitezeile] = self[:seitezeile].gsub('.18000000000001', ', 18')
 
-    match = self[:seitenzeile].match(/([0-9]+)\.([0-9]+)/)
-    # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-    self[:seitenzeile] = self[:seitenzeile].gsub(/([0-9]+)\.([0-9]+)/, "#{match[1]}, #{match[2]}")
 
-    # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-    self[:seitenzeile] = self[:seitenzeile].gsub(/und/, ';')
+    if match = self[:seitezeile].match(/([0-9]+)\.([0-9]+)/)
+      self[:seitezeile] = self[:seitezeile].gsub(/([0-9]+)\.([0-9]+)/, "#{match[1]}, #{match[2]}") # (..), (..)
+    end
 
-    if originalSEITEZEILE != self[:seitenzeile]
+    self[:seitezeile] = self[:seitezeile].gsub(/und/, ';')
+
+    if originalSEITEZEILE != self[:seitezeile]
       logger.info "\t[INFO]  [GL] uid: #{self[:uid]} Änderung SEITEZEILE, original: #{originalSEITEZEILE} new: #{self[:seitezeile]}"
     end
 
-    szs = self[:seitenzeile].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2].split(';')
-    if szs.length == 1 and szs[0].length > 1
-      sz = szs[0]
-      stopUnsicher = false
-      sz = sz.match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
-      komponenten = sz.split(',')
-      if komponenten.length == 1
-        # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
-        match = sz.match(/([0-9]*)(.*)/)
-        # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-        sz = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
-        komponenten = sz.split(',')
-      end
+    # todo check this
+    if match = self[:seitezeile].match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
+      szs = match[2].split(';')
+      if szs.length == 1 and szs[0].length > 1
+        sz = szs[0]
+        stopUnsicher = false
+        if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
+          sz = match[2]
+          komponenten = sz.split(',')
+          if komponenten.length == 1
+            # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
+            match = sz.match(/([0-9]*)(.*)/)
 
-      if komponenten.length > 2
-        sz = sz.gsub(' ', '')
-        sz = sz.gsub('/', '-')
-        sy = sz.split('-')
-        if sy.length == 2
-          start = szSplit(sy[0])
-          stop = szSplit(sy[1])
-          startSeite = start[0]
-          startZeile = start[1]
-          stopSeite = stop[0]
-          stopZeile = stop[1]
+            sz = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
+            komponenten = sz.split(',')
+          end
+
+          if komponenten.length > 2
+            sz = sz.gsub(' ', '')
+            sz = sz.gsub('/', '-')
+            sy = sz.split('-')
+            if sy.length == 2
+              start = szSplit(sy[0])
+              stop = szSplit(sy[1])
+              startSeite = start[0]
+              startZeile = start[1]
+              stopSeite = stop[0]
+              stopZeile = stop[1]
+            else
+              logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} SEITEZEILE, falsche Komponentenzahl: #{sz}"
+            end
+
+          else
+            startSeite = Integer(komponenten[0])
+            stopSeite = startSeite
+            zeilen = komponenten[1].strip()
+            if zeilen.match(/f/)
+
+              stopUnsicher = true
+              # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
+              zeilen = zeilen.gsub(/\s*f+\.*/, '')
+            end
+
+            # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
+            zeilen = zeilen.gsub(/[ \/-]+/, '-')
+            zs = zeilen.split('-')
+
+            startZeile = Integer(zs[0])
+            if zs.length > 1
+
+              stopZeile = Integer(zs[1])
+            else
+              stopZeile = startZeile
+            end
+          end
+
+          band = roemisch_nach_dezimal(self[:band])
+          #band = Integer(self[:band])
+
+          if startSeite > 0 and band > 0
+
+            # myStelle = {
+            #     # todo prüfen uid = stellenlönge ?
+            #     'uid' => stelle.length,
+            #     'band_uid' => band,
+            #     'seite_start' => startSeite,
+            #     'seite_stop' => stopSeite,
+            #     'zeile_start' => startZeile,
+            #     'zeile_stop' => stopZeile,
+            #     'stop_unsicher' => stopUnsicher,
+            #     'zerstoerung' => false,
+            #     'anmerkung' => stelleAnmerkung
+            # }
+            # stelle += [myStelle]
+
+
+            # todo extract to module
+            stelle = Stelle.find_or_create_by(
+                :tempel => 'Edfu',
+                :band => band,
+                :bandseite => "#{self[:band]}, #{'%03i' % (startSeite)}",
+                :bandseitezeile => "#{self[:band]}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}",
+                :seite_start => startSeite,
+                :seite_stop => stopSeite,
+                :zeile_start => startZeile,
+                :zeile_stop => stopZeile,
+                :stelle_anmerkung => stelleAnmerkung,
+                :stelle_unsicher => stopUnsicher,
+                :start => "#{band}#{'%03i' % (startSeite)}#{'%03i' % (startZeile)}",
+                :stop => "#{band}#{'%03i' % (stopSeite)}#{'%03i' % (stopZeile)}",
+                :zerstoerung => false,
+                :freigegeben => bandDict[Integer(band)]['freigegeben']
+            )
+            self.stellen << stelle unless self.stellen.include? stelle
+
+
+            if startZeile > 30
+              logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} zeile_start > 30: #{sz}"
+            end
+
+            if stopZeile > 30
+              logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} zeile_stop > 30: #{sz}"
+            end
+
+
+            # myGott['stelle_uid'] = myStelle['uid']
+
+          else
+            logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: #{sz}"
+          end
+
         else
-          logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} SEITEZEILE, falsche Komponentenzahl: #{sz}"
-        end
-
-      else
-        startSeite = Integer(komponenten[0])
-        stopSeite = startSeite
-        zeilen = komponenten[1].strip()
-        if zeilen.match(/f/)
-
-          stopUnsicher = true
-          # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-          zeilen = zeilen.gsub(r '\s*f+\.*', '')
-        end
-
-        # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-        zeilen = zeilen.gsub(r '[ /-]+', '-')
-        zs = zeilen.split('-')
-
-        startZeile = int(zs[0])
-        if zs.length > 1
-
-          stopZeile = Integer(zs[1])
-        else
-          stopZeile = startZeile
+          logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{self[:seitezeile]}"
         end
       end
-      band = Integer(self[:band])
-      if startSeite > 0 and band > 0
-
-        myStelle = {
-            # todo prüfen uid = stellenlönge ?
-            'uid' => stelle.length,
-            'band_uid' => band,
-            'seite_start' => startSeite,
-            'seite_stop' => stopSeite,
-            'zeile_start' => startZeile,
-            'zeile_stop' => stopZeile,
-            'stop_unsicher' => stopUnsicher,
-            'zerstoerung' => false,
-            'anmerkung' => stelleAnmerkung
-        }
-        stelle += [myStelle]
-
-        if myStelle['zeile_start'] > 30
-          logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} zeile_start > 30: #{sz}"
-        end
-
-        if myStelle['zeile_stop'] > 30
-          logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} zeile_stop > 30: #{sz}"
-        end
-
-
-        myGott['stelle_uid'] = myStelle['uid']
-      else
-        logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: #{sz}"
-      end
-
-    else
-      logger.error "\t[ERROR]  [GL] uid: #{self[:uid]} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{self[:seitenzeile]}"
     end
-
-
-    wort = []
-
-    # wird unter der Tabelle WORT_HAS_STELLE (WORT_STELLE_MM) hinzugefügt
-    wort_has_stelle = []
-    # Wörterbuch Berlin mit Datensatz für 'nicht belegt'
-
-    # wird unter der Tabelle BERLIN (WB_BERLIN) hinzugefügt
-    berlin = [{
-                  'uid' => 0,
-                  'band' => 0,
-                  'seite_start' => 0,
-                  'seite_stop' => 0,
-                  'zeile_start' => 0,
-                  'zeile_stop' => 0,
-                  'notiz' => nil
-              }]
 
   end
 end

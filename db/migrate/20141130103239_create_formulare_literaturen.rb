@@ -6,5 +6,8 @@ class CreateFormulareLiteraturen < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :formulare_literaturen, [:formular_id, :literatur_id], unique: true
+    add_index :formulare_literaturen, [:literatur_id, :formular_id], unique: true
+
   end
 end

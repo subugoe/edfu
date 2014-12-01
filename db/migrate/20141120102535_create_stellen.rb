@@ -1,21 +1,21 @@
 class CreateStellen < ActiveRecord::Migration
   def change
     create_table :stellen do |t|
-      t.string :uid
+      #t.string :uid              #   myStelle['uid']
       t.string :tempel
-      t.string :band
+      t.string :band             # myStelle['band_uid']
       t.string :bandseite
       t.string :bandseitezeile
-      t.string :seite_start
-      t.string :seite_stop
-      t.string :zeile_start
-      t.string :zeile_stop
-      t.string :stelle_anmerkung
-      t.string :stelle_unsicher
+      t.string :seite_start        # myStelle['seite_start']
+      t.string :seite_stop         # myStelle['seite_stop']
+      t.string :zeile_start        # myStelle['zeile_start']
+      t.string :zeile_stop         # myStelle['zeile_stop']
+      t.string :stelle_anmerkung    # myStelle['anmerkung']
+      t.string :stelle_unsicher     # myStelle['stop_unsicher']
       t.string :start
       t.string :stop
-      t.string :zerstoerung
-      t.string :freigegeben
+      t.string :zerstoerung         # myStelle['zerstoerung']
+      t.string :freigegeben         # myStelle['freigegeben']
       t.references :zugehoerigZu, polymorphic: true
 
       t.timestamps
