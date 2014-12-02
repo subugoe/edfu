@@ -10,7 +10,9 @@ class Formular < ActiveRecord::Base
 
   attr_accessor :photo, :photo_pfad, :photo_kommentar, :literatur
 
+  # todo has_many or has_one?
   has_many :stellen, as: :zugehoerigZu
+
   has_and_belongs_to_many :photos
   has_and_belongs_to_many :literaturen
 

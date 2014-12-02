@@ -7,6 +7,7 @@ class Gott < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
+  # todo has_many or has_one?
   has_many :stellen, as: :zugehoerigZu
 
   attr_accessor :stelle, :transliteration_nosuffix

@@ -89,8 +89,8 @@ class UploadsController < ApplicationController
 
     #process_formular
     #process_ort
-    process_gott
-    #process_wort
+    #process_gott
+    process_wort
 
   end
 
@@ -225,7 +225,7 @@ class UploadsController < ApplicationController
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
 
-    excel = Roo::Excel.new("edfu-data/WL.xlsx")
+    excel = Roo::Excel.new("public/uploads/WL.xls")
 
     excel.default_sheet = excel.sheets.first
 
@@ -239,15 +239,15 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==20
+      break if i==8
 
       Wort.where(uid: Integer(row[7])).update_or_create(
 
-          uid: row[7] || '',
+          uid: Integer(row[7]) || '',
           transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
           uebersetzung: row[1] || '',
-          hieroglyph: row[2] || '',
+          hieroglyph: Integer(row[2]) || '',
           weiteres: row[3] || '',
           belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
           belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?

@@ -199,8 +199,6 @@ class Ort < ActiveRecord::Base
 
           end
 
-          puts "vor crate"
-
           stelle = Stelle.find_or_create_by(
               :tempel => 'Edfu',
               :band => bandNr,
@@ -218,8 +216,6 @@ class Ort < ActiveRecord::Base
               :freigegeben => bandDict[Integer(bandNr)]['freigegeben']
           )
           self.stellen << stelle unless self.stellen.include? stelle
-
-          puts "hinter zuweisung"
 
           if zeileStart > 30
             logger.info "\t[Error]  [OL] uid: #{self[:uid]} zeile_start > 30, zeile_start: #{zeileStart}, teil: #{teil}"
