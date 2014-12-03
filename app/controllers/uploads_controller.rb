@@ -87,10 +87,10 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    process_formular
+    #process_formular
     process_ort
-    process_gott
-    process_wort
+    #process_gott
+    #process_wort
 
   end
 
@@ -181,11 +181,11 @@ class UploadsController < ApplicationController
       break if i==50
 
       # uid changed to string from integer
-      Ort.where(uid: row[5]).update_or_create(
+      Ort.where(uid: row[5].to_i).update_or_create(
 
           # changed to string from integer
-          uid: row[5] || '',
-          stelle: row[0] || '',
+          uid: row[5].to_i || '',
+          iStelle: row[0] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
           ort: row[2] || '',

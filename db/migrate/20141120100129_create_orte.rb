@@ -2,7 +2,7 @@ class CreateOrte < ActiveRecord::Migration
   def change
     create_table :orte do |t|
       t.string :uid
-      #t.string :stelle
+      #t.string :bandseitezeile
       t.string :transliteration
       #t.string :transliteration_nosuffix
       t.string :ort
