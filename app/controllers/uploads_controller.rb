@@ -1,4 +1,5 @@
 require 'roo'
+require 'securerandom'
 
 class UploadsController < ApplicationController
 
@@ -87,8 +88,8 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    #process_formular
-    process_ort
+    process_formular
+    #process_ort
     #process_gott
     #process_wort
 
@@ -131,12 +132,11 @@ class UploadsController < ApplicationController
       # if uid doesn't exist
       # todo use string
       if row[9] != nil and row[9] != ''
-        previousUID = uID = row[9]
+        uID = row[9].to_i
       else
-        previousUID = uID = (Float(previousUID) + 0.1).to_s
+        uID = SecureRandom.random_number(100000000)
       end
 
-        # uid changed to string from integer
         f = Formular.where(uid: uID).update_or_create(
 
           transliteration: row[0] || '',
@@ -151,7 +151,7 @@ class UploadsController < ApplicationController
           # szeneID changed to string from integer
           szeneID: row[7] != '',  # Integer(row[7]) || -1,
           literatur: row[8] || '',
-          uid: (row[9]) || ""
+          uid: uID
 
       )
 
@@ -180,7 +180,6 @@ class UploadsController < ApplicationController
       # todo replace this
       break if i==50
 
-      # uid changed to string from integer
       Ort.where(uid: row[5].to_i).update_or_create(
 
           # changed to string from integer
@@ -219,8 +218,7 @@ class UploadsController < ApplicationController
       # todo replace this
       break if i==50
 
-      # uid changed to string from integer
-      Gott.where(uid: row[9]).update_or_create(
+      Gott.where(uid: row[9].to_i).update_or_create(
 
           uid: row[9] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
@@ -261,7 +259,7 @@ class UploadsController < ApplicationController
       break if i==50
 
       # uid changed to string from integer
-      Wort.where(uid: row[7]).update_or_create(
+      Wort.where(uid: row[7].to_i).update_or_create(
 
           uid: (row[7]) || '',
           transliteration: row[0] || '', # todo transliteration_highlight hinzufügen

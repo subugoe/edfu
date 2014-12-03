@@ -844,7 +844,7 @@ class Formular < ActiveRecord::Base
         17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
     }
 
-    if arr = formular_literatur_relation_hash[self[:uid]]
+    if arr = formular_literatur_relation_hash[self[:uid].to_i]
       arr.each { |hash|
         lit = Literatur.find_or_create_by(
             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],

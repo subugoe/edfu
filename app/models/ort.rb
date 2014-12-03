@@ -237,37 +237,38 @@ class Ort < ActiveRecord::Base
         end
       end
 
+      # todo add duplcate check
       # Doppelte Einträge in OL zusammenführen
       #
       # vergleicht zunächst den ersten ort mit irgendeinem
       # nach erstem Durchgang wird ort mit vorgänger verglichen
       #
-      ort = Ort.all
-      if ort.length > 1
-
-        previousO = ort[2]
-        ort.each do |o|
-
-          previousTranslit = previousO['transliteration'].sub('[0-9 ]*$', '')
-          translit = o['transliteration'].sub('[0-9 ]*$', '')
-
-          if translit == previousTranslit and o['ort'] == previousO['ort'] and o['lokalisation'] == previousO['lokalisation']
-            # Orte stimmen überein: alle links dem o Datensatz zuweisen
-            logger.info "\t[INFO]  [OL] uid: #{o[:uid]} Duplikat von: #{previousO['uid']} mergen"
-
-            # todo check this
-            previousO.stellen.each { |pStelle|
-              unless o.stellen.include? pStelle
-                o.stellen << pStelle
-              end
-            }
-            Ort.destroy previousO
-          end
-
-          previousO = o
-
-        end
-      end
+      # ort = Ort.all
+      # if ort.length > 1
+      #
+      #   previousO = ort[2]
+      #   ort.each do |o|
+      #
+      #     previousTranslit = previousO['transliteration'].sub('[0-9 ]*$', '')
+      #     translit = o['transliteration'].sub('[0-9 ]*$', '')
+      #
+      #     if translit == previousTranslit and o['ort'] == previousO['ort'] and o['lokalisation'] == previousO['lokalisation']
+      #       # Orte stimmen überein: alle links dem o Datensatz zuweisen
+      #       logger.info "\t[INFO]  [OL] uid: #{o[:uid]} Duplikat von: #{previousO['uid']} mergen"
+      #
+      #       # todo check this
+      #       previousO.stellen.each { |pStelle|
+      #         unless o.stellen.include? pStelle
+      #           o.stellen << pStelle
+      #         end
+      #       }
+      #       Ort.destroy previousO
+      #     end
+      #
+      #     previousO = o
+      #
+      #   end
+      # end
     end
   end
 end
