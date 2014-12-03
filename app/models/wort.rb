@@ -281,8 +281,8 @@ class Wort < ActiveRecord::Base
 
     unless bereitsVorhanden
 
-      dbWB = WbBerlin.find_or_create_by(
-          :band => wbBand,
+      dbWB = WbBerlin.create(
+          :band => wbBand || 'unbekannt',
           :seite_start => wbStart[0] || '',
           :seite_stop => wbStop[0] || '',
           :zeile_start => wbStart[1] || '',
@@ -400,7 +400,7 @@ class Wort < ActiveRecord::Base
 
 
           # todo nicht korrekt
-          stelle = Stelle.find_or_create_by(
+          stelle = Stelle.create(
               :tempel => 'Edfu',
               :band => edfuBandNr,
               :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",

@@ -205,7 +205,7 @@ class Ort < ActiveRecord::Base
 
           end
 
-          stelle = Stelle.find_or_create_by(
+          stelle = Stelle.create(
               :tempel => 'Edfu',
               :band => bandNr,
               :bandseite => "#{@myBand}, #{'%03i' % (seiteStart)}",

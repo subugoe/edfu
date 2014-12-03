@@ -568,7 +568,7 @@ class Formular < ActiveRecord::Base
         #     p.save
         #   end
         # else
-        p = Photo.find_or_create_by(
+        p = Photo.create(
             name: name,
             typ: typ,
             pfad: pfad,
@@ -810,7 +810,7 @@ class Formular < ActiveRecord::Base
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
-    stelle = Stelle.find_or_create_by(
+    stelle = Stelle.create(
         :tempel => 'Edfu',
         :band => myStelle['band_uid'],
         :bandseite => myStelle['bandseite'],
@@ -878,7 +878,7 @@ class Formular < ActiveRecord::Base
 
     if arr = formular_literatur_relation_hash[self[:uid].to_i]
       arr.each { |hash|
-        lit = Literatur.find_or_create_by(
+        lit = Literatur.create(
             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
             detail: hash['detail'],
         )

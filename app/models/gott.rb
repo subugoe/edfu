@@ -291,7 +291,7 @@ class Gott < ActiveRecord::Base
 
 
             # todo extract to module
-            stelle = Stelle.find_or_create_by(
+            stelle = Stelle.create(
                 :tempel => 'Edfu',
                 :band => band,
                 :bandseite => "#{self[:band]}, #{'%03i' % (startSeite)}",
