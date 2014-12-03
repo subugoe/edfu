@@ -96,11 +96,21 @@ class UploadsController < ApplicationController
   end
 
   def prepareDB
-    Formular.delete_all
-    Gott.delete_all
-    Ort.delete_all
-    Wort.delete_all
-    WbBerlin.delete_all
+
+    #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
+    #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
+    #   OR name = 'worte'")
+
+    Formular.destroy_all
+    Gott.destroy_all
+    Ort.destroy_all
+    Wort.destroy_all
+    WbBerlin.destroy_all
+
+    #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
+    #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
+    #   OR name = 'worte'")
+
   end
 
   # todo move to Formular/Helper (Formular.xls)
@@ -137,7 +147,7 @@ class UploadsController < ApplicationController
       end
 
 
-      f = Formular.where(uid: Integer(row[9])).create(
+      f = Formular.create(
 
           transliteration: row[0] || '',
           band: Integer(row[1]) || -1,
@@ -180,10 +190,10 @@ class UploadsController < ApplicationController
       # todo replace this
       break if i==150
 
-      Ort.where(uid: row[5].to_i).create(
+      Ort.create(
 
           # changed to string from integer
-          uid: row[5].to_i || '',
+          uid: Integer(row[5]) || '',
           iStelle: row[0] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
@@ -218,9 +228,9 @@ class UploadsController < ApplicationController
       # todo replace this
       break if i==150
 
-      Gott.where(uid: row[9].to_i).create(
+      Gott.create(
 
-          uid: row[9] || '',
+          uid: Integer(row[9]) || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
           ort: row[2] || '',
@@ -259,9 +269,9 @@ class UploadsController < ApplicationController
       break if i==150
 
       # uid changed to string from integer
-      Wort.where(uid: row[7].to_i).create(
+      Wort.create(
 
-          uid: (row[7]) || '',
+          uid: Integer(row[7]) || '',
           transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
           uebersetzung: row[1] || '',
