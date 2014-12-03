@@ -5,7 +5,7 @@ require 'lib/edfu_model_helper'
 class WbBerlin < ActiveRecord::Base
   extend EdfuModelHelper
 
-  belongs_to :wort
+  has_one :wort
 
   # after_update :log_updated
   # after_create :log_created

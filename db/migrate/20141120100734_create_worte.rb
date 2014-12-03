@@ -10,6 +10,7 @@ class CreateWorte < ActiveRecord::Migration
       t.string :belegstellenEdfu
       t.string :belegstellenWb
       t.string :anmerkung
+      t.references :wb_berlin, index: true
 
       t.timestamps
     end

@@ -182,7 +182,7 @@ class Gott < ActiveRecord::Base
 
     # gelegentlich ist der Inhalt doppelt vorhanden
     szsz = self[:seitezeile].gsub(' ', '')
-    halbeLaenge = Integer(szsz.length / 2)
+    halbeLaenge = (szsz.length / 2).to_i
     halberString = szsz[halbeLaenge..-1]
     if (halberString + halberString) == szsz
       self[:seitezeile] = halberString
@@ -247,7 +247,7 @@ class Gott < ActiveRecord::Base
             end
 
           else
-            startSeite = Integer(komponenten[0])
+            startSeite = (komponenten[0]).to_i
             stopSeite = startSeite
             zeilen = komponenten[1].strip()
             if zeilen.match(/f/)
@@ -261,17 +261,17 @@ class Gott < ActiveRecord::Base
             zeilen = zeilen.gsub(/[ \/-]+/, '-')
             zs = zeilen.split('-')
 
-            startZeile = Integer(zs[0])
+            startZeile = (zs[0]).to_i
             if zs.length > 1
 
-              stopZeile = Integer(zs[1])
+              stopZeile = (zs[1]).to_i
             else
               stopZeile = startZeile
             end
           end
 
           band = roemisch_nach_dezimal(self[:band])
-          #band = Integer(self[:band])
+          #band = (self[:band]).to_i
 
           if startSeite > 0 and band > 0
 
@@ -305,7 +305,7 @@ class Gott < ActiveRecord::Base
                 :start => "#{band}#{'%03i' % (startSeite)}#{'%03i' % (startZeile)}",
                 :stop => "#{band}#{'%03i' % (stopSeite)}#{'%03i' % (stopZeile)}",
                 :zerstoerung => false,
-                :freigegeben => bandDict[Integer(band)]['freigegeben']
+                :freigegeben => bandDict[(band).to_i]['freigegeben']
             )
             self.stellen << stelle unless self.stellen.include? stelle
 

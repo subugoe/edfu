@@ -87,9 +87,9 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    #process_formular
-    #process_ort
-    #process_gott
+    process_formular
+    process_ort
+    process_gott
     process_wort
 
   end
@@ -108,6 +108,7 @@ class UploadsController < ApplicationController
 
     excel.default_sheet = excel.sheets.first
 
+    previousUID = 0
     i = 1
     excel.each do |row|
 
@@ -118,11 +119,25 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==4
+      break if i==50
 
+      # if SzeneID doesn't exist
+      # if row[7] != nil and row[7] != ''
+      #   szID = Integer(row[7])
+      # else
+      #   szID = ''
+      # end
 
+      # if uid doesn't exist
+      # todo use string
+      if row[9] != nil and row[9] != ''
+        previousUID = uID = row[9]
+      else
+        previousUID = uID = (Float(previousUID) + 0.1).to_s
+      end
 
-      f = Formular.where(uid: Integer(row[9])).update_or_create(
+        # uid changed to string from integer
+        f = Formular.where(uid: uID).update_or_create(
 
           transliteration: row[0] || '',
           band: Integer(row[1]) || -1,
@@ -133,9 +148,10 @@ class UploadsController < ApplicationController
           photo: row[6] || '',
           photo_pfad: '',
           photo_kommentar: '',
-          szeneID: Integer(row[7]) || -1,
+          # szeneID changed to string from integer
+          szeneID: row[7] != '',  # Integer(row[7]) || -1,
           literatur: row[8] || '',
-          uid: Integer(row[9]) || -1
+          uid: (row[9]) || ""
 
       )
 
@@ -162,11 +178,13 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==7
+      break if i==50
 
-      Ort.where(uid: Integer(row[5])).update_or_create(
+      # uid changed to string from integer
+      Ort.where(uid: row[5]).update_or_create(
 
-          uid: Integer(row[5]) || '',
+          # changed to string from integer
+          uid: row[5] || '',
           stelle: row[0] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
@@ -199,11 +217,12 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==5
+      break if i==50
 
-      Gott.where(uid: Integer(row[9])).update_or_create(
+      # uid changed to string from integer
+      Gott.where(uid: row[9]).update_or_create(
 
-          uid: Integer(row[9]) || '',
+          uid: row[9] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
           ort: row[2] || '',
@@ -239,15 +258,17 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==8
+      break if i==50
 
-      Wort.where(uid: Integer(row[7])).update_or_create(
+      # uid changed to string from integer
+      Wort.where(uid: row[7]).update_or_create(
 
-          uid: Integer(row[7]) || '',
+          uid: (row[7]) || '',
           transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
           transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
           uebersetzung: row[1] || '',
-          hieroglyph: Integer(row[2]) || '',
+          # hieroglyph changed to string from integer
+          hieroglyph: row[2] || '',
           weiteres: row[3] || '',
           belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
           belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?

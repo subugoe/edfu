@@ -8,7 +8,7 @@ class CreateWbBerlins < ActiveRecord::Migration
       t.string :zeile_start
       t.string :zeile_stop
       t.string :notiz
-      t.references :wort, index: true
+
 
       t.timestamps
     end

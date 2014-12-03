@@ -7,7 +7,7 @@ class Wort < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  has_one :wb_berlin
+  belongs_to  :wb_berlin
   has_many :stellen, as: :zugehoerigZu
 
   # after_update :log_updated
@@ -192,7 +192,7 @@ class Wort < ActiveRecord::Base
         wb = wb.gsub(/vor /, '')
       end
 
-      wbBand_roemisch = wb[0 .. wb.index(',')]
+      wbBand_roemisch = wb[0 .. wb.index(',')-1]
 
       wb = wb[wb.index(',') + 1 .. -1].strip()
     end
@@ -208,11 +208,11 @@ class Wort < ActiveRecord::Base
       wbTeile = wb.split('-')
       if wbTeile.length == 2
         wbSeiteZeile = wbTeile[0].split(',')
-        wbSeiteStart = Integer(wbSeiteZeile[0].strip())
+        wbSeiteStart = (wbSeiteZeile[0].strip()).to_i
         wbSeiteStop = wbSeiteStart
 
         begin
-          wbZeileStart = Integer(wbSeiteZeile[1].strip())
+          wbZeileStart = (wbSeiteZeile[1].strip()).to_i
         rescue ArgumentError
           logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit Beleg #{wbSeiteZeile[0]} überprüfen"
         end
@@ -227,8 +227,11 @@ class Wort < ActiveRecord::Base
           wbZeileStop = (wbTeile[1].strip()).to_i
         end
 
+        # todo geändert
+        # von: stop = [seiteStart, zeileStop]
+        # nach: stop = [seiteStop, zeileStop]
         wbStart = [wbSeiteStart, wbZeileStart]
-        wbStop = [wbSeiteStart, wbZeileStop]
+        wbStop = [wbSeiteStop, wbZeileStop]
 
       else
         logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} BelegstellenWb Formatfehler #{self[:belegstellenWb]} #{wb}"
@@ -280,11 +283,11 @@ class Wort < ActiveRecord::Base
 
       dbWB = WbBerlin.find_or_create_by(
           :band => wbBand,
-          :seite_start => wbStart[0],
-          :seite_stop => wbStop[0],
-          :zeile_start => wbStart[1],
-          :zeile_stop => wbStop[1],
-          :notiz => wbAnmerkung
+          :seite_start => wbStart[0] || '',
+          :seite_stop => wbStop[0] || '',
+          :zeile_start => wbStart[1] || '',
+          :zeile_stop => wbStop[1] || '',
+          :notiz => wbAnmerkung || ''
       )
       self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
 
@@ -297,7 +300,7 @@ class Wort < ActiveRecord::Base
     #--- edfu
 
 
-    if edfuAnmerkung != ''
+    if edfuAnmerkung != ''  or edfuAnmerkung.length != 0
       self[:anmerkung] = "#{edfuAnmerkung.strip()}; #{self[:anmerkung].strip() || ''}"
     else
       self[:anmerkung] = "#{self[:anmerkung].strip() || ''}"
@@ -323,7 +326,7 @@ class Wort < ActiveRecord::Base
 
         if b.index('%') != nil
           zerstoerung = true
-          b = b.gsub('%', '').gesub('&', '')
+          b = b.gsub('%', '').gsub('&', '')
 
         end
 
@@ -353,8 +356,8 @@ class Wort < ActiveRecord::Base
           edfuAnmerkung = ''
 
           if m20[4].index(' - ') != nil
-            edfuZeileStart = Integer(m20[4].split(' - ')[0])
-            edfuZeileStop = Integer(m20[4].split(' - ')[1])
+            edfuZeileStart = (m20[4].split(' - ')[0]).to_i
+            edfuZeileStop = (m20[4].split(' - ')[1]).to_i
           else
             zeilenString = m20[4]
             zeilenString = zeilenString.gsub('/', '-').gsub(' ', '')
@@ -364,8 +367,8 @@ class Wort < ActiveRecord::Base
               edfuZeileStop = edfuZeileStart
 
             elsif zeilen.length == 2
-              edfuZeileStart = Integer(zeilen[0])
-              edfuZeileStop = Integer(zeilen[1])
+              edfuZeileStart = (zeilen[0]).to_i
+              edfuZeileStop = (zeilen[1]).to_i
             else
               logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zu viele Komponenten in Zeilenangabe #{b}"
             end
@@ -396,7 +399,7 @@ class Wort < ActiveRecord::Base
           # stelle += [myStelle]
 
 
-
+          # todo nicht korrekt
           stelle = Stelle.find_or_create_by(
               :tempel => 'Edfu',
               :band => edfuBandNr,
@@ -411,7 +414,7 @@ class Wort < ActiveRecord::Base
               :start => "#{edfuBandNr}#{'%03i' % (edfuSeiteStart)}#{'%03i' % (edfuZeileStart)}",
               :stop => "#{edfuBandNr}#{'%03i' % (edfuSeiteStop)}#{'%03i' % (edfuZeileStop)}",
               :zerstoerung => false,
-              :freigegeben => bandDict[Integer(edfuBandNr)]['freigegeben']
+              :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben']
           )
           self.stellen << stelle unless self.stellen.include? stelle
 
@@ -461,4 +464,18 @@ class Wort < ActiveRecord::Base
 
 
   end
+
+  # todo in module auslagern
+  def szSplit(s)
+    parts = s.gsub(' ', '').split(',')
+
+    begin
+      parts = [(parts[0]).to_i, (parts[1]).to_i]
+    rescue ArgumentError
+      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
+    end
+
+    return parts
+  end
+
 end

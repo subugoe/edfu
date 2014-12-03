@@ -172,27 +172,27 @@ class Ort < ActiveRecord::Base
             bandNr = roemisch_nach_dezimal(@myBand)
           end
 
-          seiteStart = Integer(m3[2].strip())
+          seiteStart = (m3[2].strip()).to_i
           seiteStop = seiteStart
           zeileStart = 100
           zeileStop = 100
 
           if m3[3].index(' - ') != nil
-            seiteStop = Integer(m3[3].split(' - ')[1])
+            seiteStop = (m3[3].split(' - ')[1]).to_i
 
-            zeileStart = Integer(m3[3].split(' - ')[0])
+            zeileStart = (m3[3].split(' - ')[0]).to_i
 
-            zeileStop = Integer(m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2])
+            zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
             kommentar = ''
           else
             z = m3[3].gsub(' ', '').gsub('/', '-')
             zeilen = z.split('-')
-            zeileStart = Integer(zeilen[0])
+            zeileStart = (zeilen[0]).to_i
 
             if zeilen.length == 1
               zeileStop = zeileStart
             else
-              zeileStop = Integer(zeilen[1])
+              zeileStop = (zeilen[1]).to_i
             end
 
             kommentar = m3[4].strip()
@@ -213,7 +213,7 @@ class Ort < ActiveRecord::Base
               :start => "#{bandNr}#{'%03i' % (seiteStart)}#{'%03i' % (zeileStart)}",
               :stop => "#{bandNr}#{'%03i' % (seiteStop)}#{'%03i' % (zeileStop)}",
               :zerstoerung => false,
-              :freigegeben => bandDict[Integer(bandNr)]['freigegeben']
+              :freigegeben => bandDict[(bandNr).to_i]['freigegeben']
           )
           self.stellen << stelle unless self.stellen.include? stelle
 

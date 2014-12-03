@@ -96,7 +96,7 @@ class Formular < ActiveRecord::Base
     @myFormular = Hash.new
     @formularDict = Hash.new
 
-    @myFormular['uid'] = Integer(self[:uid])
+    @myFormular['uid'] = (self[:uid]).to_i
     @myFormular['texttyp'] = self[:texttyp]
 
 
@@ -111,8 +111,6 @@ class Formular < ActiveRecord::Base
 
     find_or_create_literatur
 
-    # todo replace this
-    puts self.to_s
 
   end
 
@@ -245,7 +243,8 @@ class Formular < ActiveRecord::Base
 
 
     # 4772-4795
-    self.photo = self.photo.gsub(/D05_1061:/, 'D05_1061,')
+    # todo check why is here a float in photo?
+    self.photo = self.photo.to_s.gsub(/D05_1061:/, 'D05_1061,')
     # 4817-4823
     self.photo = self.photo.gsub(/D05-0933/, 'D05_0933')
     # 9316-9323
@@ -641,8 +640,8 @@ class Formular < ActiveRecord::Base
 
     myStelle = {}
     # todo entfernen? Gehört zur Normalisierung
-    myStelle['band_uid'] = self[:band] #bandDict[Integer(self[:band])]['nummer']
-    myStelle['freigegeben'] = bandDict[Integer(self[:band])]['freigegeben']
+    myStelle['band_uid'] = self[:band] #bandDict[(self[:band]).to_i]['nummer']
+    myStelle['freigegeben'] = bandDict[(self[:band]).to_i]['freigegeben']
 
     ## Sonderfälle
     szOriginal = self[:seitezeile]

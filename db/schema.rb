@@ -161,12 +161,9 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.string   "zeile_start"
     t.string   "zeile_stop"
     t.string   "notiz"
-    t.integer  "wort_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "wb_berlins", ["wort_id"], name: "index_wb_berlins_on_wort_id"
 
   create_table "worte", force: true do |t|
     t.string   "uid"
@@ -178,8 +175,11 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.string   "belegstellenEdfu"
     t.string   "belegstellenWb"
     t.string   "anmerkung"
+    t.integer  "wb_berlin_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "worte", ["wb_berlin_id"], name: "index_worte_on_wb_berlin_id"
 
 end
