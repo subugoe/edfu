@@ -11,10 +11,10 @@ class Formular < ActiveRecord::Base
   attr_accessor :photo, :photo_pfad, :photo_kommentar, :literatur
 
   # todo has_many or has_one?
-  has_many :stellen, as: :zugehoerigZu
+  has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  has_and_belongs_to_many :photos
-  has_and_belongs_to_many :literaturen
+  has_and_belongs_to_many :photos, :dependent => :delete_all
+  has_and_belongs_to_many :literaturen, :dependent => :delete_all
 
   # after_update :log_updated
   # after_create :log_created
@@ -23,17 +23,17 @@ class Formular < ActiveRecord::Base
 
   # searchable do
   #
-  #   integer :uid, stored: true
+  #   text :uid, stored: true
   #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
   #   text :transliteration_nosuffix, stored: true
   #   text :uebersetzung, stored: true
   #   text :texttyp, stored: true
-  #   text :photo, stored: true # todo photo_highlight hinzufügen
-  #   text :photo_pfad, stored: true
-  #   text :photo_kommentar, stored: true
-  #   integer :szeneID, stored: true
-  #   text :literatur, stored: true
-  #   integer :band, stored: true
+  #   # text :photo, stored: true # todo photo_highlight hinzufügen
+  #   # text :photo_pfad, stored: true
+  #   # text :photo_kommentar, stored: true
+  #   text :szeneID, stored: true
+  #   # text :literatur, stored: true
+  #   text :band, stored: true
   #   text :seitezeile, stored: true
   #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
   #   # todo id hinzufügen, typ hinzufügen,
@@ -413,15 +413,6 @@ class Formular < ActiveRecord::Base
         klammern = false
         bildString = bildString[((re8.match(bildString)[0]).length)..-1]
 
-      elsif re1.match(bildString)
-        # Fall 1: Dateiname nur aus Ziffern (am Ende beliebig viele 'a')
-        # name = erstes Auftreten des match
-        name = re1.match(bildString)[0]
-        typ = 'alt'
-        # schneidet aktuelle zahl vorn ab
-        #
-        bildString = bildString[(name.length)..-1]
-
       elsif re2.match(bildString)
         # Fall 2: Dateiname der Form D03_XXXXX
         name = re2.match(bildString)[0]
@@ -452,6 +443,47 @@ class Formular < ActiveRecord::Base
         name = re10.match(bildString)[0]
         typ = 'e-o'
         bildString = bildString[(name.length)..-1]
+
+      elsif re1.match(bildString)
+        # Fall 1: Dateiname nur aus Ziffern (am Ende beliebig viele 'a')
+        # name = erstes Auftreten des match
+        name = re1.match(bildString)[0]
+        typ = 'alt'
+        # schneidet aktuelle zahl vorn ab
+        #
+        bildString = bildString[(name.length)..-1]
+
+      # vor re1 vorziehen
+      # elsif re2.match(bildString)
+      #   # Fall 2: Dateiname der Form D03_XXXXX
+      #   name = re2.match(bildString)[0]
+      #   typ = 'D03'
+      #   bildString = bildString[(name.length)..-1]
+      #
+      # elsif re3.match(bildString)
+      #   # Fall 3: Dateiname der Form D05_XXXXX
+      #   name = re3.match(bildString)[0]
+      #   typ = 'D05'
+      #   bildString = bildString[(name.length)..-1]
+      #
+      # elsif re4.match(bildString)
+      #   # Fall 4: Dateiname der Form eXXX
+      #   name = re4.match(bildString)[0]
+      #   typ = 'e'
+      #   bildString = bildString[(name.length)..-1]
+      #
+      # elsif re9.match(bildString)
+      #   # Fall 5: Name der Form GXXX [ff.]
+      #   name = re9.match(bildString)[1]
+      #   typ = 'G'
+      #   kommentar = re9.match(bildString)[2]
+      #   bildString = bildString[((re9.match(bildString)[0]).length)..-1]
+      #
+      # elsif re10.match(bildString)
+      #   # Fall 6: Name der Form e-onr-XXX
+      #   name = re10.match(bildString)[0]
+      #   typ = 'e-o'
+      #   bildString = bildString[(name.length)..-1]
 
       elsif re11.match(bildString)
         # Fall 7: Labrique, Stylistique

@@ -8,7 +8,7 @@ class Gott < ActiveRecord::Base
   extend EdfuModelHelper
 
   # todo has_many or has_one?
-  has_many :stellen, as: :zugehoerigZu
+  has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   attr_accessor :stelle, :transliteration_nosuffix
 

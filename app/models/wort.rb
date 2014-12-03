@@ -8,7 +8,7 @@ class Wort < ActiveRecord::Base
   extend EdfuModelHelper
 
   belongs_to  :wb_berlin
-  has_many :stellen, as: :zugehoerigZu
+  has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   # after_update :log_updated
   # after_create :log_created

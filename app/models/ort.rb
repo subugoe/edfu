@@ -7,7 +7,7 @@ class Ort < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  has_many :stellen, as: :zugehoerigZu
+  has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   # imported Stelle (is equivalent to bandseitezeile)
   attr_accessor :iStelle, :transliteration_nosuffix

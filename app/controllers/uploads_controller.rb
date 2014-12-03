@@ -50,15 +50,14 @@ class UploadsController < ApplicationController
     # end
 
 
-
     processed = process_files
 
     respond_to do |format|
       #if @upload.save
       if processed
-        format.html {redirect_to uploads_path, notice: "Upload was successfully created."}
+        format.html { redirect_to uploads_path, notice: "Upload was successfully created." }
       else
-        format.html {redirect_to uploads_path, alert: "Upload not created!"}
+        format.html { redirect_to uploads_path, alert: "Upload not created!" }
       end
     end
   end
@@ -88,13 +87,21 @@ class UploadsController < ApplicationController
 
   def process_files
 
+    prepareDB
     process_formular
-    #process_ort
-    #process_gott
-    #process_wort
+    process_ort
+    process_gott
+    process_wort
 
   end
 
+  def prepareDB
+    Formular.delete_all
+    Gott.delete_all
+    Ort.delete_all
+    Wort.delete_all
+    WbBerlin.delete_all
+  end
 
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
@@ -120,24 +127,17 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==50
+      break if i>150
 
       # if SzeneID doesn't exist
-      # if row[7] != nil and row[7] != ''
-      #   szID = Integer(row[7])
-      # else
-      #   szID = ''
-      # end
-
-      # if uid doesn't exist
-      # todo use string
-      if row[9] != nil and row[9] != ''
-        uID = row[9].to_i
+      if row[7] != nil and row[7] != ''
+        szID = Integer(row[7])
       else
-        uID = SecureRandom.random_number(100000000)
+        szID = ''
       end
 
-        f = Formular.where(uid: uID).update_or_create(
+
+      f = Formular.where(uid: Integer(row[9])).create(
 
           transliteration: row[0] || '',
           band: Integer(row[1]) || -1,
@@ -149,9 +149,9 @@ class UploadsController < ApplicationController
           photo_pfad: '',
           photo_kommentar: '',
           # szeneID changed to string from integer
-          szeneID: row[7] != '',  # Integer(row[7]) || -1,
+          szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
           literatur: row[8] || '',
-          uid: uID
+          uid: Integer(row[9])
 
       )
 
@@ -178,9 +178,9 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==50
+      break if i==150
 
-      Ort.where(uid: row[5].to_i).update_or_create(
+      Ort.where(uid: row[5].to_i).create(
 
           # changed to string from integer
           uid: row[5].to_i || '',
@@ -216,9 +216,9 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==50
+      break if i==150
 
-      Gott.where(uid: row[9].to_i).update_or_create(
+      Gott.where(uid: row[9].to_i).create(
 
           uid: row[9] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
@@ -256,10 +256,10 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==50
+      break if i==150
 
       # uid changed to string from integer
-      Wort.where(uid: row[7].to_i).update_or_create(
+      Wort.where(uid: row[7].to_i).create(
 
           uid: (row[7]) || '',
           transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
