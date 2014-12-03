@@ -2,6 +2,8 @@
 
 require 'lib/edfu_model_helper'
 require 'lib/edfu_numerics_conversion_helper'
+require 'rsolr'
+
 
 class Gott < ActiveRecord::Base
   include EdfuNumericsConversionHelper
@@ -14,6 +16,7 @@ class Gott < ActiveRecord::Base
 
   # after_update :log_updated
   # after_create :log_created
+  after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -44,6 +47,22 @@ class Gott < ActiveRecord::Base
 
   end
 
+  def add_to_solr
+
+    #   integer :uid, stored: true
+    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
+    #   text :transliteration_nosuffix, stored: true
+    #   text :ort, stored: true
+    #   text :eponym, stored: true
+    #   text :beziehung, stored: true
+    #   text :funktion, stored: true
+    #   integer :band, stored: true
+    #   text :seitezeile, stored: true # todo wirklich in den index?
+    #   text :anmerkung, stored: true
+    #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+    #   # todo id hinzufügen, typ hinzufügen,
+
+  end
 
   # todo update solr doc
   # todo log updated

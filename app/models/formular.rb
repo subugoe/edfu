@@ -18,6 +18,7 @@ class Formular < ActiveRecord::Base
 
   # after_update :log_updated
   # after_create :log_created
+  after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -114,6 +115,30 @@ class Formular < ActiveRecord::Base
 
   end
 
+  def add_to_solr
+
+    # todo extract to config file
+    # solr = RSolr.connect :url => 'localhost:8983/solr/development'
+    #
+    #
+    # solr.add :uid => self[:uid],
+    #   :transliteration => ,
+    #   :transliteration_nosuffix => ,
+    #   :uebersetzung => ,
+    #   :texttyp => ,
+    #   :photo  =>,
+    #   :photo_pfad => ,
+    #   :photo_kommentar =>,
+    #   :szeneID =>,
+    #   :literatur =>,
+    #   :band =>,
+    #   :seitezeile =>
+    # #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+    # #   # todo id hinzufügen, typ hinzufügen,
+    #
+    # solr.commit
+
+  end
 
   # todo update solr doc
   # todo log updated

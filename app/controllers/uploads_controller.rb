@@ -88,14 +88,16 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    process_formular
-    process_ort
-    process_gott
+    #process_formular
+    #process_ort
+    #process_gott
     process_wort
 
   end
 
   def prepareDB
+
+    #--- DB
 
     #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
     #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
@@ -110,6 +112,13 @@ class UploadsController < ApplicationController
     #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
     #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
     #   OR name = 'worte'")
+
+    #--- solr
+
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr.update :data => '<delete><query>*:*</query></delete>'
+    solr.update :data => '<commit/>'
+
 
   end
 

@@ -14,6 +14,7 @@ class Ort < ActiveRecord::Base
 
   # after_update :log_updated
   # after_create :log_created
+  after_commit :add_to_solr
   before_validation :check_data
 
   # searchable do
@@ -40,6 +41,17 @@ class Ort < ActiveRecord::Base
 
   end
 
+  def add_to_solr
+    #   integer :uid, stored: true
+    #   #text :iStelle, stored: true
+    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
+    #   text :transliteration_nosuffix, stored: true
+    #   text :ort, stored: true
+    #   text :lokalisation, stored: true
+    #   text :anmerkung, stored: true
+    #   # todo ersetze mit stelle durch stelle_id, attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+    #   # todo id hinzufügen, typ hinzufügen,
+  end
 
   # todo update solr doc
   # todo log updated

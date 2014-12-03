@@ -12,6 +12,7 @@ class Wort < ActiveRecord::Base
 
   # after_update :log_updated
   # after_create :log_created
+  after_commit :add_to_solr
   before_validation :check_data
 
   # searchable do
@@ -41,6 +42,21 @@ class Wort < ActiveRecord::Base
 
   end
 
+  def add_to_solr
+    #   integer :uid, stored: true
+    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
+    #   text :transliteration_nosuffix, stored: true
+    #   text :uebersetzung, stored: true
+    #   text :hieroglyph, stored: true
+    #   text :weiteres, stored: true
+    #   text :belegstellenEdfu, stored: true # todo in was indexiert? stelle_id?
+    #   text :belegstellenWb, stored: true # todo in was indexiert? stelle_berlin_id?
+    #   text :anmerkung, stored: true
+    #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
+    #   # todo id hinzufügen, typ hinzufügen,
+    #   # todo attr. aus Szene hinzufügen
+    #   # todo felder prüfen
+  end
 
   # todo update solr doc
   # todo log updated

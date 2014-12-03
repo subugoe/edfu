@@ -28,8 +28,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'warbler'
 
-gem 'sunspot_rails'
-gem 'sunspot_solr'
+# gem 'sunspot_rails'
+# gem 'sunspot_solr'
+gem 'rsolr', '~> 1.0.10'
 
 gem 'progress_bar'
 
