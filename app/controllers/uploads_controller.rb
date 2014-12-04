@@ -23,31 +23,31 @@ class UploadsController < ApplicationController
 
 
     # todo uncomment this
-    # uploaded_formular = params[:upload][:formular]
-    # uploaded_ort = params[:upload][:ort]
-    # uploaded_gott = params[:upload][:gott]
-    # uploaded_wort = params[:upload][:wort]
-    # email = params[:upload][:email]
-    #
-    #
-    # logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
-    #
-    #
-    # File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
-    #   file.write(uploaded_formular.read)
-    # end
-    #
-    # File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
-    #   file.write(uploaded_ort.read)
-    # end
-    #
-    # File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
-    #   file.write(uploaded_gott.read)
-    # end
-    #
-    # File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
-    #   file.write(uploaded_wort.read)
-    # end
+    uploaded_formular = params[:upload][:formular]
+    uploaded_ort = params[:upload][:ort]
+    uploaded_gott = params[:upload][:gott]
+    uploaded_wort = params[:upload][:wort]
+    email = params[:upload][:email]
+
+
+    logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
+
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
+      file.write(uploaded_formular.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
+      file.write(uploaded_ort.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
+      file.write(uploaded_gott.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
+      file.write(uploaded_wort.read)
+    end
 
 
     processed = process_files
