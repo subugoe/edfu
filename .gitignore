@@ -34,7 +34,7 @@ lib/tasks
 log/
 *.log
 
-*.lock
+#*.lock
 
 *.rbc
 capybara-*.html
