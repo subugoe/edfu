@@ -88,8 +88,8 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    #process_formular
-    process_ort
+    process_formular
+    #process_ort
     #process_gott
     #process_wort
 
@@ -146,7 +146,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i>150
+      break if i>15
 
       # if SzeneID doesn't exist
       if row[7] != nil and row[7] != ''

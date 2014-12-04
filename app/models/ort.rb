@@ -64,10 +64,11 @@ class Ort < ActiveRecord::Base
     #   # todo ersetze mit stelle durch stelle_id, attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
     #   # todo id hinzufügen, typ hinzufügen,
 
+
     solr.add (
                  {
                      :sql_uid => self[:uid],
-                     # :sort => "#{self[:transliteration]}--#{self.stelen.start}", # --- Array ! todo
+                     :sort => "#{self[:transliteration]}--#{self.stellen.collect { |stelle| stelle.start }}", # --- Array ! todo
                      #
                      :transliteration => self[:transliteration], # ---
                      #:transliteration_highlight => self[:transliteration],
@@ -77,20 +78,20 @@ class Ort < ActiveRecord::Base
                      :anmerkung => self[:anmerkung], # --- aus self, kein Array
 
 
-                     # :stelle_id => self.stellen.id, # --- Array !  todo ---
-                     # :band => self.stellen.band, # --- Array ! todo ---
-                     # :bandseite => self.stellen.bandseite, # --- Array ! todo ---
-                     # :bandseitezeile => self.stellen.bandseitezeile, # --- Array ! todo ---
-                     # :bandseitezeile_highlight => self.stellen.bandseitezeile, # --- Array ! todo
-                     #
-                     # :seite_start => self.stellen.seite_start, # --- Array !todo ---
-                     # :seite_stop => self.stellen.seite_stop, # --- Array !  todo ---
-                     # :zeile_start => self.stellen.zeile_start, # --- Array ! todo ---
-                     # :zeile_stop => self.stellen.zeile_stop, # --- Array !  todo ---
-                     # :zerstoerung => self.stellen.zerstoerung, # --- Array !  todo ---
-                     # :freigegeben => self.stellen.freigegeben, # --- Array !  todo ---
-                     # :stelle_unsicher => self.stellen.stelle_unsicher, # --- Array !  todo ---
-                     # :stelle_anmerkung => self.stellen.stelle_anmerkung, # --- Array !  todo ---
+                     :stelle_id => self.stellen.collect { |stelle| stelle.id }, # --- Array !  todo ---
+                     :band => self.stellen.collect { |stelle| stelle.band }, # --- Array ! todo ---
+                     :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # --- Array ! todo ---
+                     :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # --- Array ! todo ---
+                     #:bandseitezeile_highlight => self.stellen.bandseitezeile, # --- Array ! todo
+
+                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # --- Array !todo ---
+                     :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # --- Array !  todo ---
+                     :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # --- Array ! todo ---
+                     :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # --- Array !  todo ---
+                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # --- Array !  todo ---
+                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # --- Array !  todo ---
+                     :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # --- Array !  todo ---
+                     :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # --- Array !  todo ---
 
                      :typ => 'ort', # ---
                      :id => "ort-#{self[:uid]}" # ---
@@ -100,9 +101,6 @@ class Ort < ActiveRecord::Base
     solr.commit
 
   end
-
-
-
 
 
   # todo update solr doc

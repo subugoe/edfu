@@ -117,6 +117,9 @@ class Formular < ActiveRecord::Base
 
   def add_to_solr
 
+    # todo extract
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+
     # todo extract to config file
     # solr = RSolr.connect :url => 'localhost:8983/solr/development'
     #
@@ -137,6 +140,48 @@ class Formular < ActiveRecord::Base
     # #   # todo id hinzufügen, typ hinzufügen,
     #
     # solr.commit
+
+
+    solr.add (
+                 {
+                     :sql_uid => self[:uid], # ---
+
+                     :sort => "#{self.stellen.first.start}", # --- todo ???
+                     #
+                     :transliteration => self[:transliteration], # ---
+                     #:transliteration_highlight => self[:transliteration], # ---
+                     :transliteration_nosuffix => self[:transliteration], #
+                     :uebersetzung => self[:uebersetzung], # ---
+                     :texttyp => self[:texttyp], # ---
+                     :szene_nummer => self[:szeneID], #  todo stimmt szene_numme = SzeneID
+
+                     :photo => self.photos.collect { |photo| photo.name }, # ---
+                     :photo_kommentar => self.photos.collect { |photo| photo.kommentar }, # ---
+                     :photo_pfad => self.photos.collect { |photo| photo.pfad }, # ---
+
+                     :literatur => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
+
+                     :stelle_id => self.stellen.collect { |stelle| stelle.id }, # ---
+                     :band => self.stellen.collect { |stelle| stelle.band }, # ---
+                     :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
+                     :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
+                     #:bandseitezeile_highlight => self.stellen.bandseitezeile, # ---
+
+                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
+                     :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
+                     :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
+                     :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
+                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
+                     :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
+                     :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+
+                     :typ => 'formular', # ---
+                     :id => "formular-#{self[:uid]}" # ---
+                 }
+             )
+
+    solr.commit
 
   end
 
@@ -478,37 +523,37 @@ class Formular < ActiveRecord::Base
         #
         bildString = bildString[(name.length)..-1]
 
-      # vor re1 vorziehen
-      # elsif re2.match(bildString)
-      #   # Fall 2: Dateiname der Form D03_XXXXX
-      #   name = re2.match(bildString)[0]
-      #   typ = 'D03'
-      #   bildString = bildString[(name.length)..-1]
-      #
-      # elsif re3.match(bildString)
-      #   # Fall 3: Dateiname der Form D05_XXXXX
-      #   name = re3.match(bildString)[0]
-      #   typ = 'D05'
-      #   bildString = bildString[(name.length)..-1]
-      #
-      # elsif re4.match(bildString)
-      #   # Fall 4: Dateiname der Form eXXX
-      #   name = re4.match(bildString)[0]
-      #   typ = 'e'
-      #   bildString = bildString[(name.length)..-1]
-      #
-      # elsif re9.match(bildString)
-      #   # Fall 5: Name der Form GXXX [ff.]
-      #   name = re9.match(bildString)[1]
-      #   typ = 'G'
-      #   kommentar = re9.match(bildString)[2]
-      #   bildString = bildString[((re9.match(bildString)[0]).length)..-1]
-      #
-      # elsif re10.match(bildString)
-      #   # Fall 6: Name der Form e-onr-XXX
-      #   name = re10.match(bildString)[0]
-      #   typ = 'e-o'
-      #   bildString = bildString[(name.length)..-1]
+        # vor re1 vorziehen
+        # elsif re2.match(bildString)
+        #   # Fall 2: Dateiname der Form D03_XXXXX
+        #   name = re2.match(bildString)[0]
+        #   typ = 'D03'
+        #   bildString = bildString[(name.length)..-1]
+        #
+        # elsif re3.match(bildString)
+        #   # Fall 3: Dateiname der Form D05_XXXXX
+        #   name = re3.match(bildString)[0]
+        #   typ = 'D05'
+        #   bildString = bildString[(name.length)..-1]
+        #
+        # elsif re4.match(bildString)
+        #   # Fall 4: Dateiname der Form eXXX
+        #   name = re4.match(bildString)[0]
+        #   typ = 'e'
+        #   bildString = bildString[(name.length)..-1]
+        #
+        # elsif re9.match(bildString)
+        #   # Fall 5: Name der Form GXXX [ff.]
+        #   name = re9.match(bildString)[1]
+        #   typ = 'G'
+        #   kommentar = re9.match(bildString)[2]
+        #   bildString = bildString[((re9.match(bildString)[0]).length)..-1]
+        #
+        # elsif re10.match(bildString)
+        #   # Fall 6: Name der Form e-onr-XXX
+        #   name = re10.match(bildString)[0]
+        #   typ = 'e-o'
+        #   bildString = bildString[(name.length)..-1]
 
       elsif re11.match(bildString)
         # Fall 7: Labrique, Stylistique
@@ -754,10 +799,10 @@ class Formular < ActiveRecord::Base
       logger.error "\t[ERROR]  [FL] uid: #{self[:uid]} Fehler mit SEITEZEILE,  #{self[:seitezeile]}"
     end
 
-    if myStelle['anmerkung'] == nil
-      myStelle['anmerkung'] = "#{kommentar}"
+    if myStelle['anmerkung'] != nil and myStelle['anmerkung'] != ''
+      myStelle['anmerkung'] += "; #{kommentar}"
     else
-      myStelle['anmerkung'] = "; #{kommentar}"
+      myStelle['anmerkung'] = "#{kommentar}"
     end
 
     result = []
