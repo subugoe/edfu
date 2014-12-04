@@ -278,8 +278,8 @@ class Ort < ActiveRecord::Base
               :zeile_stop => zeileStop,
               :stelle_anmerkung => kommentar,
               :stelle_unsicher => false,
-              :start => "#{bandNr}#{'%03i' % (seiteStart)}#{'%03i' % (zeileStart)}",
-              :stop => "#{bandNr}#{'%03i' % (seiteStop)}#{'%03i' % (zeileStop)}",
+              # :start => "#{bandNr}#{'%03i' % (seiteStart)}#{'%03i' % (zeileStart)}", # todo nicht in stelle?
+              # :stop => "#{bandNr}#{'%03i' % (seiteStop)}#{'%03i' % (zeileStop)}",    # todo nicht in stelle ?
               :zerstoerung => false,
               :freigegeben => bandDict[(bandNr).to_i]['freigegeben']
           )

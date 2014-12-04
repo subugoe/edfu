@@ -35,6 +35,13 @@ class Stelle < ActiveRecord::Base
   #
   # end
 
+  def start
+    return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%03i' % self[:zeile_start]}"
+  end
+
+  def stop
+    return "#{self[:band]}#{'%03i' % self[:seite_stop]}#{'%03i' % self[:zeile_stop]}"
+  end
 
   private
 
@@ -72,8 +79,8 @@ class Stelle < ActiveRecord::Base
                      :seite_stop => self.seite_stop, # ---
                      :zeile_start => self.zeile_start, # ---
                      :zeile_stop => self.zeile_stop, # ---
-                     :start => self.start, # ---
-                     :stop => self.stop, # ---
+                     :start => start, # ---
+                     :stop => stop, # ---
 
                      :freigegeben => self.freigegeben, # ---
                      :zerstoerung => self.zerstoerung, # ---
@@ -91,6 +98,8 @@ class Stelle < ActiveRecord::Base
 
 
   end
+
+
 
 
   # todo update solr doc

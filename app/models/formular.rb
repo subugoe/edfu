@@ -146,7 +146,7 @@ class Formular < ActiveRecord::Base
                  {
                      :sql_uid => self[:uid], # ---
 
-                     :sort => "#{self.stellen.first.start}", # ---
+                     :sort => "#{self.stellen.first.start}", # --- todo
 
                      :transliteration => self[:transliteration], # ---
 
@@ -843,8 +843,8 @@ class Formular < ActiveRecord::Base
     end
 
     # todo führende Nulle einfügen 001011002
-    myStelle['start'] = "#{self[:band]}#{'%03i' % (result[0][0])}#{'%03i' % (result[0][1])}"
-    myStelle['stop'] = "#{self[:band]}#{'%03i' % (result[1][0])}#{'%03i' % (result[1][1])}"
+    # myStelle['start'] = "#{self[:band]}#{'%03i' % (result[0][0])}#{'%03i' % (result[0][1])}"
+    # myStelle['stop'] = "#{self[:band]}#{'%03i' % (result[1][0])}#{'%03i' % (result[1][1])}"
 
     myStelle['bandseite'] = "#{band_roemisch}, #{'%03i' % (result[0][0])}"
 
@@ -880,6 +880,7 @@ class Formular < ActiveRecord::Base
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
+    # todo nicht besser fond_or_crate_by
     stelle = Stelle.create(
         :tempel => 'Edfu',
         :band => myStelle['band_uid'],
@@ -891,8 +892,8 @@ class Formular < ActiveRecord::Base
         :zeile_stop => myStelle['zeile_stop'],
         :stelle_anmerkung => myStelle['anmerkung'],
         :stelle_unsicher => myStelle['stop_unsicher'],
-        :start => myStelle['start'],
-        :stop => myStelle['stop'],
+        # :start => myStelle['start'],
+        # :stop => myStelle['stop'],
         :zerstoerung => myStelle['zerstoerung'],
         :freigegeben => myStelle['freigegeben']
     )
@@ -946,6 +947,7 @@ class Formular < ActiveRecord::Base
         17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
     }
 
+    # todo nicht besser fond_or_crate_by
     if arr = formular_literatur_relation_hash[self[:uid].to_i]
       arr.each { |hash|
         lit = Literatur.create(

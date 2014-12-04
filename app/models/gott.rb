@@ -53,32 +53,32 @@ class Gott < ActiveRecord::Base
 
     solr.add (
                  {
-                     :sql_uid => self[:uid], # ? ---
+                     :sql_uid => self[:uid], # ---
                      :transliteration => self[:transliteration], # ---
-                     #:transliteration_highlight => self[:transliteration], # ---
                      :transliteration_nosuffix => self[:transliteration], # ? ---
                      :ort => self[:ort], # ---
                      :eponym => self[:eponym], # ---
                      :beziehung => self[:beziehung], # ---
                      :funktion => self[:funktion], # ---
-                     :band => self[:band].to_i, # ---
+                     :band => @band, #self[:band], # ---
                     # :seitezeile => self[:seitezeile], # ? new
                      :anmerkung => self[:anmerkung], # ---
-                   #  :sort => "Act--#{self.stelle.start}", # ---
-                     :freigegeben => self[:freigegeben], # ---
-                     :zerstörung => self[:zerstoerung], # ---
+                     :sort => "Act--#{self.stellen.first.start}", # --- todo
 
-                     # :stelle_unsicher => self.stelle.unsicher, # ? ---
-                     # :seite_start => self.stelle.seite_start, # ? ---
-                     # :seite_stop => self.stelle.seite_stop, # ? ---
-                     # :zeile_start => self.stelle.zeile_start, # ? ---
-                     # :zeile_stop => self.stelle.zeile_stop, # ? ---
-                     # :bandseite => self.stelle.bandseite, # ? ---
-                     # :bandseitezeile => self.stelle.bandseitezeile, # ? ---
-                     # #:bandseitezeile_highlight => self.stelle.bandseitezeile, # ? ---
-                     # :stelle_id => self.stelle.id, # ---
-                     # :start => self.stelle.start, # ? new
-                     # :stop => self.stelle.stop, # ? new
+                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben}, # ---
+                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung}, # ---
+                     :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
+                     :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
+                     :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
+                     :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
+                     :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+                     :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
+                     :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
+                     :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
+
+                     # :start => self.stellen.start, # ? new
+                     # :stop => self.stellen.stop, # ? new
 
                      :typ => 'gott', # ---
                      :id => "gott-#{self[:uid]}" # ---
@@ -321,10 +321,10 @@ class Gott < ActiveRecord::Base
             end
           end
 
-          band = roemisch_nach_dezimal(self[:band])
+          @band = roemisch_nach_dezimal(self[:band]).to_i
           #band = (self[:band]).to_i
 
-          if startSeite > 0 and band > 0
+          if startSeite > 0 and @band > 0
 
             # myStelle = {
             #     # todo prüfen uid = stellenlönge ?
@@ -344,7 +344,7 @@ class Gott < ActiveRecord::Base
             # todo extract to module
             stelle = Stelle.create(
                 :tempel => 'Edfu',
-                :band => band,
+                :band => @band,
                 :bandseite => "#{self[:band]}, #{'%03i' % (startSeite)}",
                 :bandseitezeile => "#{self[:band]}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}",
                 :seite_start => startSeite,
@@ -353,10 +353,10 @@ class Gott < ActiveRecord::Base
                 :zeile_stop => stopZeile,
                 :stelle_anmerkung => stelleAnmerkung,
                 :stelle_unsicher => stopUnsicher,
-                :start => "#{band}#{'%03i' % (startSeite)}#{'%03i' % (startZeile)}",
-                :stop => "#{band}#{'%03i' % (stopSeite)}#{'%03i' % (stopZeile)}",
+                # :start => "#{band}#{'%03i' % (startSeite)}#{'%03i' % (startZeile)}",
+                # :stop => "#{band}#{'%03i' % (stopSeite)}#{'%03i' % (stopZeile)}",
                 :zerstoerung => false,
-                :freigegeben => bandDict[(band).to_i]['freigegeben']
+                :freigegeben => bandDict[@band]['freigegeben']
             )
             self.stellen << stelle unless self.stellen.include? stelle
 

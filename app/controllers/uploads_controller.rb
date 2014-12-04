@@ -90,8 +90,8 @@ class UploadsController < ApplicationController
     prepareDB
     process_formular
     process_ort
-    #process_gott
-    #process_wort
+    process_gott
+    process_wort
 
   end
 
@@ -235,7 +235,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==150
+      break if i==15
 
       Gott.create(
 
@@ -275,7 +275,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==150
+      break if i==15
 
 
       if row[2] != nil and row[2] != ''

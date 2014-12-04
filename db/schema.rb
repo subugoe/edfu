@@ -134,8 +134,6 @@ ActiveRecord::Schema.define(version: 20141130103239) do
     t.string   "zeile_stop"
     t.string   "stelle_anmerkung"
     t.string   "stelle_unsicher"
-    t.string   "start"
-    t.string   "stop"
     t.string   "zerstoerung"
     t.string   "freigegeben"
     t.integer  "zugehoerigZu_id"

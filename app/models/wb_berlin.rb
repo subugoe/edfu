@@ -32,6 +32,11 @@ class WbBerlin < ActiveRecord::Base
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%02i' % self[:zeile_start]}"
   end
 
+  def sort
+    return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%03i' % self[:zeile_start]}"
+  end
+
+
   def berlin_display
 
     roemisch = dezimal_nach_roemisch(self[:band])
