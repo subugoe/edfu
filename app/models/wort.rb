@@ -99,7 +99,7 @@ class Wort < ActiveRecord::Base
                      :berlin_zeile_stop => self.wb_berlin.zeile_stop.to_i, # ---
 
                      :typ => 'wort',
-                     :id => "wort-#{self.id}"
+                     :id => "wort-#{self[:uid]}"
                  }
              )
 

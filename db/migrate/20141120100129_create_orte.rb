@@ -8,6 +8,7 @@ class CreateOrte < ActiveRecord::Migration
       t.string :ort
       t.string :lokalisation
       t.string :anmerkung
+      # t.string :iStelle
 
       t.timestamps
     end

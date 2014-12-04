@@ -81,7 +81,7 @@ class Gott < ActiveRecord::Base
                      # :stop => self.stelle.stop, # ? new
 
                      :typ => 'gott', # ---
-                     :id => "gott-#{self.id}" # ---
+                     :id => "gott-#{self[:uid]}" # ---
                  }
              )
 

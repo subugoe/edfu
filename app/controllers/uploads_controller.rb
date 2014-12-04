@@ -89,9 +89,9 @@ class UploadsController < ApplicationController
 
     prepareDB
     #process_formular
-    #process_ort
-    process_gott
-    process_wort
+    process_ort
+    #process_gott
+    #process_wort
 
   end
 
@@ -205,7 +205,7 @@ class UploadsController < ApplicationController
           uid: Integer(row[5]) || '',
           iStelle: row[0] || '',
           transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
-          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
           ort: row[2] || '',
           lokalisation: row[3] || '',
           anmerkung: row[4] || ''

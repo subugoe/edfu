@@ -10,7 +10,7 @@ class Ort < ActiveRecord::Base
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   # imported Stelle (is equivalent to bandseitezeile)
-  attr_accessor :iStelle, :transliteration_nosuffix
+  attr_accessor :iStelle # , :transliteration_nosuffix
 
   # after_update :log_updated
   # after_create :log_created
@@ -32,6 +32,14 @@ class Ort < ActiveRecord::Base
   # end
 
 
+  def transliteration_nosuffix
+    return self.transliteration
+  end
+
+  def transliteration_nosuffix= tn
+    self.transliteration= tn
+  end
+
   private
 
 
@@ -42,6 +50,10 @@ class Ort < ActiveRecord::Base
   end
 
   def add_to_solr
+
+    # todo extract
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+
     #   integer :uid, stored: true
     #   #text :iStelle, stored: true
     #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
@@ -51,7 +63,47 @@ class Ort < ActiveRecord::Base
     #   text :anmerkung, stored: true
     #   # todo ersetze mit stelle durch stelle_id, attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
     #   # todo id hinzufügen, typ hinzufügen,
+
+    solr.add (
+                 {
+                     :sql_uid => self[:uid],
+                     # :sort => "#{self[:transliteration]}--#{self.stelen.start}", # --- Array ! todo
+                     #
+                     :transliteration => self[:transliteration], # ---
+                     #:transliteration_highlight => self[:transliteration],
+                     :transliteration_nosuffix => self[:transliteration], # ---
+                     :ort => self[:ort], # ---
+                     :lokalisation => self[:lokalisation], # ---
+                     :anmerkung => self[:anmerkung], # --- aus self, kein Array
+
+
+                     # :stelle_id => self.stellen.id, # --- Array !  todo ---
+                     # :band => self.stellen.band, # --- Array ! todo ---
+                     # :bandseite => self.stellen.bandseite, # --- Array ! todo ---
+                     # :bandseitezeile => self.stellen.bandseitezeile, # --- Array ! todo ---
+                     # :bandseitezeile_highlight => self.stellen.bandseitezeile, # --- Array ! todo
+                     #
+                     # :seite_start => self.stellen.seite_start, # --- Array !todo ---
+                     # :seite_stop => self.stellen.seite_stop, # --- Array !  todo ---
+                     # :zeile_start => self.stellen.zeile_start, # --- Array ! todo ---
+                     # :zeile_stop => self.stellen.zeile_stop, # --- Array !  todo ---
+                     # :zerstoerung => self.stellen.zerstoerung, # --- Array !  todo ---
+                     # :freigegeben => self.stellen.freigegeben, # --- Array !  todo ---
+                     # :stelle_unsicher => self.stellen.stelle_unsicher, # --- Array !  todo ---
+                     # :stelle_anmerkung => self.stellen.stelle_anmerkung, # --- Array !  todo ---
+
+                     :typ => 'ort', # ---
+                     :id => "ort-#{self[:uid]}" # ---
+                 }
+             )
+
+    solr.commit
+
   end
+
+
+
+
 
   # todo update solr doc
   # todo log updated
@@ -93,8 +145,8 @@ class Ort < ActiveRecord::Base
     }
 
 
-    ort = []
-    stelle = []
+    # ort = []
+    # stelle = []
 
     re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
@@ -172,7 +224,8 @@ class Ort < ActiveRecord::Base
     teile = self.iStelle.strip.split(';') #.match(/(^\s*;\s*)(.*)(\s*;\s*$)/))[2].split(';')
 
 
-    @bandNr = 0
+    myBand = ''
+    bandNr = 0
 
     teile.each do |teil|
 
@@ -184,10 +237,10 @@ class Ort < ActiveRecord::Base
           logger.info "\t[Error]  [OL] uid: #{self[:uid]} Fehler mit STELLE, teil: #{teil}"
         else
 
-          @myBand = m3[1].strip() unless m3[1].empty?
+          myBand = m3[1].strip() unless m3[1].empty?
 
-          if (@myBand).length > 0
-            bandNr = roemisch_nach_dezimal(@myBand)
+          if (myBand).length > 0
+            bandNr = roemisch_nach_dezimal(myBand)
           end
 
           seiteStart = (m3[2].strip()).to_i
@@ -220,8 +273,8 @@ class Ort < ActiveRecord::Base
           stelle = Stelle.create(
               :tempel => 'Edfu',
               :band => bandNr,
-              :bandseite => "#{@myBand}, #{'%03i' % (seiteStart)}",
-              :bandseitezeile => "#{@myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}",
+              :bandseite => "#{myBand}, #{'%03i' % (seiteStart)}",
+              :bandseitezeile => "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}",
               :seite_start => seiteStart,
               :seite_stop => seiteStop,
               :zeile_start => zeileStart,

@@ -18,7 +18,7 @@ class OrteControllerTest < ActionController::TestCase
 
   test "should create ort" do
     assert_difference('Ort.count') do
-      post :create, ort: { anmerkung: @ort.anmerkung, lokalisation: @ort.lokalisation, ort: @ort.ort, stelle: @ort.stelle, transliteration: @ort.transliteration, transliteration_nosuffix: @ort.transliteration_nosuffix, uid: @ort.uid }
+      post :create, ort: { anmerkung: @ort.anmerkung, lokalisation: @ort.lokalisation, ort: @ort.ort, stelle: @ort.stelle, transliteration: @ort.transliteration, transliteration_nosuffix: @ort.transliteration, uid: @ort.uid }
     end
 
     assert_redirected_to ort_path(assigns(:ort))
@@ -35,7 +35,7 @@ class OrteControllerTest < ActionController::TestCase
   end
 
   test "should update ort" do
-    patch :update, id: @ort, ort: { anmerkung: @ort.anmerkung, lokalisation: @ort.lokalisation, ort: @ort.ort, stelle: @ort.stelle, transliteration: @ort.transliteration, transliteration_nosuffix: @ort.transliteration_nosuffix, uid: @ort.uid }
+    patch :update, id: @ort, ort: { anmerkung: @ort.anmerkung, lokalisation: @ort.lokalisation, ort: @ort.ort, stelle: @ort.stelle, transliteration: @ort.transliteration, transliteration_nosuffix: @ort.transliteration, uid: @ort.uid }
     assert_redirected_to ort_path(assigns(:ort))
   end
 
