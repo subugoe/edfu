@@ -90,7 +90,7 @@ class UploadsController < ApplicationController
     prepareDB
     #process_formular
     #process_ort
-    #process_gott
+    process_gott
     process_wort
 
   end
@@ -277,6 +277,17 @@ class UploadsController < ApplicationController
       # todo replace this
       break if i==150
 
+
+      if row[2] != nil and row[2] != ''
+        begin
+          hierogl = Integer(row[2])
+        rescue ArgumentError
+          hierogl = row[2].to_s
+        end
+      else
+        hierogl = ''
+      end
+
       # uid changed to string from integer
       Wort.create(
 
@@ -285,7 +296,7 @@ class UploadsController < ApplicationController
           transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
           uebersetzung: row[1] || '',
           # hieroglyph changed to string from integer
-          hieroglyph: row[2] || '',
+          hieroglyph: hierogl || '',
           weiteres: row[3] || '',
           belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
           belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?

@@ -1,10 +1,12 @@
 # encoding: utf-8 
 
+require 'lib/edfu_numerics_conversion_helper'
 require 'lib/edfu_model_helper'
 require 'rubygems'
 require 'rsolr'
 
 class WbBerlin < ActiveRecord::Base
+  include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
   has_one :wort
@@ -26,6 +28,27 @@ class WbBerlin < ActiveRecord::Base
   #
   # end
 
+  def start
+    return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%02i' % self[:zeile_start]}"
+  end
+
+  def berlin_display
+
+    roemisch = dezimal_nach_roemisch(self[:band])
+
+    if self[:seite_start].to_i == self[:seite_stop].to_i
+      if self[:zeile_start].to_i == self[:zeile_stop].to_i
+        return "#{roemisch}, #{'%03i' % self[:seite_start]}, #{'%02i' % self[:zeile_stop]}"
+      else
+        return "#{roemisch}, #{'%03i' % self[:seite_start]}, #{'%02i' % self[:zeile_start]} - #{'%02i' % self[:zeile_stop]}"
+      end
+    else
+      return "#{roemisch}, #{'%03i' % self[:seite_start]}, #{'%02i' % self[:zeile_start]} - #{'%03i' % self[:seite_stop]}, #{'%02i' % self[:zeile_stop]}"
+    end
+
+
+  end
+
 
   private
 
@@ -33,21 +56,23 @@ class WbBerlin < ActiveRecord::Base
   def add_to_solr
 
 
+    # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
 
-    solr.add ({
-        :sql_uid => self.id,
-        :band => self[:band],
-        :seite_start => self[:seite_start],
-        :seite_stop => self[:seite_stop],
-        :zeile_start => self[:zeile_start],
-        :zeile_stop => self[:zeile_stop],
-        :typ => 'wb_berlin',
-        :id => "wb_berlin-#{self.id}"})
-    #   # todo id hinzufügen, typ hinzufügen,
+    solr.add (
+                 {
+                     :sql_uid => self.id,
+                     :band => self[:band].to_i,
+                     :seite_start => self[:seite_start].to_i,
+                     :seite_stop => self[:seite_stop].to_i,
+                     :zeile_start => self[:zeile_start].to_i,
+                     :zeile_stop => self[:zeile_stop].to_i,
+                     :typ => 'wb_berlin',
+                     :id => "wb_berlin-#{self.id}"
+                 }
+             )
 
     solr.commit
-
 
   end
 

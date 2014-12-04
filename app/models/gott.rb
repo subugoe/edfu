@@ -49,18 +49,50 @@ class Gott < ActiveRecord::Base
 
   def add_to_solr
 
-    #   integer :uid, stored: true
-    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-    #   text :transliteration_nosuffix, stored: true
-    #   text :ort, stored: true
-    #   text :eponym, stored: true
-    #   text :beziehung, stored: true
-    #   text :funktion, stored: true
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+
+    solr.add (
+                 {
+                     :sql_uid => self[:uid], # ? ---
+                     :transliteration => self[:transliteration], # ---
+                     #:transliteration_highlight => self[:transliteration], # ---
+                     :transliteration_nosuffix => self[:transliteration], # ? ---
+                     :ort => self[:ort], # ---
+                     :eponym => self[:eponym], # ---
+                     :beziehung => self[:beziehung], # ---
+                     :funktion => self[:funktion], # ---
+                     :band => self[:band].to_i, # ---
+                    # :seitezeile => self[:seitezeile], # ? new
+                     :anmerkung => self[:anmerkung], # ---
+                   #  :sort => "Act--#{self.stelle.start}", # ---
+                     :freigegeben => self[:freigegeben], # ---
+                     :zerstörung => self[:zerstoerung], # ---
+
+                     # :stelle_unsicher => self.stelle.unsicher, # ? ---
+                     # :seite_start => self.stelle.seite_start, # ? ---
+                     # :seite_stop => self.stelle.seite_stop, # ? ---
+                     # :zeile_start => self.stelle.zeile_start, # ? ---
+                     # :zeile_stop => self.stelle.zeile_stop, # ? ---
+                     # :bandseite => self.stelle.bandseite, # ? ---
+                     # :bandseitezeile => self.stelle.bandseitezeile, # ? ---
+                     # #:bandseitezeile_highlight => self.stelle.bandseitezeile, # ? ---
+                     # :stelle_id => self.stelle.id, # ---
+                     # :start => self.stelle.start, # ? new
+                     # :stop => self.stelle.stop, # ? new
+
+                     :typ => 'gott', # ---
+                     :id => "gott-#{self.id}" # ---
+                 }
+             )
+
+
     #   integer :band, stored: true
     #   text :seitezeile, stored: true # todo wirklich in den index?
     #   text :anmerkung, stored: true
     #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
     #   # todo id hinzufügen, typ hinzufügen,
+
+    solr.commit
 
   end
 
@@ -149,7 +181,7 @@ class Gott < ActiveRecord::Base
       # 5791
       self[:seitezeile] = '33, 14'
     elsif self[:uid] == 6335
-      self[:band] = 'VII'  # 7'
+      self[:band] = 'VII' # 7'
     elsif self[:seitezeile] == '331,6 und 332,1'
       # 6420
       self[:seitezeile] = '331, 6 - 332, 1'
