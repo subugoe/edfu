@@ -1,6 +1,7 @@
-"jruby-1.7.16.1"
+#"jruby-1.7.16.1"
 
 source 'https://rubygems.org'
+ruby "1.9.3", :engine => "jruby", :engine_version => "1.7.16.1"
 
 # for spreadsheet processing
 gem 'roo', '~> 1.13.2'
