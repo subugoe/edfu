@@ -1,39 +1,15 @@
 # encoding: utf-8 
 
 require 'lib/edfu_model_helper'
+require 'rsolr'
 
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper
 
   belongs_to :zugehoerigZu, polymorphic: true
 
-
-  #after_update :log_updated
-  #after_create :log_created
   after_commit :add_to_solr
 
-  # searchable do
-  #
-  #   # integer :uid, stored: true
-  #   text :tempel, stored: true
-  #   integer :band, stored: true
-  #   integer :bandseite, stored: true
-  #   integer :bandseitezeile, stored: true
-  #   integer :seite_start, stored: true
-  #   integer :seite_stop, stored: true
-  #   integer :zeile_start, stored: true
-  #   integer :zeile_stop, stored: true
-  #   text :stelle_anmerkung, stored: true
-  #   boolean :stelle_unsicher, stored: true
-  #   integer :start, stored: true
-  #   integer :stop, stored: true
-  #   boolean :zerstoerung, stored: true
-  #   boolean :freigegeben, stored: true
-  #   # t.references :zugehoerigZu, polymorphic: true
-  #   # todo besitzer hinzufügen, id hinzufügen, typ hinzufügen
-  #
-  #
-  # end
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%03i' % self[:zeile_start]}"
@@ -49,25 +25,6 @@ class Stelle < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
-    #   # integer :uid, stored: true
-    #   text :tempel, stored: true
-    #   integer :band, stored: true
-    #   integer :bandseite, stored: true
-    #   integer :bandseitezeile, stored: true
-    #   integer :seite_start, stored: true
-    #   integer :seite_stop, stored: true
-    #   integer :zeile_start, stored: true
-    #   integer :zeile_stop, stored: true
-    #   text :stelle_anmerkung, stored: true
-    #   boolean :stelle_unsicher, stored: true
-    #   integer :start, stored: true
-    #   integer :stop, stored: true
-    #   boolean :zerstoerung, stored: true
-    #   boolean :freigegeben, stored: true
-    #   # t.references :zugehoerigZu, polymorphic: true
-    #   # todo besitzer hinzufügen, id hinzufügen, typ hinzufügen
-
     solr.add (
                  {
                      :sql_uid => self[:id], # ---
@@ -93,10 +50,7 @@ class Stelle < ActiveRecord::Base
                      :id => "stelle-#{self[:id]}" # ---
                  }
              )
-
     solr.commit
-
-
   end
 
 

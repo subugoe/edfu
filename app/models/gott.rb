@@ -14,28 +14,8 @@ class Gott < ActiveRecord::Base
 
   attr_accessor :stelle, :transliteration_nosuffix
 
-  # after_update :log_updated
-  # after_create :log_created
   after_commit :add_to_solr
   before_validation :check_data
-
-
-  # searchable do
-  #
-  #   integer :uid, stored: true
-  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-  #   text :transliteration_nosuffix, stored: true
-  #   text :ort, stored: true
-  #   text :eponym, stored: true
-  #   text :beziehung, stored: true
-  #   text :funktion, stored: true
-  #   integer :band, stored: true
-  #   text :seitezeile, stored: true # todo wirklich in den index?
-  #   text :anmerkung, stored: true
-  #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-  #   # todo id hinzufügen, typ hinzufügen,
-  #
-  # end
 
 
   private
@@ -50,7 +30,6 @@ class Gott < ActiveRecord::Base
   def add_to_solr
 
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
     solr.add (
                  {
                      :sql_uid => self[:uid], # ---
@@ -60,10 +39,10 @@ class Gott < ActiveRecord::Base
                      :eponym => self[:eponym], # ---
                      :beziehung => self[:beziehung], # ---
                      :funktion => self[:funktion], # ---
-                     :band => @band, #self[:band], # ---
-                    # :seitezeile => self[:seitezeile], # ? new
+                     :band => @band,
+
                      :anmerkung => self[:anmerkung], # ---
-                     :sort => "Act--#{self.stellen.first.start}", # --- todo
+                     :sort => "Act--#{self.stellen.first.start}", # ---
 
                      :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben}, # ---
                      :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung}, # ---
@@ -77,23 +56,11 @@ class Gott < ActiveRecord::Base
                      :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
                      :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
 
-                     # :start => self.stellen.start, # ? new
-                     # :stop => self.stellen.stop, # ? new
-
                      :typ => 'gott', # ---
                      :id => "gott-#{self[:uid]}" # ---
                  }
              )
-
-
-    #   integer :band, stored: true
-    #   text :seitezeile, stored: true # todo wirklich in den index?
-    #   text :anmerkung, stored: true
-    #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    #   # todo id hinzufügen, typ hinzufügen,
-
     solr.commit
-
   end
 
   # todo update solr doc

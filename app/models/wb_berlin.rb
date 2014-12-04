@@ -2,7 +2,6 @@
 
 require 'lib/edfu_numerics_conversion_helper'
 require 'lib/edfu_model_helper'
-require 'rubygems'
 require 'rsolr'
 
 class WbBerlin < ActiveRecord::Base
@@ -11,22 +10,7 @@ class WbBerlin < ActiveRecord::Base
 
   has_one :wort
 
-  # after_update :log_updated
-  # after_create :log_created
   after_commit :add_to_solr
-
-  # searchable do
-  #
-  #   integer :uid, stored: true
-  #   integer :band, stored: true
-  #   integer :seite_start, stored: true
-  #   integer :seite_stop, stored: true
-  #   integer :zeile_start, stored: true
-  #   integer :zeile_stop, stored: true
-  #   # t.references :wort, stored: true
-  #   # todo id hinzufügen, typ hinzufügen,
-  #
-  # end
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%02i' % self[:zeile_start]}"
@@ -60,10 +44,8 @@ class WbBerlin < ActiveRecord::Base
 
   def add_to_solr
 
-
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
     solr.add (
                  {
                      :sql_uid => self.id,
@@ -76,9 +58,7 @@ class WbBerlin < ActiveRecord::Base
                      :id => "wb_berlin-#{self.id}"
                  }
              )
-
     solr.commit
-
   end
 
 

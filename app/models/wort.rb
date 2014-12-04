@@ -2,6 +2,7 @@
 
 require 'lib/edfu_model_helper'
 require 'lib/edfu_numerics_conversion_helper'
+require 'rsolr'
 
 class Wort < ActiveRecord::Base
   include EdfuNumericsConversionHelper
@@ -10,31 +11,12 @@ class Wort < ActiveRecord::Base
   belongs_to :wb_berlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  # after_update :log_updated
-  # after_create :log_created
   after_commit :add_to_solr
   before_validation :check_data
 
-  # searchable do
-  #
-  #   integer :uid, stored: true
-  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-  #   text :transliteration_nosuffix, stored: true
-  #   text :uebersetzung, stored: true
-  #   text :hieroglyph, stored: true
-  #   text :weiteres, stored: true
-  #   text :belegstellenEdfu, stored: true # todo in was indexiert? stelle_id?
-  #   text :belegstellenWb, stored: true # todo in was indexiert? stelle_berlin_id?
-  #   text :anmerkung, stored: true
-  #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-  #   # todo id hinzufügen, typ hinzufügen,
-  #   # todo attr. aus Szene hinzufügen
-  #   # todo felder prüfen
-  #
-  # end
-
 
   private
+
 
   def check_data
 
@@ -46,22 +28,6 @@ class Wort < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
-    #   integer :uid, stored: true
-    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-    #   text :transliteration_nosuffix, stored: true
-    #   text :uebersetzung, stored: true
-    #   text :hieroglyph, stored: true
-    #   text :weiteres, stored: true
-    #   text :belegstellenEdfu, stored: true # todo in was indexiert? stelle_id?
-    #   text :belegstellenWb, stored: true # todo in was indexiert? stelle_berlin_id?
-    #   text :anmerkung, stored: true
-    #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    #   # todo id hinzufügen, typ hinzufügen,
-    #   # todo attr. aus Szene hinzufügen
-    #   # todo felder prüfen
-
-
     solr.add (
                  {
                      :sql_uid => self[:uid],
@@ -77,14 +43,13 @@ class Wort < ActiveRecord::Base
                      :band => self.stellen.collect { |stelle| stelle.band }, #
                      :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
                      :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
-                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # --- Array !todo
+                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
                      :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
                      :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
                      :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
                      :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
                      :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
                      :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
-
 
                      :sort => "Ddt--#{self.wb_berlin.sort}", # ---
                      :berlin_display => self.wb_berlin.berlin_display, # ---
@@ -98,25 +63,7 @@ class Wort < ActiveRecord::Base
                      :id => "wort-#{self[:uid]}"
                  }
              )
-
     solr.commit
-
-
-  end
-
-  # todo update solr doc
-  # todo log updated
-  def log_updated
-    logger.info "[INFO]  after update: #{id}"
-  end
-
-
-  # todo add doc to solr
-  # todo log created
-  def log_created
-
-    logger.info "[INFO]  before save: #{id}"
-
   end
 
 
@@ -310,19 +257,6 @@ class Wort < ActiveRecord::Base
     end
 
 
-    # myWB = {
-    #     'uid' => berlin.length,
-    #     'band' => band,
-    #     'seite_start' => start[0],
-    #     'seite_stop' => stop[0],
-    #     'zeile_start' => start[1],
-    #     'zeile_stop' => stop[1],
-    #     'vornach' => vornach,
-    #     'notiz' => notiz,
-    #     'anmerkung' => wbAnmerkung
-    # }
-
-
     bereitsVorhanden = false
 
     # hat 1:1 relation
@@ -351,10 +285,7 @@ class Wort < ActiveRecord::Base
       )
       self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
 
-      # berlin += [myWB]
     end
-
-    # wbID = myWB['uid']
 
 
     #--- edfu
@@ -442,21 +373,6 @@ class Wort < ActiveRecord::Base
             logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} m20.group(5) zu lang #{b}"
           end
 
-
-          # myStelle = {
-          #     'uid' => stelle.length,
-          #     'band_uid' => edfuBandNr,
-          #     'seite_start' => edfuSeiteStart,
-          #     'seite_stop' => edfuSeiteStop,
-          #     'zeile_start' => edfuZeileStart,
-          #     'zeile_stop' => edfuZeileStop,
-          #     'anmerkung' => edfuAnmerkung,
-          #     'stop_unsicher' => false,
-          #     'zerstoerung' => zerstoerung
-          # }
-          # stelle += [myStelle]
-
-
           # todo nicht korrekt
           stelle = Stelle.create(
               :tempel => 'Edfu',
@@ -485,40 +401,12 @@ class Wort < ActiveRecord::Base
             logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop > 30 #{b}"
           end
 
-          # attr of relationshp removed
-          #
-          # wort_has_stelle += [
-          #     {
-          #         'uid_local' => self[:uid],
-          #         'uid_foreign' => myStelle['uid'],
-          #         'schreiber_verbessert' => klammer,
-          #         'chassinat_verbessert' => stern
-          #     }
-          # ]
 
         else
           logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine erkennbare Seitenzahl #{b}"
         end
       }
     end
-
-
-    # myWort = {
-    #     'uid' => self[:uid],
-    #     #'id' => self[:uid],
-    #     'transliteration' => self[:transliteration],
-    #     'weiteres' => self[:weiteres],
-    #     'uebersetzung' => self[:uebersetzung],
-    #     'anmerkung' => (edfuAnmerkung + self[:anmerkung]).strip(),
-    #     'hieroglyph' => self[:ids],
-    #     'lemma' => nil, # is transliteration
-    #     'wb_berlin_uid' => wbID
-    # }
-
-    # todo wird unter der Tabelle WORT hinzugefügt
-    # wort += [myWort]
-
-
   end
 
   # todo in module auslagern

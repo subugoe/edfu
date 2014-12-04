@@ -2,7 +2,7 @@
 
 require 'lib/edfu_model_helper'
 require 'lib/edfu_numerics_conversion_helper'
-
+require 'rsolr'
 
 class Formular < ActiveRecord::Base
   include EdfuNumericsConversionHelper
@@ -16,78 +16,9 @@ class Formular < ActiveRecord::Base
   has_and_belongs_to_many :photos, :dependent => :delete_all
   has_and_belongs_to_many :literaturen, :dependent => :delete_all
 
-  # after_update :log_updated
-  # after_create :log_created
   after_commit :add_to_solr
   before_validation :check_data
 
-
-  # searchable do
-  #
-  #   text :uid, stored: true
-  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-  #   text :transliteration_nosuffix, stored: true
-  #   text :uebersetzung, stored: true
-  #   text :texttyp, stored: true
-  #   # text :photo, stored: true # todo photo_highlight hinzufügen
-  #   # text :photo_pfad, stored: true
-  #   # text :photo_kommentar, stored: true
-  #   text :szeneID, stored: true
-  #   # text :literatur, stored: true
-  #   text :band, stored: true
-  #   text :seitezeile, stored: true
-  #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-  #   # todo id hinzufügen, typ hinzufügen,
-  #
-  # end
-
-
-  def to_s
-
-    # photos
-    p = Hash.new
-    p[:name] = Array.new
-    p[:typ] = Array.new
-    p[:pfad] = Array.new
-    p[:kommentar] = Array.new
-
-
-    self.photos.each { |pp|
-      p[:name] << pp.name || ''
-      p[:typ] << pp.typ || ''
-      p[:pfad] << pp.pfad || ''
-      p[:kommentar] << pp.kommentar || ''
-    }
-
-    # literaturen
-
-
-    l = Array.new
-    self.literaturen.each { |lit|
-      if lit.beschreibung
-        l << "#{lit.beschreibung} : #{lit.detail}"
-      else
-        l << ''
-      end
-    }
-
-
-    puts "
-         uid: #{uid} #{uid.class}
-         transliteration: #{transliteration} #{transliteration.class}
-         transliteration_nosuffix: #{transliteration_nosuffix} #{transliteration_nosuffix.class}
-         uebersetzung: #{uebersetzung} #{uebersetzung.class}
-         texttyp: #{texttyp} #{texttyp.class}
-         photo: #{p[:name]}
-         photo_pfad: #{p[:pfad]}
-         photo_kommentar: #{p[:kommentar]}
-         szeneID: #{szeneID} #{szeneID.class}
-         literatur: #{l}
-         band: #{band} #{band.class}
-         seitezeile: #{seitezeile} #{seitezeile.class}
-         "
-
-  end
 
   private
 
@@ -100,60 +31,29 @@ class Formular < ActiveRecord::Base
     @myFormular['uid'] = (self[:uid]).to_i
     @myFormular['texttyp'] = self[:texttyp]
 
-
     check_uebersetzungs_string
-
-
     check_and_add_photo_string
-
     find_or_create_stelle
-
     check_transliteration_re_3
-
     find_or_create_literatur
-
-
   end
 
   def add_to_solr
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
-    # todo extract to config file
-    # solr = RSolr.connect :url => 'localhost:8983/solr/development'
-    #
-    #
-    # solr.add :uid => self[:uid],
-    #   :transliteration => ,
-    #   :transliteration_nosuffix => ,
-    #   :uebersetzung => ,
-    #   :texttyp => ,
-    #   :photo  =>,
-    #   :photo_pfad => ,
-    #   :photo_kommentar =>,
-    #   :szeneID =>,
-    #   :literatur =>,
-    #   :band =>,
-    #   :seitezeile =>
-    # #   # todo stelle_id und attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    # #   # todo id hinzufügen, typ hinzufügen,
-    #
-    # solr.commit
-
-
     solr.add (
                  {
                      :sql_uid => self[:uid], # ---
 
-                     :sort => "#{self.stellen.first.start}", # --- todo
+                     :sort => "#{self.stellen.first.start}", # ---
 
                      :transliteration => self[:transliteration], # ---
 
                      :transliteration_nosuffix => self[:transliteration], #
                      :uebersetzung => self[:uebersetzung], # ---
                      :texttyp => self[:texttyp], # ---
-                     :szene_nummer => self[:szeneID], #  todo stimmt szene_nummer = SzeneID
+                     :szene_nummer => self[:szeneID], #  todo stimmt szene_nummer = SzeneID ?
 
                      :photo => self.photos.collect { |photo| photo.name }, # ---
                      :photo_kommentar => self.photos.collect { |photo| photo.kommentar }, # ---
@@ -180,9 +80,7 @@ class Formular < ActiveRecord::Base
                      :id => "formular-#{self[:uid]}" # ---
                  }
              )
-
-    solr.commit
-
+        solr.commit
   end
 
   # todo update solr doc

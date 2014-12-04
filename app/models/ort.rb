@@ -2,6 +2,7 @@
 
 require 'lib/edfu_model_helper'
 require 'lib/edfu_numerics_conversion_helper'
+require 'rsolr'
 
 class Ort < ActiveRecord::Base
   include EdfuNumericsConversionHelper
@@ -12,24 +13,9 @@ class Ort < ActiveRecord::Base
   # imported Stelle (is equivalent to bandseitezeile)
   attr_accessor :iStelle # , :transliteration_nosuffix
 
-  # after_update :log_updated
-  # after_create :log_created
   after_commit :add_to_solr
   before_validation :check_data
 
-  # searchable do
-  #
-  #   integer :uid, stored: true
-  #   #text :iStelle, stored: true
-  #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-  #   text :transliteration_nosuffix, stored: true
-  #   text :ort, stored: true
-  #   text :lokalisation, stored: true
-  #   text :anmerkung, stored: true
-  #   # todo ersetze mit stelle durch stelle_id, attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-  #   # todo id hinzufügen, typ hinzufügen,
-  #
-  # end
 
 
   def transliteration_nosuffix
@@ -53,18 +39,6 @@ class Ort < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-
-    #   integer :uid, stored: true
-    #   #text :iStelle, stored: true
-    #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
-    #   text :transliteration_nosuffix, stored: true
-    #   text :ort, stored: true
-    #   text :lokalisation, stored: true
-    #   text :anmerkung, stored: true
-    #   # todo ersetze mit stelle durch stelle_id, attr. aus Stelle hinzufügen, und bandseitezeile_highlight hinzufügen
-    #   # todo id hinzufügen, typ hinzufügen,
-
-
     solr.add (
                  {
                      :sql_uid => self[:uid],
@@ -77,7 +51,6 @@ class Ort < ActiveRecord::Base
                      :lokalisation => self[:lokalisation], # ---
                      :anmerkung => self[:anmerkung], # ---
 
-
                      :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
                      :band => self.stellen.collect { |stelle| stelle.band }, # ---
                      :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
@@ -87,6 +60,7 @@ class Ort < ActiveRecord::Base
                      :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
                      :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
                      :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+
                      :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
                      :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
                      :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
@@ -96,9 +70,7 @@ class Ort < ActiveRecord::Base
                      :id => "ort-#{self[:uid]}" # ---
                  }
              )
-
     solr.commit
-
   end
 
 
