@@ -146,14 +146,14 @@ class Formular < ActiveRecord::Base
                  {
                      :sql_uid => self[:uid], # ---
 
-                     :sort => "#{self.stellen.first.start}", # --- todo ???
-                     #
+                     :sort => "#{self.stellen.first.start}", # ---
+
                      :transliteration => self[:transliteration], # ---
-                     #:transliteration_highlight => self[:transliteration], # ---
+
                      :transliteration_nosuffix => self[:transliteration], #
                      :uebersetzung => self[:uebersetzung], # ---
                      :texttyp => self[:texttyp], # ---
-                     :szene_nummer => self[:szeneID], #  todo stimmt szene_numme = SzeneID
+                     :szene_nummer => self[:szeneID], #  todo stimmt szene_nummer = SzeneID
 
                      :photo => self.photos.collect { |photo| photo.name }, # ---
                      :photo_kommentar => self.photos.collect { |photo| photo.kommentar }, # ---
@@ -161,11 +161,11 @@ class Formular < ActiveRecord::Base
 
                      :literatur => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
 
-                     :stelle_id => self.stellen.collect { |stelle| stelle.id }, # ---
+                     :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
                      :band => self.stellen.collect { |stelle| stelle.band }, # ---
                      :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
                      :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
-                     #:bandseitezeile_highlight => self.stellen.bandseitezeile, # ---
+
 
                      :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
                      :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---

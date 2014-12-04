@@ -89,7 +89,7 @@ class UploadsController < ApplicationController
 
     prepareDB
     process_formular
-    #process_ort
+    process_ort
     #process_gott
     #process_wort
 
@@ -197,7 +197,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==150
+      break if i==15
 
       Ort.create(
 
