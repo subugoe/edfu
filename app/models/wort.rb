@@ -7,7 +7,7 @@ class Wort < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  belongs_to  :wb_berlin
+  belongs_to :wb_berlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   # after_update :log_updated
@@ -43,6 +43,10 @@ class Wort < ActiveRecord::Base
   end
 
   def add_to_solr
+
+    # todo extract
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+
     #   integer :uid, stored: true
     #   text :transliteration, stored: true # todo transliteration_highlight hinzufügen
     #   text :transliteration_nosuffix, stored: true
@@ -56,6 +60,52 @@ class Wort < ActiveRecord::Base
     #   # todo id hinzufügen, typ hinzufügen,
     #   # todo attr. aus Szene hinzufügen
     #   # todo felder prüfen
+
+
+    solr.add (
+                 {
+                     :sql_uid => self[:uid],
+
+                     :transliteration => self[:transliteration],
+                     #:transliteration_highlight => self[:transliteration],
+                     :transliteration_nosuffix => self[:transliteration_nosuffix], # ---
+                     :uebersetzung => self[:uebersetzung], # ---
+                     :hieroglyph => self[:hieroglyph], # ---
+                     :weiteres => self[:weiteres], # ---
+                     :anmerkung => self[:anmerkung], # --- aus self, kein Array
+
+                     #:belegstellenEdfu => self[:belegstellenEdfu],
+                     # :stelle_id => self.stellen.id, # --- Array !  todo
+                     # :band => self.stellen.band, # --- Array ! todo
+                     # :bandseite => self.stellen.bandseite, # --- Array ! todo
+                     # :bandseitezeile => self.stellen.bandseitezeile, # --- Array ! todo
+                     # :bandseitezeile_highlight => self.stellen.bandseitezeile, # --- Array ! todo
+                     #
+                     # :seite_start => self.stellen.seite_start, # --- Array !todo
+                     # :seite_stop => self.stellen.seite_stop, # --- Array !  todo
+                     # :zeile_start => self.stellen.zeile_start, # --- Array ! todo
+                     # :zeile_stop => self.stellen.zeile_stop, # --- Array !  todo
+                     # :zerstoerung => self.stellen.zerstoerung, # --- Array !  todo
+                     # :freigegeben => self.stellen.freigegeben, # --- Array !  todo
+                     # :stelle_unsicher => self.stellen.stelle_unsicher, # --- Array !  todo
+
+                     #:belegstellenWb => self[:belegstellenWb],
+                     :sort => "Ddt--#{self.wb_berlin.start}", # ---
+                     :berlin_display => self.wb_berlin.berlin_display, # ---
+                     :berlin_band => self.wb_berlin.band.to_i, # ---
+                     :berlin_seite_start => self.wb_berlin.seite_start.to_i, # ---
+                     :berlin_seite_stop => self.wb_berlin.seite_stop.to_i, # ---
+                     :berlin_zeile_start => self.wb_berlin.zeile_start.to_i, # ---
+                     :berlin_zeile_stop => self.wb_berlin.zeile_stop.to_i, # ---
+
+                     :typ => 'wort',
+                     :id => "wort-#{self.id}"
+                 }
+             )
+
+    solr.commit
+
+
   end
 
   # todo update solr doc
@@ -264,8 +314,6 @@ class Wort < ActiveRecord::Base
     end
 
 
-
-
     # myWB = {
     #     'uid' => berlin.length,
     #     'band' => band,
@@ -289,9 +337,9 @@ class Wort < ActiveRecord::Base
         self.wb_berlin.zeile_start == wbZeileStart and
         self.wb_berlin.zeile_stop == wbZeileStop)
 
-        self.wb_berlin.notiz = wbAnmerkung if self.wb_berlin.notiz != wbAnmerkung
+      self.wb_berlin.notiz = wbAnmerkung if self.wb_berlin.notiz != wbAnmerkung
 
-        bereitsVorhanden = true
+      bereitsVorhanden = true
     end
 
 
@@ -316,13 +364,11 @@ class Wort < ActiveRecord::Base
     #--- edfu
 
 
-    if edfuAnmerkung != ''  or edfuAnmerkung.length != 0
+    if edfuAnmerkung != '' or edfuAnmerkung.length != 0
       self[:anmerkung] = "#{edfuAnmerkung.strip()}; #{self[:anmerkung].strip() || ''}"
     else
       self[:anmerkung] = "#{self[:anmerkung].strip() || ''}"
     end
-
-
 
 
     edfuBandNr = 0
@@ -475,8 +521,6 @@ class Wort < ActiveRecord::Base
 
     # todo wird unter der Tabelle WORT hinzugefügt
     # wort += [myWort]
-
-
 
 
   end
