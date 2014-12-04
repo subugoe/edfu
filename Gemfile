@@ -44,3 +44,8 @@ gem 'autoprefixer-rails'
 gem 'bootstrap_form'
 
 gem 'jquery-datatables-rails', '~> 3.1.0'
+
+
+# gems required by Heroku
+gem 'pg', group: :production
+gem 'rails_12factor', group: :production
