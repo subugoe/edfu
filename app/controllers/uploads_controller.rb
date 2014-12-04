@@ -1,5 +1,6 @@
 require 'roo'
 require 'securerandom'
+require 'benchmark'
 
 class UploadsController < ApplicationController
 
@@ -33,22 +34,28 @@ class UploadsController < ApplicationController
     logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
 
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
-      file.write(uploaded_formular.read)
-    end
+    n = 50000
+    Benchmark.bm(7) do |x|
+      x.report("File handling:") {
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
-      file.write(uploaded_ort.read)
-    end
+        File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
+          file.write(uploaded_formular.read)
+        end
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
-      file.write(uploaded_gott.read)
-    end
+        File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
+          file.write(uploaded_ort.read)
+        end
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
-      file.write(uploaded_wort.read)
-    end
+        File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
+          file.write(uploaded_gott.read)
+        end
 
+        File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
+          file.write(uploaded_wort.read)
+        end
+
+      }
+    end
 
     processed = process_files
 
@@ -125,58 +132,74 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
-    logger.info "[Upload] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
-
-    file = Rails.root.join('public', 'uploads', 'Formular.xls')
-
-    #excel = Roo::Excel.new(file.to_s)
-    excel = Roo::Excel.new("public/uploads/Formular.xls")
+    n = 50000
+    Benchmark.bm(7) do |x|
 
 
-    excel.default_sheet = excel.sheets.first
+      logger.info "[Upload] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
-    previousUID = 0
-    i = 1
-    excel.each do |row|
+      file = Rails.root.join('public', 'uploads', 'Formular.xls')
+      excel = nil
 
-      # not process the header
-      if i==1
-        i += 1
-        next
-      end
+      x.report("read formular excel sheet:") {
+        #excel = Roo::Excel.new(file.to_s)
+        excel = Roo::Excel.new("public/uploads/Formular.xls")
+      }
 
-      # todo replace this
-      break if i>15
+      excel.default_sheet = excel.sheets.first
 
-      # if SzeneID doesn't exist
-      if row[7] != nil and row[7] != ''
-        szID = Integer(row[7])
-      else
-        szID = ''
-      end
+      previousUID = 0
+      i = 1
 
+      x.report("create all formulars:") {
+        excel.each do |row|
 
-      f = Formular.create(
+          # not process the header
+          if i==1
+            i += 1
+            next
+          end
 
-          transliteration: row[0] || '',
-          band: Integer(row[1]) || -1,
-          seitezeile: row[2] || '',
-          transliteration_nosuffix: row[3] || '',
-          uebersetzung: row[4] || '',
-          texttyp: row[5] || '',
-          photo: row[6] || '',
-          photo_pfad: '',
-          photo_kommentar: '',
-          # szeneID changed to string from integer
-          szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
-          literatur: row[8] || '',
-          uid: Integer(row[9])
+          # todo replace this
+          #break if i>400
 
-      )
+          # if SzeneID doesn't exist
+          if row[7] != nil and row[7] != ''
+            szID = Integer(row[7])
+          else
+            szID = ''
+          end
 
-      i += 1
+          # if uid doesn't exist
+          # todo use string
+          if row[9] != nil and row[9] != ''
+            uID = Integer(row[9])
+          else
+            uID = SecureRandom.random_number(100000000)
+          end
+
+          x.report("create one formular:") {
+            f = Formular.create(
+
+                transliteration: row[0] || '',
+                band: Integer(row[1]) || -1,
+                seitezeile: row[2] || '',
+                transliteration_nosuffix: row[3] || '',
+                uebersetzung: row[4] || '',
+                texttyp: row[5] || '',
+                photo: row[6] || '',
+                photo_pfad: '',
+                photo_kommentar: '',
+                # szeneID changed to string from integer
+                szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
+                literatur: row[8] || '',
+                uid: uID
+            )
+          }
+          i += 1
+        end
+      }
     end
-
   end
 
   # todo move to Ort-Model/Helper (Topo.xls)
