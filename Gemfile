@@ -10,8 +10,8 @@ gem 'roo', '~> 1.13.2'
 gem 'rails', '4.1.8'
 
 # Use jdbcsqlite3 as the database for Active Record
-# gem 'activerecord-jdbcsqlite3-adapter'
-gem 'sqlite3'
+gem 'activerecord-jdbcsqlite3-adapter',  group: :development
+# gem 'sqlite3'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
