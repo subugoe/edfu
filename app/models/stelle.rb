@@ -36,8 +36,8 @@ class Stelle < ActiveRecord::Base
                      :seite_stop => self.seite_stop, # ---
                      :zeile_start => self.zeile_start, # ---
                      :zeile_stop => self.zeile_stop, # ---
-                     :start => start, # ---
-                     :stop => stop, # ---
+                     :start => self.start, # ---
+                     :stop => self.stop, # ---
 
                      :freigegeben => self.freigegeben, # ---
                      :zerstoerung => self.zerstoerung, # ---

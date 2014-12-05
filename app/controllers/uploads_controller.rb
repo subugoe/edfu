@@ -35,27 +35,27 @@ class UploadsController < ApplicationController
 
 
     n = 50000
-    Benchmark.bm(7) do |x|
-      x.report("File handling:") {
+    #Benchmark.bm(7) do |x|
+    #x.report("File handling:") {
 
-        File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
-          file.write(uploaded_formular.read)
-        end
-
-        File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
-          file.write(uploaded_ort.read)
-        end
-
-        File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
-          file.write(uploaded_gott.read)
-        end
-
-        File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
-          file.write(uploaded_wort.read)
-        end
-
-      }
+    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
+      file.write(uploaded_formular.read)
     end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
+      file.write(uploaded_ort.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
+      file.write(uploaded_gott.read)
+    end
+
+    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
+      file.write(uploaded_wort.read)
+    end
+
+    #}
+    # end
 
     processed = process_files
 
@@ -96,9 +96,9 @@ class UploadsController < ApplicationController
 
     prepareDB
     process_formular
-    process_ort
-    process_gott
-    process_wort
+    #process_ort
+    #process_gott
+    #process_wort
 
   end
 
@@ -132,7 +132,11 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
+    formulare_batch = Array.new()
+    formulare_batch_size = 1000
+
     n = 50000
+    i = 1
     Benchmark.bm(7) do |x|
 
 
@@ -141,15 +145,12 @@ class UploadsController < ApplicationController
       file = Rails.root.join('public', 'uploads', 'Formular.xls')
       excel = nil
 
-      x.report("read formular excel sheet:") {
-        #excel = Roo::Excel.new(file.to_s)
-        excel = Roo::Excel.new("public/uploads/Formular.xls")
-      }
+
+      #excel = Roo::Excel.new(file.to_s)
+      excel = Roo::Excel.new("public/uploads/Formular.xls")
+
 
       excel.default_sheet = excel.sheets.first
-
-      previousUID = 0
-      i = 1
 
       x.report("create all formulars:") {
         excel.each do |row|
@@ -161,7 +162,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i>400
+          #break if i>1000
 
           # if SzeneID doesn't exist
           if row[7] != nil and row[7] != ''
@@ -178,28 +179,43 @@ class UploadsController < ApplicationController
             uID = SecureRandom.random_number(100000000)
           end
 
-          x.report("create one formular:") {
-            f = Formular.create(
+          # x.report("create one formular:") {
+          formulare_batch << Formular.new(
+              #    f = Formular.create(
+              {
+                  transliteration: row[0] || '',
+                  band: Integer(row[1]) || -1,
+                  seitezeile: row[2] || '',
+                  transliteration_nosuffix: row[3] || '',
+                  uebersetzung: row[4] || '',
+                  texttyp: row[5] || '',
+                  photo: row[6] || '',
+                  photo_pfad: '',
+                  photo_kommentar: '',
+                  # szeneID changed to string from integer
+                  szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
+                  literatur: row[8] || '',
+                  uid: uID
+              }
+          )
 
-                transliteration: row[0] || '',
-                band: Integer(row[1]) || -1,
-                seitezeile: row[2] || '',
-                transliteration_nosuffix: row[3] || '',
-                uebersetzung: row[4] || '',
-                texttyp: row[5] || '',
-                photo: row[6] || '',
-                photo_pfad: '',
-                photo_kommentar: '',
-                # szeneID changed to string from integer
-                szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
-                literatur: row[8] || '',
-                uid: uID
-            )
-          }
+          if formulare_batch.size >= formulare_batch_size
+            Formular.import formulare_batch # , :validate => true
+            #   #Formular.create formulare_batch
+            formulare_batch.clear
+          end
+
+
+          # }
           i += 1
         end
+
+        Formular.import formulare_batch unless formulare_batch == nil
       }
     end
+
+    puts i
+
   end
 
   # todo move to Ort-Model/Helper (Topo.xls)
@@ -220,7 +236,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==15
+      #break if i==15
 
       Ort.create(
 
@@ -258,7 +274,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==15
+      #break if i==15
 
       Gott.create(
 
@@ -298,7 +314,7 @@ class UploadsController < ApplicationController
       end
 
       # todo replace this
-      break if i==15
+      #break if i==15
 
 
       if row[2] != nil and row[2] != ''

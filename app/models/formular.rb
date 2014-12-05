@@ -16,7 +16,7 @@ class Formular < ActiveRecord::Base
   has_and_belongs_to_many :photos, :dependent => :delete_all
   has_and_belongs_to_many :literaturen, :dependent => :delete_all
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -32,10 +32,10 @@ class Formular < ActiveRecord::Base
     @myFormular['texttyp'] = self[:texttyp]
 
     check_uebersetzungs_string
-    check_and_add_photo_string
-    find_or_create_stelle
+    #check_and_add_photo_string
+    #find_or_create_stelle
     check_transliteration_re_3
-    find_or_create_literatur
+    #find_or_create_literatur
   end
 
   def add_to_solr
@@ -46,7 +46,7 @@ class Formular < ActiveRecord::Base
                  {
                      :sql_uid => self[:uid], # ---
 
-                     :sort => "#{self.stellen.first.start}", # ---
+                     #:sort => "#{self.stellen.first.start}", # ---  todo
 
                      :transliteration => self[:transliteration], # ---
 

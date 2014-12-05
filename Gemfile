@@ -13,6 +13,9 @@ gem 'rails', '4.1.8'
 gem 'activerecord-jdbcsqlite3-adapter',  group: :development
 # gem 'sqlite3'
 
+# supports batchimport
+gem 'activerecord-import', '~> 0.6.0'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
