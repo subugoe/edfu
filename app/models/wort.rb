@@ -58,6 +58,7 @@ class Wort < ActiveRecord::Base
                      :berlin_seite_stop => self.wb_berlin.seite_stop.to_i, # ---
                      :berlin_zeile_start => self.wb_berlin.zeile_start.to_i, # ---
                      :berlin_zeile_stop => self.wb_berlin.zeile_stop.to_i, # ---
+                     :stelle_berlin_id => self.wb_berlin.id,
 
                      :typ => 'wort',
                      :id => "wort-#{self[:uid]}"
@@ -362,7 +363,11 @@ class Wort < ActiveRecord::Base
 
 
     if edfuAnmerkung != '' or edfuAnmerkung.length != 0
-      self[:anmerkung] = "#{edfuAnmerkung.strip()}; #{self[:anmerkung].strip() || ''}"
+      if self[:anmerkung] == nil or self[:anmerkung] == ''
+        self[:anmerkung] = "#{edfuAnmerkung.strip()}"
+      else
+        self[:anmerkung] = "#{edfuAnmerkung.strip()}; #{self[:anmerkung].strip() || ''}"
+      end
     else
       self[:anmerkung] = "#{self[:anmerkung].strip() || ''}"
     end
