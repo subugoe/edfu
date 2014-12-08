@@ -1,5 +1,7 @@
 # encoding: utf-8 
 
+require 'edfu_model_helper'
+require 'edfu_numerics_conversion_helper'
 require 'rsolr'
 
 class Wort < ActiveRecord::Base
@@ -261,17 +263,17 @@ class Wort < ActiveRecord::Base
         wbSeiteStop = wbSeiteStart
 
 
-        logger.debug "\t[DEBUG]  [WL] uid: #{self[:uid]} wb: #{wb}, seitezeile: #{wbSeiteZeile}, start: #{wbSeiteStart}, stop: #{wbSeiteStop}"
+        #logger.debug "\t[DEBUG]  [WL] uid: #{self[:uid]} wb: #{wb}, seitezeile: #{wbSeiteZeile}, start: #{wbSeiteStart}, stop: #{wbSeiteStop}"
 
         begin
           if wbSeiteZeile[1] != nil and wbSeiteZeile[1].strip() != ''
             wbZeileStart = (wbSeiteZeile[1].strip()).to_i # if wbSeiteZeile[1] != nil
           else
             wbZeileStart = 1
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit Beleg #{wb} überprüfen -> ZeileStart auf 1 gesetzt :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit BelegstellenWb #{wb} überprüfen -> ZeileStart auf 1 gesetzt"
           end
         rescue ArgumentError
-          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit Beleg #{wbSeiteZeile[0]} überprüfen"
+          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit BelegstellenWb #{wbSeiteZeile[0]} überprüfen"
         end
 
         if wbTeile[1].index(',') != nil
@@ -291,7 +293,7 @@ class Wort < ActiveRecord::Base
         wbStop = [wbSeiteStop, wbZeileStop]
 
       else
-        logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} BelegstellenWb Formatfehler #{self[:belegstellenWb]} #{wb}"
+        logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} BelegstellenWb Formatfehler #{wb}"
       end
 
     else
@@ -305,35 +307,36 @@ class Wort < ActiveRecord::Base
     end
 
 
-    bereitsVorhanden = false
+    # bereitsVorhanden = false
+    #
+    # # hat 1:1 relation;  todo wird das noch gebraucht?
+    # if (self.wb_berlin != nil and
+    #     self.wb_berlin.seite_start == wbSeiteStart and
+    #     self.wb_berlin.band == wbBand and
+    #     self.wb_berlin.seite_stop == wbSeiteStop and
+    #     self.wb_berlin.zeile_start == wbZeileStart and
+    #     self.wb_berlin.zeile_stop == wbZeileStop)
+    #
+    #   self.wb_berlin.notiz = wbAnmerkung if self.wb_berlin.notiz != wbAnmerkung
+    #
+    #   bereitsVorhanden = true
+    # end
+    #
+    #
+    # unless bereitsVorhanden
 
-    # hat 1:1 relation
-    if (self.wb_berlin != nil and
-        self.wb_berlin.seite_start == wbSeiteStart and
-        self.wb_berlin.band == wbBand and
-        self.wb_berlin.seite_stop == wbSeiteStop and
-        self.wb_berlin.zeile_start == wbZeileStart and
-        self.wb_berlin.zeile_stop == wbZeileStop)
 
-      self.wb_berlin.notiz = wbAnmerkung if self.wb_berlin.notiz != wbAnmerkung
+    dbWB = WbBerlin.create(
+        :band => wbBand || 'unbekannt',
+        :seite_start => wbStart[0] || '',
+        :seite_stop => wbStop[0] || '',
+        :zeile_start => wbStart[1] || '',
+        :zeile_stop => wbStop[1] || '',
+        :notiz => wbAnmerkung || ''
+    )
+    self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
 
-      bereitsVorhanden = true
-    end
-
-
-    unless bereitsVorhanden
-
-      dbWB = WbBerlin.create(
-          :band => wbBand || 'unbekannt',
-          :seite_start => wbStart[0] || '',
-          :seite_stop => wbStop[0] || '',
-          :zeile_start => wbStart[1] || '',
-          :zeile_stop => wbStop[1] || '',
-          :notiz => wbAnmerkung || ''
-      )
-      self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
-
-    end
+    #end
 
 
     #--- edfu
@@ -386,7 +389,7 @@ class Wort < ActiveRecord::Base
             bandDezimal = roemisch_nach_dezimal bandRoemisch
             edfuBandNr = bandDezimal # roemisch[m20[1].strip()]
           elsif edfuBandNr == 0
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} FEHLER", "fehlende Bandangabe #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} FEHLER", "fehlende Bandangabe #{b}"
           end
 
           edfuSeiteStart = m20[3].length
@@ -409,7 +412,7 @@ class Wort < ActiveRecord::Base
               edfuZeileStart = (zeilen[0]).to_i
               edfuZeileStop = (zeilen[1]).to_i
             else
-              logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zu viele Komponenten in Zeilenangabe: #{b} :: #{bEdfu})"
+              logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zu viele Komponenten in Zeilenangabe: #{b}"
             end
 
             edfuAnmerkung = m20[6].strip()
@@ -420,7 +423,7 @@ class Wort < ActiveRecord::Base
           elsif m20[5] == '>*'
             stern = true
           elsif (m20[5]).length > 2
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} m20[5] zu lang #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} m20[5] zu lang #{b}"
           end
 
           # todo nicht korrekt
@@ -444,26 +447,26 @@ class Wort < ActiveRecord::Base
 
 
           if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start == nil; #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start == nil; #{b}"
           elsif edfuZeileStart > 30
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start > 30; #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start > 30; #{b}"
           end
 
           if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop  == nil; #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop  == nil; #{b}"
           elsif edfuZeileStop > 30
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop > 30;  #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop > 30;  #{b}"
           end
 
 
         else
-          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine erkennbare Seitenzahl #{b} :: #{bEdfu}"
+          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine erkennbare Seitenzahl #{b}"
         end
       }
     end
   end
 
-  # todo in module auslagern
+# todo in module auslagern
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
 
