@@ -126,11 +126,13 @@ class Wort < ActiveRecord::Base
       bEdfu = bEdfu[0..i-1]
     end
 
+    # 2132, 2276, 2325
+    bEdfu = bEdfu.gsub(/E VII/, 'VII')
+
     if bEdfu.index('zum Beispiel') == 0
       # 1266, 1296, 2781, 2811
       bEdfu = bEdfu.gsub(/zum Beispiel/, '')
       edfuAnmerkung = '(Beispiele) '
-
 
     elsif bEdfu == 'VII, 029, 05; 212; 13'
       # 27
@@ -157,6 +159,8 @@ class Wort < ActiveRecord::Base
     elsif bEdfu == 'VII, 273, 05 f.'
       # 3239
       bEdfu = 'VII, 273, 05'
+
+
 
     elsif bEdfu == 'VIII, 063 12'
       # 3853
@@ -219,6 +223,11 @@ class Wort < ActiveRecord::Base
       elsif wb == 'II, 498 - 500, 24'
         # 1418-1420
         wb = 'II, 498, 01 - 500, 24'
+
+      elsif wb = 'I, 435. 16 - 18'
+        # 1424
+        wb = 'I, 435, 16 - 18'
+
       elsif wb == 'III, 026 - 027, 19'
         # 1441
         wb = 'III, 026,01 - 027, 19'
