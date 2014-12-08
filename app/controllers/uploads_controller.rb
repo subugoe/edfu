@@ -31,7 +31,7 @@ class UploadsController < ApplicationController
     email = params[:upload][:email]
 
 
-    logger.info "\t[INFO]  [Upload] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
+    logger.debug "\t[DEBUG]  [UploadController] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
 
 
     n = 50000
@@ -95,10 +95,10 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    process_formular
+    #process_formular
     #process_ort
     #process_gott
-    #process_wort
+    process_wort
 
   end
 
@@ -132,6 +132,8 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
+    logger.ddebug "\t[DEBUG]  [UploadController] Processing formular table"
+
     formulare_batch = Array.new()
     formulare_batch_size = 1000
 
@@ -140,7 +142,7 @@ class UploadsController < ApplicationController
     Benchmark.bm(7) do |x|
 
 
-      logger.info "[Upload] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
+      logger.debug"\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
       file = Rails.root.join('public', 'uploads', 'Formular.xls')
       excel = nil
@@ -148,8 +150,6 @@ class UploadsController < ApplicationController
 
       #excel = Roo::Excel.new(file.to_s)
       excel = Roo::Excel.new("public/uploads/Formular.xls")
-
-
       excel.default_sheet = excel.sheets.first
 
       x.report("create all formulars:") {
@@ -162,7 +162,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i>1000
+          # break if i>1000
 
           # if SzeneID doesn't exist
           if row[7] != nil and row[7] != ''
@@ -179,9 +179,9 @@ class UploadsController < ApplicationController
             uID = SecureRandom.random_number(100000000)
           end
 
-          # x.report("create one formular:") {
-          formulare_batch << Formular.new(
-              #    f = Formular.create(
+
+          #formulare_batch << Formular.new(
+          f = Formular.create(
               {
                   transliteration: row[0] || '',
                   band: Integer(row[1]) || -1,
@@ -199,27 +199,26 @@ class UploadsController < ApplicationController
               }
           )
 
-          if formulare_batch.size >= formulare_batch_size
-            Formular.import formulare_batch # , :validate => true
-            #   #Formular.create formulare_batch
-            formulare_batch.clear
-          end
+          # if formulare_batch.size >= formulare_batch_size
+          #   Formular.import formulare_batch # , :validate => true
+          #   #Formular.create formulare_batch
+          #   formulare_batch.clear
+          # end
 
 
-          # }
           i += 1
         end
 
-        Formular.import formulare_batch unless formulare_batch == nil
+        #Formular.import formulare_batch unless formulare_batch == nil
       }
     end
-
-    puts i
 
   end
 
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
+
+    logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
 
     # todo replace this with uploaded file
     excel = Roo::Excel.new("public/uploads/Topo.xls")
@@ -227,126 +226,140 @@ class UploadsController < ApplicationController
     excel.default_sheet = excel.sheets.first
 
     i = 1
-    excel.each do |row|
 
-      # not process the header
-      if i==1
-        i += 1
-        next
-      end
+    Benchmark.bm(7) do |x|
+      x.report("create all topos:") {
+        excel.each do |row|
 
-      # todo replace this
-      #break if i==15
+          # not process the header
+          if i==1
+            i += 1
+            next
+          end
 
-      Ort.create(
+          # todo replace this
+          #break if i==15
 
-          # changed to string from integer
-          uid: Integer(row[5]) || '',
-          iStelle: row[0] || '',
-          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
-          #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
-          ort: row[2] || '',
-          lokalisation: row[3] || '',
-          anmerkung: row[4] || ''
+          Ort.create(
 
-      )
+              # changed to string from integer
+              uid: Integer(row[5]) || '',
+              iStelle: row[0] || '',
+              transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
+              #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+              ort: row[2] || '',
+              lokalisation: row[3] || '',
+              anmerkung: row[4] || ''
+
+          )
 
 
-      i += 1
+          i += 1
+        end
+      }
     end
-
   end
 
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
+
+    logger.debug"\t[DEBUG]  [UploadController] Processing gods table"
 
     excel = Roo::Excel.new("public/uploads/Gods.xls")
 
     excel.default_sheet = excel.sheets.first
 
     i = 1
-    excel.each do |row|
+    Benchmark.bm(7) do |x|
+      x.report("create all gods:") {
+        excel.each do |row|
 
-      # not process the header
-      if i==1
-        i += 1
-        next
-      end
+          # not process the header
+          if i==1
+            i += 1
+            next
+          end
 
-      # todo replace this
-      #break if i==15
+          # todo replace this
+          #break if i==15
 
-      Gott.create(
+          Gott.create(
 
-          uid: Integer(row[9]) || '',
-          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
-          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
-          ort: row[2] || '',
-          eponym: row[3] || '',
-          beziehung: row[4] || '',
-          funktion: row[5] || '',
-          band: row[6] || '',
-          seitezeile: row[7] || '', # todo wirklich in den index?
-          anmerkung: row[8] || '',
+              uid: Integer(row[9]) || '',
+              transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
+              transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+              ort: row[2] || '',
+              eponym: row[3] || '',
+              beziehung: row[4] || '',
+              funktion: row[5] || '',
+              band: row[6] || '',
+              seitezeile: row[7] || '', # todo wirklich in den index?
+              anmerkung: row[8] || '',
 
-      )
+          )
 
 
-      i += 1
+          i += 1
+        end
+      }
     end
-
   end
 
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
+
+    logger.debug"\t[DEBUG]  [UploadController] Processing word table"
 
     excel = Roo::Excel.new("public/uploads/WL.xls")
 
     excel.default_sheet = excel.sheets.first
 
     i = 1
-    excel.each do |row|
+    Benchmark.bm(7) do |x|
+      x.report("create all words:") {
+        excel.each do |row|
 
-      # not process the header
-      if i==1
-        i += 1
-        next
-      end
+          # not process the header
+          if i==1
+            i += 1
+            next
+          end
 
-      # todo replace this
-      #break if i==15
+          # todo replace this
+          #break if i==15
 
 
-      if row[2] != nil and row[2] != ''
-        begin
-          hierogl = Integer(row[2])
-        rescue ArgumentError
-          hierogl = row[2].to_s
+          if row[2] != nil and row[2] != ''
+            begin
+              hierogl = Integer(row[2])
+            rescue ArgumentError
+              hierogl = row[2].to_s
+            end
+          else
+            hierogl = ''
+          end
+
+          # uid changed to string from integer
+          Wort.create(
+
+              uid: Integer(row[7]) || '',
+              transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
+              transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
+              uebersetzung: row[1] || '',
+              # hieroglyph changed to string from integer
+              hieroglyph: hierogl || '',
+              weiteres: row[3] || '',
+              belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
+              belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
+              anmerkung: row[6] || ''
+
+          )
+
+
+          i += 1
         end
-      else
-        hierogl = ''
-      end
-
-      # uid changed to string from integer
-      Wort.create(
-
-          uid: Integer(row[7]) || '',
-          transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
-          transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
-          uebersetzung: row[1] || '',
-          # hieroglyph changed to string from integer
-          hieroglyph: hierogl || '',
-          weiteres: row[3] || '',
-          belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
-          belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
-          anmerkung: row[6] || ''
-
-      )
-
-
-      i += 1
+      }
     end
-
   end
 
 end

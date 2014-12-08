@@ -1,7 +1,5 @@
 module EdfuNumericsConversionHelper
 
-  private
-
   def dezimal_nach_roemisch (dezimal)
 
     hsh = {

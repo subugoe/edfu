@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-require 'lib/edfu_model_helper'
-require 'lib/edfu_numerics_conversion_helper'
+require 'edfu_model_helper'
+require 'edfu_numerics_conversion_helper'
 require 'rsolr'
 
 class Formular < ActiveRecord::Base
@@ -16,7 +16,7 @@ class Formular < ActiveRecord::Base
   has_and_belongs_to_many :photos, :dependent => :delete_all
   has_and_belongs_to_many :literaturen, :dependent => :delete_all
 
-  #after_commit :add_to_solr
+  after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -32,10 +32,10 @@ class Formular < ActiveRecord::Base
     @myFormular['texttyp'] = self[:texttyp]
 
     check_uebersetzungs_string
-    #check_and_add_photo_string
-    #find_or_create_stelle
+    check_and_add_photo_string
+    find_or_create_stelle
     check_transliteration_re_3
-    #find_or_create_literatur
+    find_or_create_literatur
   end
 
   def add_to_solr
@@ -80,20 +80,20 @@ class Formular < ActiveRecord::Base
                      :id => "formular-#{self[:uid]}" # ---
                  }
              )
-        solr.commit
+    solr.commit
   end
 
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[INFO]  after update: #{id}"
+    logger.debug "[DEBUG]  after update: #{id}"
   end
 
 
   # todo add doc to solr
   # todo log created
   def log_created
-    logger.info "[INFO]  before save: #{id}"
+    logger.debug "[DEBUG]  before save: #{id}"
   end
 
 
@@ -421,37 +421,6 @@ class Formular < ActiveRecord::Base
         #
         bildString = bildString[(name.length)..-1]
 
-        # vor re1 vorziehen
-        # elsif re2.match(bildString)
-        #   # Fall 2: Dateiname der Form D03_XXXXX
-        #   name = re2.match(bildString)[0]
-        #   typ = 'D03'
-        #   bildString = bildString[(name.length)..-1]
-        #
-        # elsif re3.match(bildString)
-        #   # Fall 3: Dateiname der Form D05_XXXXX
-        #   name = re3.match(bildString)[0]
-        #   typ = 'D05'
-        #   bildString = bildString[(name.length)..-1]
-        #
-        # elsif re4.match(bildString)
-        #   # Fall 4: Dateiname der Form eXXX
-        #   name = re4.match(bildString)[0]
-        #   typ = 'e'
-        #   bildString = bildString[(name.length)..-1]
-        #
-        # elsif re9.match(bildString)
-        #   # Fall 5: Name der Form GXXX [ff.]
-        #   name = re9.match(bildString)[1]
-        #   typ = 'G'
-        #   kommentar = re9.match(bildString)[2]
-        #   bildString = bildString[((re9.match(bildString)[0]).length)..-1]
-        #
-        # elsif re10.match(bildString)
-        #   # Fall 6: Name der Form e-onr-XXX
-        #   name = re10.match(bildString)[0]
-        #   typ = 'e-o'
-        #   bildString = bildString[(name.length)..-1]
 
       elsif re11.match(bildString)
         # Fall 7: Labrique, Stylistique
@@ -497,107 +466,24 @@ class Formular < ActiveRecord::Base
           bildString = ''
         end
 
-        # photoID = typ + '-' + name
-        # myPhoto = {}
 
-        # if photosDict.include?(photoID)
-        #   myPhoto = photosDict[photoID]
-        #   #myPhoto['count'] += 1
-        # else
-        #   # pfad in model übernommen
-        #   if typ == 'D05' or typ == 'D03' or typ == 'alt'
-        #     pfad = typ + '/' + name + '.jpg'
-        #   else
-        #     pfad = ''
-        #   end
-
-
-        # myPhoto = {
-        #     'uid' => photosDict.length,
-        #     'photo_typ_uid' => photoTypDict[typ]['uid'],
-        #     'name' => name,
-        #     #'count' => 1,
-        #     'typ' => typ,
-        #     'kommentar' => kommentar
-        # }
-        # photosDict[photoID] = myPhoto
-        # ---
-        #  name = myPhoto['name']
-        #  typ = myPhoto['typ']
         pfad = "#{typ}/#{name}"
-        # kommentar = 'aaa'
 
-        # p = Photo.find_by(name: name, typ: typ)
-        # if p
-        #   if p.kommentar != kommentar
-        #     # weitere Kommentare durch :&: angezeigt
-        #     p.kommentar += " :&: #{kommentar}"
-        #     logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
-        #     p.save
-        #   end
-        # else
-        p = Photo.create(
+        p = Photo.find_or_create_by(
             name: name,
             typ: typ,
             pfad: pfad,
             kommentar: kommentar
         )
-        # end
         self.photos << p unless self.photos.include? p
 
       end
 
 
-      # kombi aus strip & führendes/endende Komma abschneiden
-      #m = bildString.match(/(^\w*,\w*)(.*)(\w*,\w*$)/)
-
-      #if m
       bildString = bildString.strip.sub(',', '').strip # m[2]
-      #end
 
     end
 
-
-    # photosDict.each { |k, myPhoto|
-    #
-    #   name = myPhoto['name']
-    #   typ = myPhoto['typ']
-    #   pfad = "#{myPhoto['typ']}/#{myPhoto['name']}"
-    #   kommentar = "..." #myPhoto['kommentar'] || ''
-    #
-    #   p = Photo.find_by(name: name, typ: typ)
-    #   if p
-    #     if p.kommentar != kommentar
-    #       # weitere KOmmentare durch :&: angezeigt
-    #       p.kommentar += " :&: #{kommentar}"
-    #       logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
-    #       p.save
-    #     end
-    #   else
-    #     p = Photo.create(
-    #         name: name,
-    #         typ: typ,
-    #         pfad: pfad,
-    #         kommentar: kommentar
-    #     )
-    #     self.photos << p
-    #   end
-    #
-    #
-    #   # if photo_kommentar != p.kommentar
-    #   #   p.kommentar << ", #{photo_kommentar}"
-    #   #   logger.warn "\t[INFO]  [FL] uid: #{self[:uid]} kommentar ergänzt:  #{p.kommentar}"
-    #   #   p.save
-    #   # end
-    #
-    #
-    #
-    #
-    # }
-
-    # self[:photos] = photo_name
-    # self.photo_pfad = photo_pfad
-    # self.photo_kommentar = photo_kommentar
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
@@ -778,8 +664,7 @@ class Formular < ActiveRecord::Base
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
-    # todo nicht besser fond_or_crate_by
-    stelle = Stelle.create(
+    stelle = Stelle.create( #.update_or_create(
         :tempel => 'Edfu',
         :band => myStelle['band_uid'],
         :bandseite => myStelle['bandseite'],
@@ -848,11 +733,17 @@ class Formular < ActiveRecord::Base
     # todo nicht besser fond_or_crate_by
     if arr = formular_literatur_relation_hash[self[:uid].to_i]
       arr.each { |hash|
-        lit = Literatur.create(
+        lit = Literatur.find_or_create_by(
+             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
+             detail: hash['detail'],
+         )
+         self.literaturen << lit unless self.literaturen.include? lit
+
+        self.literaturen.build(
             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
             detail: hash['detail'],
         )
-        self.literaturen << lit unless self.literaturen.include? lit
+
       }
     end
 

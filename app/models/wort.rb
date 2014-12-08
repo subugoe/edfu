@@ -1,7 +1,5 @@
 # encoding: utf-8 
 
-require 'lib/edfu_model_helper'
-require 'lib/edfu_numerics_conversion_helper'
 require 'rsolr'
 
 class Wort < ActiveRecord::Base
@@ -51,7 +49,7 @@ class Wort < ActiveRecord::Base
                      :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
                      :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
 
-                     :sort => "Ddt--#{self.wb_berlin.sort}", # ---
+                     #:sort => "Ddt--#{self.wb_berlin.sort}", # ---  todo
                      :berlin_display => self.wb_berlin.berlin_display, # ---
                      :berlin_band => self.wb_berlin.band.to_i, # ---
                      :berlin_seite_start => self.wb_berlin.seite_start.to_i, # ---

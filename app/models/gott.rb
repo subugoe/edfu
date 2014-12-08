@@ -1,7 +1,5 @@
 # encoding: utf-8 
 
-require 'lib/edfu_model_helper'
-require 'lib/edfu_numerics_conversion_helper'
 require 'rsolr'
 
 
@@ -42,10 +40,10 @@ class Gott < ActiveRecord::Base
                      :band => @band,
 
                      :anmerkung => self[:anmerkung], # ---
-                     :sort => "Act--#{self.stellen.first.start}", # ---
+                     #:sort => "Act--#{self.stellen.first.start}", # --- todo
 
-                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben}, # ---
-                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung}, # ---
+                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
+                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
                      :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
                      :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
                      :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
@@ -66,14 +64,14 @@ class Gott < ActiveRecord::Base
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[INFO]  after update: #{id}"
+    logger.debug "[DEBUG]  after update: #{id}"
   end
 
 
   # todo add doc to solr
   # todo log created
   def log_created
-    logger.info "[INFO]  before save: #{id}"
+    logger.debug  "[DEBUG]  before save: #{id}"
   end
 
   def check_seitezeile_re_1
@@ -199,6 +197,13 @@ class Gott < ActiveRecord::Base
     # gott += [myGott]
 
     # gelegentlich ist der Inhalt doppelt vorhanden
+
+    logger.debug "\t[Debug]  [GL] uid: #{self[:uid]}, seitezeile: #{self[:seitezeile]} (#{self[:seitezeile].class})"
+
+    if self[:seitezeile].class == Float
+      self[:seitezeile] = self[:seitezeile].to_s
+    end
+
     szsz = self[:seitezeile].gsub(' ', '')
     halbeLaenge = (szsz.length / 2).to_i
     halberString = szsz[halbeLaenge..-1]

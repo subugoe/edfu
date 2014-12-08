@@ -41,6 +41,7 @@ gem 'rsolr', '~> 1.0.10'
 
 gem 'progress_bar'
 
+# Authentication/Authorization
 gem 'activeadmin', github: 'activeadmin'
 gem 'devise'
 
@@ -51,6 +52,9 @@ gem 'autoprefixer-rails'
 gem 'bootstrap_form'
 
 gem 'jquery-datatables-rails', '~> 3.1.0'
+
+
+
 
 
 # gems required by Heroku

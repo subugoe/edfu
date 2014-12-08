@@ -1,7 +1,5 @@
 # encoding: utf-8 
 
-require 'lib/edfu_numerics_conversion_helper'
-require 'lib/edfu_model_helper'
 require 'rsolr'
 
 class WbBerlin < ActiveRecord::Base

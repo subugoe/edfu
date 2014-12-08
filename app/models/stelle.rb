@@ -1,10 +1,12 @@
 # encoding: utf-8 
 
-require 'lib/edfu_model_helper'
 require 'rsolr'
+require 'edfu_model_helper'
+require 'edfu_numerics_conversion_helper'
 
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper
+
 
   belongs_to :zugehoerigZu, polymorphic: true
 

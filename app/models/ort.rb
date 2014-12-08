@@ -1,7 +1,5 @@
 # encoding: utf-8 
 
-require 'lib/edfu_model_helper'
-require 'lib/edfu_numerics_conversion_helper'
 require 'rsolr'
 
 class Ort < ActiveRecord::Base
@@ -42,7 +40,7 @@ class Ort < ActiveRecord::Base
     solr.add (
                  {
                      :sql_uid => self[:uid],
-                     :sort => "#{self[:transliteration]}--#{self.stellen.first.start }", #
+                     #:sort => "#{self[:transliteration]}--#{self.stellen.first.start }", # --- todo
 
                      :transliteration => self[:transliteration], # ---
 
@@ -77,7 +75,7 @@ class Ort < ActiveRecord::Base
   # todo update solr doc
   # todo log updated
   def log_updated
-    logger.info "[INFO]  after update: #{id}"
+    logger.debug "[DEBUG]  after update: #{id}"
   end
 
 
@@ -85,7 +83,7 @@ class Ort < ActiveRecord::Base
   # todo log created
   def log_created
 
-    logger.info "[INFO]  before save: #{id}"
+    logger.debug "[DEBUG]  before save: #{id}"
 
   end
 
@@ -141,7 +139,7 @@ class Ort < ActiveRecord::Base
       self.iStelle = ''
     elsif self.iStelle == 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([]; wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
       # 619
-      self.iStelle= u 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
+      self.iStelle=  'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
     elsif self.iStelle == 'VIII, 5, 11; (vergleiche auch 8, 9; V, 95, 12 ([]); 324, 5;'
       # 628
       self.iStelle= 'VIII, 5, 11 (vergleiche auch 8, 9); V, 95, 12 ([]); 324, 5'
@@ -175,7 +173,7 @@ class Ort < ActiveRecord::Base
     end
 
     if self.iStelle != originalStelle
-      logger.info "\t[INFO]  [OL] uid: #{self[:uid]} Änderung STELLE, origialstelle: #{kommentar} new: #{self.iStelle}"
+      logger.info "\t[INFO]  [OL] uid: #{self[:uid]} Änderung STELLE, origialstelle: #{anm} new: #{self.iStelle}"
     end
 
     if self[:anmerkung] != nil and self[:anmerkung] != ''
@@ -222,7 +220,12 @@ class Ort < ActiveRecord::Base
 
             zeileStart = (m3[3].split(' - ')[0]).to_i
 
+            begin
             zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
+            rescue NoMethodError
+              logger.debug "\t[DEBUG]  [OL] uid: #{self[:uid]}, Bandseitezeile: #{self[:bandseitezeile]}, Teil: #{teil}"
+            end
+
             kommentar = ''
           else
             z = m3[3].gsub(' ', '').gsub('/', '-')
