@@ -11,7 +11,7 @@ class Wort < ActiveRecord::Base
   belongs_to :wb_berlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  #after_commit :add_to_solr
+  after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -129,10 +129,21 @@ class Wort < ActiveRecord::Base
     # 2132, 2276, 2325
     bEdfu = bEdfu.gsub(/E VII/, 'VII')
 
+    # 3189, 3239
+    bEdfu = bEdfu.gsub(' f.', '')
+
+    # 3514
+    bEdfu = bEdfu.gsub('; ;', ';')
+
+
     if bEdfu.index('zum Beispiel') == 0
       # 1266, 1296, 2781, 2811
       bEdfu = bEdfu.gsub(/zum Beispiel/, '')
       edfuAnmerkung = '(Beispiele) '
+
+    elsif bEdfu == 'VIII, 026, 4 f.; 033 16'
+      # 3189
+      bEdfu = 'VIII, 026, 4; 033, 16'
 
     elsif bEdfu == 'VII, 029, 05; 212; 13'
       # 27
@@ -159,7 +170,6 @@ class Wort < ActiveRecord::Base
     elsif bEdfu == 'VII, 273, 05 f.'
       # 3239
       bEdfu = 'VII, 273, 05'
-
 
 
     elsif bEdfu == 'VIII, 063 12'

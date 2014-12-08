@@ -103,30 +103,34 @@ class UploadsController < ApplicationController
   end
 
   def prepareDB
+    Benchmark.bm(7) do |x|
+      #--- DB
 
-    #--- DB
+      #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
+      #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
+      #   OR name = 'worte'")
 
-    #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
-    #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
-    #   OR name = 'worte'")
+      x.report("delte data sets from db:") {
+        Formular.destroy_all
+        Gott.destroy_all
+        Ort.destroy_all
+        Wort.destroy_all
+        WbBerlin.destroy_all
+      }
 
-    Formular.destroy_all
-    Gott.destroy_all
-    Ort.destroy_all
-    Wort.destroy_all
-    WbBerlin.destroy_all
+      #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
+      #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
+      #   OR name = 'worte'")
 
-    #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
-    #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
-    #   OR name = 'worte'")
+      #--- solr
 
-    #--- solr
+      x.report("delete solr docs:") {
+        solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+        solr.update :data => '<delete><query>*:*</query></delete>'
+        solr.update :data => '<commit/>'
+      }
 
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.update :data => '<delete><query>*:*</query></delete>'
-    solr.update :data => '<commit/>'
-
-
+    end
   end
 
   # todo move to Formular/Helper (Formular.xls)
@@ -142,7 +146,7 @@ class UploadsController < ApplicationController
     Benchmark.bm(7) do |x|
 
 
-      logger.debug"\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
+      logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
       file = Rails.root.join('public', 'uploads', 'Formular.xls')
       excel = nil
@@ -263,7 +267,7 @@ class UploadsController < ApplicationController
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
-    logger.debug"\t[DEBUG]  [UploadController] Processing gods table"
+    logger.debug "\t[DEBUG]  [UploadController] Processing gods table"
 
     excel = Roo::Excel.new("public/uploads/Gods.xls")
 
@@ -308,7 +312,7 @@ class UploadsController < ApplicationController
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
 
-    logger.debug"\t[DEBUG]  [UploadController] Processing word table"
+    logger.debug "\t[DEBUG]  [UploadController] Processing word table"
 
     excel = Roo::Excel.new("public/uploads/WL.xls")
 
