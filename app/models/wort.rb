@@ -9,7 +9,7 @@ class Wort < ActiveRecord::Base
   belongs_to :wb_berlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -119,13 +119,53 @@ class Wort < ActiveRecord::Base
 
     bEdfu = self[:belegstellenEdfu]
 
+    if bEdfu.strip().end_with? (';')
+      i = bEdfu.rindex(';')
+      bEdfu = bEdfu[0..i-1]
+    end
+
     if bEdfu.index('zum Beispiel') == 0
       # 1266, 1296, 2781, 2811
       bEdfu = bEdfu.gsub(/zum Beispiel/, '')
       edfuAnmerkung = '(Beispiele) '
+
+
+    elsif bEdfu == 'VII, 029, 05; 212; 13'
+      # 27
+      bEdfu = 'VII, 029, 05; 212, 13'
+    elsif bEdfu == 'VII, 057, 04; 081, 04; 123, 11; 139, 08; 146, 17; 190, 11210, 14; 214, 16'
+      # 824
+      bEdfu = 'VII, 057, 04; 081, 04; 123, 11; 139, 08; 146, 17; 190, 11; 210, 14; 214, 16'
+    elsif bEdfu == 'VII, 027, 08; 040, 11; 076, 11; 088, 04; 106, 01; 192; 02; 247, 02; 297, 01; 300, 16;  313, 02; 324, 16; 325, 01'
+      # 825
+      bEdfu = 'VII, 027, 08; 040, 11; 076, 11; 088, 04; 106, 01; 192, 02; 247, 02; 297, 01; 300, 16;  313, 02; 324, 16; 325, 01'
+    elsif bEdfu == 'VII, 076, 06; 101, 04; 105, 14; 180, 14; 182, 05; 183, 03; 214, 08; 264, 07; 266, 02; 288, 03; 293; 08'
+      # 1370
+      bEdfu = 'VII, 076, 06; 101, 04; 105, 14; 180, 14; 182, 05; 183, 03; 214, 08; 264, 07; 266, 02; 288, 03; 293, 08'
+    elsif bEdfu == 'VIII, 0,31, 07; 060, 07'
+      # 2278
+      bEdfu = 'VIII, 031, 07; 060, 07'
+    elsif bEdfu == 'VIII, 033, 01; 068, 02; 098, 02; 103; 18; 162, 05; VII, 002, 07; 028, 08; 072, 17; 075, 07; 094, 02; 163, 14; 165, 14; 230, 10'
+      # 2900
+      bEdfu = 'VIII, 033, 01; 068, 02; 098, 02; 103, 18; 162, 05; VII, 002, 07; 028, 08; 072, 17; 075, 07; 094, 02; 163, 14; 165, 14; 230, 10'
+    elsif bEdfu == 'VIII, 026, 4 f.; 033 16'
+      # 3189
+      bEdfu = 'VIII, 026, 04; 033 16'
+
+    elsif bEdfu == 'VII, 273, 05 f.'
+      # 3239
+      bEdfu = 'VII, 273, 05'
+
+    elsif bEdfu == 'VIII, 063 12'
+      # 3853
+      bEdfu = 'VIII, 063, 12'
+
     elsif bEdfu.index('<VIII, ') == 0
       # 732, 797, 804, 816, 2247, 2312, 2319, 2331
       bEdfu = 'VIII, <' + bEdfu[7..-1]
+    elsif bEdfu.index('VII; ') == 0
+      # 794
+      bEdfu = 'VII, 128, 02; 172, 06; 285, 09'
     elsif bEdfu == 'E VIII, 0,31, 07; 060, 07'
       # 1089, 2604
       bEdfu = 'E VIII, 031, 07; 060, 07'
@@ -167,6 +207,7 @@ class Wort < ActiveRecord::Base
       if wb == 'nach II, 123, 12 - 124*'
         wb = 'nach II, 123, 12 - 124, 1'
         wbAnmerkung = '*'
+
       elsif wb == 'I, 171, 03 - 12; 18 - 21'
         # 356
         wb = 'I, 171, 03 - 12'
@@ -179,11 +220,12 @@ class Wort < ActiveRecord::Base
       elsif wb == 'III, 026 - 027, 19'
         # 1441
         wb = 'III, 026,01 - 027, 19'
+
       end
 
 
       if wb != self[:belegstellenWb]
-        wbAnmerkung += 'ursprünglich: ' + self[:belegstellenWb]
+        wbAnmerkung = 'ursprünglich: ' + self[:belegstellenWb]
         logger.info "\t[INFO]  [GL] uid: #{self[:uid]} Änderung BelegstellenWb, original: #{self[:wbBelegstellen]} new: #{wb}"
       end
 
@@ -218,8 +260,16 @@ class Wort < ActiveRecord::Base
         wbSeiteStart = (wbSeiteZeile[0].strip()).to_i
         wbSeiteStop = wbSeiteStart
 
+
+        logger.debug "\t[DEBUG]  [WL] uid: #{self[:uid]} wb: #{wb}, seitezeile: #{wbSeiteZeile}, start: #{wbSeiteStart}, stop: #{wbSeiteStop}"
+
         begin
-          wbZeileStart = (wbSeiteZeile[1].strip()).to_i
+          if wbSeiteZeile[1] != nil and wbSeiteZeile[1].strip() != ''
+            wbZeileStart = (wbSeiteZeile[1].strip()).to_i # if wbSeiteZeile[1] != nil
+          else
+            wbZeileStart = 1
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit Beleg #{wb} überprüfen -> ZeileStart auf 1 gesetzt :: #{bEdfu}"
+          end
         rescue ArgumentError
           logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} Datensatz mit Beleg #{wbSeiteZeile[0]} überprüfen"
         end
@@ -322,10 +372,11 @@ class Wort < ActiveRecord::Base
             b = edfuSeiteStart.to_s + ', ' + b
             #					print "\t".join(["WL", str(self[:uid]), "INFO", u"Seitenzahl hinzugefügt", b])
           else
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine Seitenzahl #{b}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine Seitenzahl #{b} :: #{bEdfu}"
           end
 
         end
+
         m20 = re20.match(b)
 
         if m20
@@ -335,7 +386,7 @@ class Wort < ActiveRecord::Base
             bandDezimal = roemisch_nach_dezimal bandRoemisch
             edfuBandNr = bandDezimal # roemisch[m20[1].strip()]
           elsif edfuBandNr == 0
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} FEHLER", "fehlende Bandangabe #{b}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} FEHLER", "fehlende Bandangabe #{b} :: #{bEdfu}"
           end
 
           edfuSeiteStart = m20[3].length
@@ -349,6 +400,7 @@ class Wort < ActiveRecord::Base
             zeilenString = m20[4]
             zeilenString = zeilenString.gsub('/', '-').gsub(' ', '')
             zeilen = zeilenString.split('-')
+
             if zeilen.length == 1
               edfuZeileStart = zeilen[0].to_i
               edfuZeileStop = edfuZeileStart
@@ -357,7 +409,7 @@ class Wort < ActiveRecord::Base
               edfuZeileStart = (zeilen[0]).to_i
               edfuZeileStop = (zeilen[1]).to_i
             else
-              logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zu viele Komponenten in Zeilenangabe #{b}"
+              logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zu viele Komponenten in Zeilenangabe: #{b} :: #{bEdfu})"
             end
 
             edfuAnmerkung = m20[6].strip()
@@ -368,7 +420,7 @@ class Wort < ActiveRecord::Base
           elsif m20[5] == '>*'
             stern = true
           elsif (m20[5]).length > 2
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} m20.group(5) zu lang #{b}"
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} m20[5] zu lang #{b} :: #{bEdfu}"
           end
 
           # todo nicht korrekt
@@ -391,17 +443,21 @@ class Wort < ActiveRecord::Base
           self.stellen << stelle unless self.stellen.include? stelle
 
 
-          if edfuZeileStart > 30
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start > 30 #{b}"
+          if edfuZeileStart == nil
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start == nil; #{b} :: #{bEdfu}"
+          elsif edfuZeileStart > 30
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_start > 30; #{b} :: #{bEdfu}"
           end
 
-          if edfuZeileStop > 30
-            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop > 30 #{b}"
+          if edfuZeileStart == nil
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop  == nil; #{b} :: #{bEdfu}"
+          elsif edfuZeileStop > 30
+            logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} zeile_stop > 30;  #{b} :: #{bEdfu}"
           end
 
 
         else
-          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine erkennbare Seitenzahl #{b}"
+          logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} keine erkennbare Seitenzahl #{b} :: #{bEdfu}"
         end
       }
     end
