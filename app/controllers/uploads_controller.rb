@@ -104,23 +104,16 @@ class UploadsController < ApplicationController
 
   def prepareDB
     Benchmark.bm(7) do |x|
+
       #--- DB
 
-      #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
-      #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
-      #   OR name = 'worte'")
-
-      x.report("delte data sets from db:") {
+      x.report("delete data from db:") {
         Formular.destroy_all
         Gott.destroy_all
         Ort.destroy_all
         Wort.destroy_all
         WbBerlin.destroy_all
       }
-
-      #ActiveRecord::Base.connection.execute("Update sqlite_sequence set seq = 1 where name = 'formulare' OR name = 'goetter'
-      #   OR name = 'photos' OR name = 'stellen' OR name = 'literaturen' OR name = 'orte' OR name = 'wb_berlins'
-      #   OR name = 'worte'")
 
       #--- solr
 

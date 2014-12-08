@@ -234,7 +234,7 @@ class Wort < ActiveRecord::Base
         # 1418-1420
         wb = 'II, 498, 01 - 500, 24'
 
-      elsif wb = 'I, 435. 16 - 18'
+      elsif wb == 'I, 435. 16 - 18'
         # 1424
         wb = 'I, 435, 16 - 18'
 
@@ -411,7 +411,7 @@ class Wort < ActiveRecord::Base
             logger.error "\t[ERROR]  [WL] uid: #{self[:uid]} FEHLER", "fehlende Bandangabe #{b}"
           end
 
-          edfuSeiteStart = m20[3].length
+          edfuSeiteStart = m20[3].to_i
           edfuSeiteStop = edfuSeiteStart
           edfuAnmerkung = ''
 
