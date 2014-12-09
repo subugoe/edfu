@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  uid: MyString
+  id: MyString
   tempel: MyString
   band: MyString
   bandseite: MyString
@@ -12,13 +12,11 @@ one:
   zeile_stop: MyString
   stelle_anmerkung: MyString
   stelle_unsicher: MyString
-  start: MyString
-  stop: MyString
   zerstoerung: MyString
   freigegeben: MyString
 
 two:
-  uid: MyString
+  id: MyString
   tempel: MyString
   band: MyString
   bandseite: MyString
@@ -29,7 +27,5 @@ two:
   zeile_stop: MyString
   stelle_anmerkung: MyString
   stelle_unsicher: MyString
-  start: MyString
-  stop: MyString
   zerstoerung: MyString
   freigegeben: MyString
