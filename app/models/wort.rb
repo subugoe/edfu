@@ -11,7 +11,7 @@ class Wort < ActiveRecord::Base
   belongs_to :wb_berlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
   before_validation :check_data
 
 
@@ -142,7 +142,7 @@ class Wort < ActiveRecord::Base
       bEdfu = bEdfu.gsub(/zum Beispiel/, '')
       edfuAnmerkung = '(Beispiele) '
 
-    elsif bEdfu == 'VIII, 026, 4 f.; 033 16'
+    elsif bEdfu == 'VIII, 026, 4; 033 16 '
       # 3189
       bEdfu = 'VIII, 026, 4; 033, 16'
 
@@ -346,15 +346,15 @@ class Wort < ActiveRecord::Base
     # unless bereitsVorhanden
 
 
-    dbWB = WbBerlin.create(
-        :band => wbBand || 'unbekannt',
-        :seite_start => wbStart[0] || '',
-        :seite_stop => wbStop[0] || '',
-        :zeile_start => wbStart[1] || '',
-        :zeile_stop => wbStop[1] || '',
-        :notiz => wbAnmerkung || ''
-    )
-    self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
+    # dbWB = WbBerlin.create(
+    #     :band => wbBand || 'unbekannt',
+    #     :seite_start => wbStart[0] || '',
+    #     :seite_stop => wbStop[0] || '',
+    #     :zeile_start => wbStart[1] || '',
+    #     :zeile_stop => wbStop[1] || '',
+    #     :notiz => wbAnmerkung || ''
+    # )
+    # self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
 
     #end
 
@@ -451,23 +451,23 @@ class Wort < ActiveRecord::Base
           end
 
           # todo nicht korrekt
-          stelle = Stelle.create(
-              :tempel => 'Edfu',
-              :band => edfuBandNr,
-              :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
-              :bandseitezeile => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
-              :seite_start => edfuSeiteStart,
-              :seite_stop => edfuSeiteStop,
-              :zeile_start => edfuZeileStart,
-              :zeile_stop => edfuZeileStop,
-              :stelle_anmerkung => edfuAnmerkung,
-              :stelle_unsicher => false,
-              # :start => "#{edfuBandNr}#{'%03i' % (edfuSeiteStart)}#{'%03i' % (edfuZeileStart)}",
-              # :stop => "#{edfuBandNr}#{'%03i' % (edfuSeiteStop)}#{'%03i' % (edfuZeileStop)}",
-              :zerstoerung => false,
-              :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben']
-          )
-          self.stellen << stelle unless self.stellen.include? stelle
+          # stelle = Stelle.create(
+          #     :tempel => 'Edfu',
+          #     :band => edfuBandNr,
+          #     :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
+          #     :bandseitezeile => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
+          #     :seite_start => edfuSeiteStart,
+          #     :seite_stop => edfuSeiteStop,
+          #     :zeile_start => edfuZeileStart,
+          #     :zeile_stop => edfuZeileStop,
+          #     :stelle_anmerkung => edfuAnmerkung,
+          #     :stelle_unsicher => false,
+          #     # :start => "#{edfuBandNr}#{'%03i' % (edfuSeiteStart)}#{'%03i' % (edfuZeileStart)}",
+          #     # :stop => "#{edfuBandNr}#{'%03i' % (edfuSeiteStop)}#{'%03i' % (edfuZeileStop)}",
+          #     :zerstoerung => false,
+          #     :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben']
+          # )
+          # self.stellen << stelle unless self.stellen.include? stelle
 
 
           if edfuZeileStart == nil

@@ -94,7 +94,7 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    prepareDB
+    #prepareDB
     #process_formular
     #process_ort
     #process_gott
@@ -129,7 +129,7 @@ class UploadsController < ApplicationController
   # todo move to Formular/Helper (Formular.xls)
   def process_formular
 
-    logger.ddebug "\t[DEBUG]  [UploadController] Processing formular table"
+    logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
 
     formulare_batch = Array.new()
     formulare_batch_size = 1000
@@ -312,14 +312,24 @@ class UploadsController < ApplicationController
     excel.default_sheet = excel.sheets.first
 
     i = 1
+    uniqueId = false
+
     Benchmark.bm(7) do |x|
       x.report("create all words:") {
         excel.each do |row|
 
-          # not process the header
+
+          # ignore the header
           if i==1
+            if row[7] != nil && row[7].casecmp('UniqueId') == 0
+              uniqueId = true
+            else
+              logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
+            end
+
             i += 1
             next
+
           end
 
           # todo replace this
@@ -336,21 +346,30 @@ class UploadsController < ApplicationController
             hierogl = ''
           end
 
+          if uniqueId
+            uid = Integer(row[7]) || ''
+          else
+            uid = i-1
+          end
+
           # uid changed to string from integer
-          Wort.create(
+          # Wort.create(
+          #
+          #     uid: uid,
+          #     transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
+          #     transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
+          #     uebersetzung: row[1] || '',
+          #     # hieroglyph changed to string from integer
+          #     hieroglyph: hierogl || '',
+          #     weiteres: row[3] || '',
+          #     belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
+          #     belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
+          #     anmerkung: row[6] || ''
+          #
+          # )
 
-              uid: Integer(row[7]) || '',
-              transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
-              transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
-              uebersetzung: row[1] || '',
-              # hieroglyph changed to string from integer
-              hieroglyph: hierogl || '',
-              weiteres: row[3] || '',
-              belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
-              belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
-              anmerkung: row[6] || ''
 
-          )
+          logger.debug "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
 
 
           i += 1
