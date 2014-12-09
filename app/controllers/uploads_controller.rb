@@ -5,6 +5,7 @@ require 'benchmark'
 class UploadsController < ApplicationController
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
 
   # todo add multifile upload
@@ -94,11 +95,11 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    #prepareDB
-    #process_formular
-    #process_ort
-    #process_gott
-    process_wort
+    # prepareDB
+    # process_formular
+    # process_ort
+    # process_gott
+    # process_wort
 
   end
 
@@ -353,20 +354,20 @@ class UploadsController < ApplicationController
           end
 
           uid changed to string from integer
-          # Wort.create(
-          #
-          #     uid: uid,
-          #     transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
-          #     transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
-          #     uebersetzung: row[1] || '',
-          #     # hieroglyph changed to string from integer
-          #     hieroglyph: hierogl || '',
-          #     weiteres: row[3] || '',
-          #     belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
-          #     belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
-          #     anmerkung: row[6] || ''
-          #
-          # )
+          Wort.create(
+
+              uid: uid,
+              transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
+              transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
+              uebersetzung: row[1] || '',
+              # hieroglyph changed to string from integer
+              hieroglyph: hierogl || '',
+              weiteres: row[3] || '',
+              belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
+              belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
+              anmerkung: row[6] || ''
+
+          )
 
 
           logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"

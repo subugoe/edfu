@@ -1,5 +1,7 @@
 class WorteController < ApplicationController
+
   before_action :set_wort, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
   # GET /worte
   # GET /worte.json

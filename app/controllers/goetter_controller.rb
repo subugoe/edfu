@@ -1,5 +1,7 @@
 class GoetterController < ApplicationController
+
   before_action :set_gott, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
   # GET /goetter
   # GET /goetter.json

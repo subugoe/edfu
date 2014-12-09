@@ -1,5 +1,7 @@
 class OrteController < ApplicationController
+
   before_action :set_ort, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
   # GET /orte
   # GET /orte.json
