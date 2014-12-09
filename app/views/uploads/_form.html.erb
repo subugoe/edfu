@@ -1,4 +1,4 @@
-<%= bootstrap_form_for(@upload, layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-10") do |f| %>
+<%= bootstrap_form_for(@upload, layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-6") do |f| %>
     <% if @upload.errors.any? %>
         <div id="error_explanation">
             <h2><%= pluralize(@upload.errors.count, "error") %> prohibited this upload from being saved:</h2>
