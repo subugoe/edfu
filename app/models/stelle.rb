@@ -55,25 +55,5 @@ class Stelle < ActiveRecord::Base
     solr.commit
   end
 
-
-
-
-  # todo update solr doc
-  # todo log updated
-  def log_updated
-    logger.info "[INFO]  after update: #{id}"
-  end
-
-
-  # todo add doc to solr
-  # todo log created
-  def log_created
-
-    logger.info "[INFO]  before save: #{id}"
-
-  end
-
-
-
 end
 

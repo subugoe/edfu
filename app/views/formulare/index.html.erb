@@ -1,43 +1,41 @@
 <h1>Formular</h1>
 
 <table class="table">
-  <thead>
+    <thead>
     <tr>
-      <th>Uid</th>
-      <th>Transliteration</th>
-      <th>Transliteration nosuffix</th>
-      <th>Uebersetzung</th>
-      <th>Texttyp</th>
-      <th>Photo</th>
-      <th>Photo pfad</th>
-      <th>Photo kommentar</th>
-      <th>Szeneid</th>
-      <th>Literatur</th>
-      <th>Band</th>
-      <th>Seitezeile</th>
-        <!-- todo handle stellen -->
-      <th></th>
+        <th>Uid</th>
+        <th>Transliteration</th>
+        <th>Transliteration nosuffix</th>
+        <th>Uebersetzung</th>
+        <th>Texttyp</th>
+        <th>Photo</th>
+        <th>Photo pfad</th>
+        <th>Photo kommentar</th>
+        <th>Szeneid</th>
+        <th>Literatur</th>
+        <th>Band</th>
+        <th>Seitezeile</th>
+        <th></th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <% @formulare.each do |formular| %>
-      <tr>
-        <td><%= formular.uid %></td>
-        <td><%= formular.transliteration %></td>
-        <td><%= formular.transliteration_nosuffix %></td>
-        <td><%= formular.uebersetzung %></td>
-        <td><%= formular.texttyp %></td>
-        <td><%= formular.photo %></td>
-        <td><%= formular.photo_pfad %></td>
-        <td><%= formular.photo_kommentar %></td>
-        <td><%= formular.szeneID %></td>
-        <td><%= formular.literatur %></td>
-        <td><%= formular.band %></td>
-        <td><%= formular.seitezeile %></td>
-          <!-- todo handle stellen -->
-        <td><%= link_to 'Show', formular %></td>
-      </tr>
+        <tr>
+            <td><%= formular.uid %></td>
+            <td><%= formular.transliteration %></td>
+            <td><%= formular.transliteration_nosuffix %></td>
+            <td><%= formular.uebersetzung %></td>
+            <td><%= formular.texttyp %></td>
+            <td><%= formular.photos.collect { |photo| photo.name } %></td>
+            <td><%= formular.photos.collect { |photo| photo.pfad } %></td>
+            <td><%= formular.photos.collect { |photo| photo.kommentar } %></td>
+            <td><%= formular.szeneID %></td>
+            <td><%= formular.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" } %></td>
+            <td><%= formular.band %></td>
+            <td><%= formular.seitezeile %></td>
+            <td><%= link_to 'Show', formular %></td>
+        </tr>
     <% end %>
-  </tbody>
+    </tbody>
 </table>

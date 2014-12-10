@@ -1,78 +1,85 @@
+<h1>Stelle</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Uid:</strong>
-  <%= @stelle.uid %>
+    <strong>Id:</strong>
+    <%= @stelle.id %>
 </p>
 
 <p>
-  <strong>Tempel:</strong>
-  <%= @stelle.tempel %>
+    <strong>Tempel:</strong>
+    <%= @stelle.tempel %>
 </p>
 
 <p>
-  <strong>Band:</strong>
-  <%= @stelle.band %>
+    <strong>Band:</strong>
+    <%= @stelle.band %>
 </p>
 
 <p>
-  <strong>Bandseite:</strong>
-  <%= @stelle.bandseite %>
+    <strong>Bandseite:</strong>
+    <%= @stelle.bandseite %>
 </p>
 
 <p>
-  <strong>Bandseitezeile:</strong>
-  <%= @stelle.bandseitezeile %>
+    <strong>Bandseitezeile:</strong>
+    <%= @stelle.bandseitezeile %>
 </p>
 
 <p>
-  <strong>Seite start:</strong>
-  <%= @stelle.seite_start %>
+    <strong>Seite start:</strong>
+    <%= @stelle.seite_start %>
 </p>
 
 <p>
-  <strong>Seite stop:</strong>
-  <%= @stelle.seite_stop %>
+    <strong>Seite stop:</strong>
+    <%= @stelle.seite_stop %>
 </p>
 
 <p>
-  <strong>Zeile start:</strong>
-  <%= @stelle.zeile_start %>
+    <strong>Zeile start:</strong>
+    <%= @stelle.zeile_start %>
 </p>
 
 <p>
-  <strong>Zeile stop:</strong>
-  <%= @stelle.zeile_stop %>
+    <strong>Zeile stop:</strong>
+    <%= @stelle.zeile_stop %>
 </p>
 
 <p>
-  <strong>Stelle anmerkung:</strong>
-  <%= @stelle.stelle_anmerkung %>
+    <strong>Stelle anmerkung:</strong>
+    <%= @stelle.stelle_anmerkung %>
 </p>
 
 <p>
-  <strong>Stelle unsicher:</strong>
-  <%= @stelle.stelle_unsicher %>
+    <strong>Stelle unsicher:</strong>
+    <%= @stelle.stelle_unsicher %>
 </p>
 
 <p>
-  <strong>Start:</strong>
-  <%= @stelle.start %>
+    <strong>Start:</strong>
+    <%= @stelle.start %>
 </p>
 
 <p>
-  <strong>Stop:</strong>
-  <%= @stelle.stop %>
+    <strong>Stop:</strong>
+    <%= @stelle.stop %>
 </p>
 
 <p>
-  <strong>Zerstoerung:</strong>
-  <%= @stelle.zerstoerung %>
+    <strong>Zerstoerung:</strong>
+    <%= @stelle.zerstoerung %>
 </p>
 
 <p>
-  <strong>Freigegeben:</strong>
-  <%= @stelle.freigegeben %>
+    <strong>Freigegeben:</strong>
+    <%= @stelle.freigegeben %>
+</p>
+
+<p>
+    <strong>Zugehörig zu:</strong>
+    <%= link_to "#{@stelle.zugehoerigZu_type.downcase}-#{@stelle.zugehoerigZu.uid}", @stelle.zugehoerigZu  %>
 </p>
 
 <%= link_to 'Back', stellen_path %>

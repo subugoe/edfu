@@ -1,21 +1,20 @@
 class StellenController < ApplicationController
 
-  # todo wird nicht gebraucht ?!
 
-  #before_action :set_stelle, only: [:show, :edit, :update, :destroy]
-  #before_filter :authenticate_user!
-  #
-  # # GET /stellen
-  # # GET /stellen.json
-  # def index
-  #   @stellen = Stelle.all
-  # end
-  #
-  # # GET /stellen/1
-  # # GET /stellen/1.json
-  # def show
-  # end
-  #
+  before_action :set_stelle, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
+
+  # GET /stellen
+  # GET /stellen.json
+  def index
+    @stellen = Stelle.all
+  end
+
+  # GET /stellen/1
+  # GET /stellen/1.json
+  def show
+  end
+
   # # GET /stellen/new
   # def new
   #   @stelle = Stelle.new
@@ -65,14 +64,17 @@ class StellenController < ApplicationController
   #   end
   # end
   #
-  # private
-  #   # Use callbacks to share common setup or constraints between actions.
-  #   def set_stelle
-  #     @stelle = Stelle.find(params[:id])
-  #   end
-  #
-  #   # Never trust parameters from the scary internet, only allow the white list through.
-  #   def stelle_params
-  #     params.require(:stelle).permit(:uid, :tempel, :band, :bandseite, :bandseitezeile, :seite_start, :seite_stop, :zeile_start, :zeile_stop, :stelle_anmerkung, :stelle_unsicher, :start, :stop, :zerstoerung, :freigegeben)
-  #   end
+
+  private
+
+    # Use callbacks to share common setup or constraints between actions.
+    def set_stelle
+      @stelle = Stelle.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def stelle_params
+      params.require(:stelle).permit(:uid, :tempel, :band, :bandseite, :bandseitezeile, :seite_start, :seite_stop, :zeile_start, :zeile_stop, :stelle_anmerkung, :stelle_unsicher, :start, :stop, :zerstoerung, :freigegeben)
+    end
+
 end

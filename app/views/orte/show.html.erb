@@ -1,38 +1,40 @@
+<h1>Ort</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Uid:</strong>
-  <%= @ort.uid %>
+    <strong>Uid:</strong>
+    <%= @ort.uid %>
 </p>
 
 <p>
-  <strong>Stelle:</strong>
-    <!-- todo handle stellen <%= @ort.stelle %> -->
+    <strong>Transliteration:</strong>
+    <%= @ort.transliteration %>
 </p>
 
 <p>
-  <strong>Transliteration:</strong>
-  <%= @ort.transliteration %>
+    <strong>Transliteration nosuffix:</strong>
+    <%= @ort.transliteration_nosuffix %>
 </p>
 
 <p>
-  <strong>Transliteration nosuffix:</strong>
-  <%= @ort.transliteration_nosuffix %>
+    <strong>Ort:</strong>
+    <%= @ort.ort %>
 </p>
 
 <p>
-  <strong>Ort:</strong>
-  <%= @ort.ort %>
+    <strong>Lokalisation:</strong>
+    <%= @ort.lokalisation %>
 </p>
 
 <p>
-  <strong>Lokalisation:</strong>
-  <%= @ort.lokalisation %>
+    <strong>Stellen:</strong>
+    <%= raw @ort.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
 </p>
 
 <p>
-  <strong>Anmerkung:</strong>
-  <%= @ort.anmerkung %>
+    <strong>Anmerkung:</strong>
+    <%= @ort.anmerkung %>
 </p>
 
 <%= link_to 'Back', orte_path %>

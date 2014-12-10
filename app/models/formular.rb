@@ -8,7 +8,8 @@ class Formular < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  attr_accessor :photo, :photo_pfad, :photo_kommentar, :literatur
+  # iXYZ - 'i' for imported
+  attr_accessor :iphoto, :iliteratur
 
   # todo has_many or has_one?
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all

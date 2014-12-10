@@ -1,21 +1,20 @@
 class WbsBerlinController < ApplicationController
 
-  # todo wird nicht benötigt ?!
 
-  # before_action :set_wb_berlin, only: [:show, :edit, :update, :destroy]
-  # before_filter :authenticate_user!
-  #
-  # # GET /wb_berlins
-  # # GET /wb_berlins.json
-  # def index
-  #   @wb_berlins = WbBerlin.all
-  # end
-  #
-  # # GET /wb_berlins/1
-  # # GET /wb_berlins/1.json
-  # def show
-  # end
-  #
+  before_action :set_wb_berlin, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
+
+  # GET /wb_berlins
+  # GET /wb_berlins.json
+  def index
+    @wb_berlins = WbBerlin.all
+  end
+
+  # GET /wb_berlins/1
+  # GET /wb_berlins/1.json
+  def show
+  end
+
   # # GET /wb_berlins/new
   # def new
   #   @wb_berlin = WbBerlin.new
@@ -64,15 +63,17 @@ class WbsBerlinController < ApplicationController
   #     format.json { head :no_content }
   #   end
   # end
-  #
-  # private
-  #   # Use callbacks to share common setup or constraints between actions.
-  #   def set_wb_berlin
-  #     @wb_berlin = WbBerlin.find(params[:id])
-  #   end
-  #
-  #   # Never trust parameters from the scary internet, only allow the white list through.
-  #   def wb_berlin_params
-  #     params.require(:wb_berlin).permit(:uid, :band, :seite_start, :seite_stop, :zeile_start, :zeile_stop, :wort_id)
-  #   end
+
+  private
+
+    # Use callbacks to share common setup or constraints between actions.
+    def set_wb_berlin
+      @wb_berlin = WbBerlin.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def wb_berlin_params
+      params.require(:wb_berlin).permit(:uid, :band, :seite_start, :seite_stop, :zeile_start, :zeile_stop, :wort_id)
+    end
+
 end

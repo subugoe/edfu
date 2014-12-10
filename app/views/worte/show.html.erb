@@ -1,3 +1,5 @@
+<h1>Wort</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -31,14 +33,20 @@
 </p>
 
 <p>
-    <!-- todo handle stellen <strong>Belegstellenedfu:</strong> -->
-    <!-- todo handle stellen <%= @wort.belegstellenEdfu %> -->
-</p>
-
-<p>
   <strong>Belegstellenwb:</strong>
   <%= @wort.belegstellenWb %>
 </p>
+
+<p>
+    <strong>Stellen:</strong>
+    <%= raw @wort.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
+</p>
+
+<p>
+    <strong>WB_Berlin:</strong>
+    <%= link_to "wb_berlin-#{@wort.wb_berlin.id}", @wort.wb_berlin %>
+</p>
+
 
 <p>
   <strong>Anmerkung:</strong>

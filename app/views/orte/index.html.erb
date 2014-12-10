@@ -4,7 +4,6 @@
   <thead>
     <tr>
       <th>Uid</th>
-        <!-- todo handle stellen <th>Stelle</th> -->
       <th>Transliteration</th>
       <th>Transliteration nosuffix</th>
       <th>Ort</th>
@@ -18,7 +17,6 @@
     <% @orte.each do |ort| %>
       <tr>
         <td><%= ort.uid %></td>
-        <!-- todo handle stellen <td><%= ort.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td> -->
         <td><%= ort.transliteration %></td>
         <td><%= ort.transliteration_nosuffix %></td>
         <td><%= ort.ort %></td>

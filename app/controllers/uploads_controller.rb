@@ -187,12 +187,9 @@ class UploadsController < ApplicationController
                   transliteration_nosuffix: row[3] || '',
                   uebersetzung: row[4] || '',
                   texttyp: row[5] || '',
-                  photo: row[6] || '',
-                  photo_pfad: '',
-                  photo_kommentar: '',
-                  # szeneID changed to string from integer
+                  iphoto: row[6] || '',
                   szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
-                  literatur: row[8] || '',
+                  iliteratur: row[8] || '',
                   uid: uID
               }
           )

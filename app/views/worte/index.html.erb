@@ -11,7 +11,8 @@
       <th>Weiteres</th>
       <th>Belegstellenedfu</th>      <!-- todo handle stellen -->
       <th>Belegstellenwb</th>
-      <th>Anmerkung</th>
+        <th>WB_Berlin</th>
+        <th>Anmerkung</th>
       <th></th>
     </tr>
   </thead>
@@ -27,7 +28,8 @@
         <td><%= wort.weiteres %></td>
         <td><%= wort.belegstellenEdfu %></td>   <!-- todo handle stellen -->
         <td><%= wort.belegstellenWb %></td>
-        <td><%= wort.anmerkung %></td>
+          <td><%= wort.wb_berlin.id %></td>   <!-- todo link -->
+          <td><%= wort.anmerkung %></td>
         <td><%= link_to 'Show', wort %></td>
       </tr>
     <% end %>

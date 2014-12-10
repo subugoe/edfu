@@ -49,9 +49,6 @@
                             <a href="#">Stellen</a>
                         </li>
                         <li>
-                            <%= link_to 'Benutzer', admin_dashboard_path %>
-                        </li>
-                        <li>
                             <% if user_signed_in? %>
                                 <%="Hallo, #{current_user.email}"%> <%= link_to 'Sign out', destroy_user_session_path, :method => :delete %>
                             <% else %>
