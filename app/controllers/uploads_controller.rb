@@ -4,11 +4,13 @@ require 'benchmark'
 require 'verify_formular_helper'
 require 'verify_ort_helper'
 require 'verify_gott_helper'
+require 'verify_wort_helper'
 
 class UploadsController < ApplicationController
   include VerifyFormularHelper
   include VerifyOrtHelper
   include VerifyGottHelper
+  include VerifyWortHelper
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -104,8 +106,8 @@ class UploadsController < ApplicationController
     prepareDB
     #process_formular
     #process_ort
-    process_gott
-    #process_wort
+    #process_gott
+    process_wort
 
   end
 
@@ -391,9 +393,11 @@ class UploadsController < ApplicationController
 
           #puts  "word uid: #{uid}"
 
-          #uid changed to string from integer
-          Wort.create(
+          belegstellenEdfu = row[4] || ''
+          belegstellenWb = row[5] || ''
 
+          #uid changed to string from integer
+          w = Wort.create(
               uid: uid,
               transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
               transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
@@ -401,11 +405,12 @@ class UploadsController < ApplicationController
               # hieroglyph changed to string from integer
               hieroglyph: hierogl || '',
               weiteres: row[3] || '',
-              belegstellenEdfu: row[4] || '', # todo in was indexiert? stelle_id?
-              belegstellenWb: row[5] || '', # todo in was indexiert? stelle_berlin_id?
+              belegstellenEdfu: belegstellenEdfu, # todo in was indexiert? stelle_id?
+              belegstellenWb: belegstellenWb, # todo in was indexiert? stelle_berlin_id?
               anmerkung: row[6] || ''
-
           )
+
+          manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
 
 
           # logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"

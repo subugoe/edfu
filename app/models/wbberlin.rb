@@ -1,14 +1,17 @@
 # encoding: utf-8 
 
 require 'rsolr'
+require 'edfu_numerics_conversion_helper'
 
 class Wbberlin < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  has_one :wort
+  belongs_to :wort
 
   after_commit :add_to_solr
+
+
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%02i' % self[:zeile_start]}"
@@ -61,21 +64,6 @@ class Wbberlin < ActiveRecord::Base
     solr.commit
   end
 
-
-  # todo update solr doc
-  # todo log updated
-  def log_updated
-    logger.info "[INFO]  after update: #{id}"
-  end
-
-
-  # todo add doc to solr
-  # todo log created
-  def log_created
-
-    logger.info "---- in: log_created"
-
-  end
 
 
 end

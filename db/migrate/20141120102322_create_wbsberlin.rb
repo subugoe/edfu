@@ -8,7 +8,7 @@ class CreateWbsberlin < ActiveRecord::Migration
       t.string :zeile_start
       t.string :zeile_stop
       t.string :notiz
-
+      t.belongs_to :wort
 
       t.timestamps
     end

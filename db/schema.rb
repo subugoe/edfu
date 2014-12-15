@@ -177,6 +177,7 @@ ActiveRecord::Schema.define(version: 20141209145651) do
     t.string   "zeile_start"
     t.string   "zeile_stop"
     t.string   "notiz"
+    t.integer  "wort_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -191,11 +192,8 @@ ActiveRecord::Schema.define(version: 20141209145651) do
     t.string   "belegstellenEdfu"
     t.string   "belegstellenWb"
     t.string   "anmerkung"
-    t.integer  "wbberlin_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "worte", ["wbberlin_id"], name: "index_worte_on_wbberlin_id"
 
 end
