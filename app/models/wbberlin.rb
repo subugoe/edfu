@@ -9,7 +9,7 @@ class Wbberlin < ActiveRecord::Base
 
   belongs_to :wort
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
 
 
 

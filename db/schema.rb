@@ -104,6 +104,8 @@ ActiveRecord::Schema.define(version: 20141209145651) do
     t.datetime "updated_at"
   end
 
+  add_index "literaturen", ["beschreibung", "detail"], name: "index_literaturen_on_beschreibung_and_detail"
+
   create_table "orte", force: true do |t|
     t.string   "uid"
     t.string   "transliteration"
@@ -141,6 +143,8 @@ ActiveRecord::Schema.define(version: 20141209145651) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "stellen", ["bandseitezeile"], name: "index_stellen_on_bandseitezeile"
 
   create_table "uploads", force: true do |t|
     t.string   "formular"

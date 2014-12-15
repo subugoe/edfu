@@ -20,5 +20,6 @@ class CreateStellen < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :stellen, :bandseitezeile # , :unique => true
   end
 end

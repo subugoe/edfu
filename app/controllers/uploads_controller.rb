@@ -104,10 +104,10 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    #process_formular
+    process_formular
     #process_ort
     #process_gott
-    process_wort
+    #process_wort
 
   end
 
@@ -180,7 +180,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          break if i>15
+          #break if i>15
 
           # if SzeneID doesn't exist
           if row[7] != nil and row[7] != ''
@@ -204,6 +204,7 @@ class UploadsController < ApplicationController
           seitezeile = row[2] || ''
           band = Integer(row[1]) || -1
 
+          # in batch und dann bulk ingest, nebenläufig ausführen
           f = Formular.create (
                                   {
                                       uid: uID,
@@ -216,11 +217,11 @@ class UploadsController < ApplicationController
                                       szeneID: szID
                                   }
                               )
-
+          # formulare.each ... {
           manipulate_photo_string_and_create(photo, uID, f)
           create_literaturen(uID, f)
           create_stellen(seitezeile, band, uID, f)
-
+                                # ... }
 
           i += 1
         end
@@ -260,7 +261,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          break if i==15
+          #break if i==15
 
           #puts  "topo uid: #{Integer(row[5])}"
 
@@ -309,7 +310,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          break if i==15
+          #break if i==15
 
           #puts  "god uid: #{Integer(row[9])}"
 
@@ -372,7 +373,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          break if i==15
+          #break if i==15
 
 
           if row[2] != nil and row[2] != ''

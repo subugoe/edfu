@@ -4,7 +4,7 @@ class CreatePhotos < ActiveRecord::Migration
 
       t.string :name
       t.string :typ
-      t.string :pfad
+      t.string :pfad, index: true
       t.text :kommentar
 
       t.timestamps

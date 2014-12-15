@@ -76,7 +76,7 @@ module VerifyFormularHelper
         )
 
         #literaturen << lit # unless self.literaturen.include? lit
-        formular.literaturen << lit
+        formular.literaturen << lit unless formular.literaturen.include? lit
       }
     end
 
@@ -256,6 +256,7 @@ module VerifyFormularHelper
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
+    # todo create or find_or_create ???
     stelle = Stelle.create(#.update_or_create(
         :tempel => 'Edfu',
         :band => band_uid,
@@ -622,13 +623,13 @@ module VerifyFormularHelper
         end
 
         # todo ggf. in array sammeln und als batch speichern
-        p = Photo.find_or_create_by(
-            name: name,
-            typ: typ,
-            pfad: pfad,
-            kommentar: kommentar
-        )
-        formular.photos << p
+        p = Photo.find_or_create_by(pfad: pfad) do  |photo|
+            photo.name = name
+            photo.typ = typ
+            #pfad: pfad
+            photo.kommentar = kommentar
+        end
+        formular.photos << p unless formular.photos.include? p
         #photos << p # unless self.photos.include? p
 
       end

@@ -7,5 +7,6 @@ class CreateLiteraturen < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :literaturen, [:beschreibung, :detail]
   end
 end
