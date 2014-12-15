@@ -1,10 +1,12 @@
 require 'roo'
 require 'securerandom'
 require 'benchmark'
-
+require 'verify_formular_helper'
+require 'verify_ort_helper'
 
 class UploadsController < ApplicationController
-
+  include VerifyFormularHelper
+  include VerifyOrtHelper
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -99,7 +101,7 @@ class UploadsController < ApplicationController
 
     prepareDB
     process_formular
-    #process_ort
+    process_ort
     #process_gott
     #process_wort
 
@@ -135,9 +137,17 @@ class UploadsController < ApplicationController
     logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
 
     formulare_batch = Array.new()
-    literaturen = Array.new()
+
+    literaturen = Array.new
     literatur_batch = Array.new()
-    photo_batch = Hash.new()
+    literatur_hash = Hash.new()
+
+
+    photos = Array.new
+    photo_batch = Array.new()
+
+    stellen = Array.new
+    stellen_batch = Array.new
 
     #formulare_batch_size = 1000
 
@@ -183,72 +193,40 @@ class UploadsController < ApplicationController
             uID = SecureRandom.random_number(100000000)
           end
 
-          #puts  "formular uid: #{uID}"
 
-          #formulare_batch << Formular.new(
-          f = Formular.new(
-              {
-                  transliteration: row[0] || '',
-                  band: Integer(row[1]) || -1,
-                  seitezeile: row[2] || '',
-                  transliteration_nosuffix: row[3] || '',
-                  uebersetzung: row[4] || '',
-                  texttyp: row[5] || '',
-                  iphoto: row[6].to_s || '',
-                  #photo_pfad: '',
-                  #photo_kommentar: '',
-                  # szeneID changed to string from integer
-                  szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
-                  iliteratur: row[8] || '',
-                  uid: uID
-              }
-          )
+          uebersetzung = row[4] || ''
+          photo = row[6].to_s || ''
+          literatur = row[8] || ''
+          seitezeile = row[2] || ''
+          band = Integer(row[1]) || -1
 
-          puts f.to_s
+          f = Formular.create (
+                                  {
+                                      uid: uID,
+                                      transliteration: row[0] || '',
+                                      band: band,
+                                      seitezeile: seitezeile,
+                                      transliteration_nosuffix: row[3] || '',
+                                      uebersetzung: check_uebersetzungs_string(uebersetzung, uID),
+                                      texttyp: row[5] || '',
+                                      szeneID: szID
+                                  }
+                              )
 
-          formulare_batch << f
-
-          # find_or_create_by(
-          #     beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
-          #     detail: hash['detail'],
-          # )
-
-
-          # literaturen << f.create_literaturen
-          # if literatur_batch.empty?
-          #   literatur_batch << literaturen
-          # else
-          #   literatur_batch.each { |lits|
-          #     literaturen.each { |lit|
-          #       lit_exist = true if (lit.beschreibung == lits.beschreibung) && (lit.detail == lits.detail)
-          #     }
-          #   }
-          # end
-
-
-          # photo_batch << f.create_photos
-
-          # if formulare_batch.size >= formulare_batch_size
-          #   Formular.import formulare_batch # , :validate => true
-          #   #Formular.create formulare_batch
-          #   formulare_batch.clear
-          # end
+          manipulate_photo_string_and_create(photo, uID, f)
+          create_literaturen(uID, f)
+          create_stellen(seitezeile, band, uID, f)
 
 
           i += 1
         end
-
-        # literatur_batch.each { |lit|
-        #   lit.find_or_create_by(
-        #       beschreibung: lit.beschreibung,
-        #       detail: lit.detail
-        #   )
-        #
-        # }
-
-        Formular.import formulare_batch unless formulare_batch == nil
-
       }
+
+
+      #x.report("write formular batch to db:") {
+      #  Formular.import formulare_batch #unless formulare_batch == nil
+      #}
+
     end
 
   end
@@ -257,6 +235,8 @@ class UploadsController < ApplicationController
   def process_ort
 
     logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
+
+    stellen = Array.new
 
     # todo replace this with uploaded file
     excel = Roo::Excel.new("public/uploads/Topo.xls")
@@ -280,11 +260,14 @@ class UploadsController < ApplicationController
 
           #puts  "topo uid: #{Integer(row[5])}"
 
-          Ort.create(
+          iStelle = row[0] || ''
+          uid = Integer(row[5]) || ''
+
+          o = Ort.create(
 
               # changed to string from integer
-              uid: Integer(row[5]) || '',
-              iStelle: row[0] || '',
+              uid: uid,
+              #iStelle: row[0] || '',
               transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
               #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
               ort: row[2] || '',
@@ -293,6 +276,7 @@ class UploadsController < ApplicationController
 
           )
 
+          manipulate_stelle_string_and_create(iStelle, uid, o)
 
           i += 1
         end
