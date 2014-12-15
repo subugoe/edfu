@@ -3,10 +3,12 @@ require 'securerandom'
 require 'benchmark'
 require 'verify_formular_helper'
 require 'verify_ort_helper'
+require 'verify_gott_helper'
 
 class UploadsController < ApplicationController
   include VerifyFormularHelper
   include VerifyOrtHelper
+  include VerifyGottHelper
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -100,9 +102,9 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    process_formular
-    process_ort
-    #process_gott
+    #process_formular
+    #process_ort
+    process_gott
     #process_wort
 
   end
@@ -309,20 +311,26 @@ class UploadsController < ApplicationController
 
           #puts  "god uid: #{Integer(row[9])}"
 
-          Gott.create(
+          uid = Integer(row[9]) || ''
+          seitezeile = row[7] || ''
+          band = row[6] || ''
 
-              uid: Integer(row[9]) || '',
+          g  = Gott.create(
+
+              uid: uid,
               transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
               transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
               ort: row[2] || '',
               eponym: row[3] || '',
               beziehung: row[4] || '',
               funktion: row[5] || '',
-              band: row[6] || '',
-              seitezeile: row[7] || '', # todo wirklich in den index?
+              band: band,
+              seitezeile: seitezeile,
               anmerkung: row[8] || '',
 
           )
+
+          manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
 
 
           i += 1

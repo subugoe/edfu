@@ -10,7 +10,7 @@ class Ort < ActiveRecord::Base
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   # imported Stelle (is equivalent to bandseitezeile)
-  attr_accessor :iStelle # , :transliteration_nosuffix
+  #attr_accessor :iStelle # , :transliteration_nosuffix
 
   after_commit :add_to_solr
   #before_validation :check_data
@@ -42,6 +42,7 @@ class Ort < ActiveRecord::Base
         :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
         :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+
 
         :typ => 'ort', # ---
         :id => "ort-#{self[:uid]}" # ---
