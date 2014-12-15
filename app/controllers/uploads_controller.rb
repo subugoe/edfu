@@ -99,9 +99,9 @@ class UploadsController < ApplicationController
 
     prepareDB
     process_formular
-    process_ort
-    process_gott
-    process_wort
+    #process_ort
+    #process_gott
+    #process_wort
 
   end
 
@@ -135,7 +135,11 @@ class UploadsController < ApplicationController
     logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
 
     formulare_batch = Array.new()
-    formulare_batch_size = 1000
+    literaturen = Array.new()
+    literatur_batch = Array.new()
+    photo_batch = Hash.new()
+
+    #formulare_batch_size = 1000
 
     n = 50000
     i = 1
@@ -182,7 +186,7 @@ class UploadsController < ApplicationController
           #puts  "formular uid: #{uID}"
 
           #formulare_batch << Formular.new(
-          f = Formular.create(
+          f = Formular.new(
               {
                   transliteration: row[0] || '',
                   band: Integer(row[1]) || -1,
@@ -200,6 +204,30 @@ class UploadsController < ApplicationController
               }
           )
 
+          puts f.to_s
+
+          formulare_batch << f
+
+          # find_or_create_by(
+          #     beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
+          #     detail: hash['detail'],
+          # )
+
+
+          # literaturen << f.create_literaturen
+          # if literatur_batch.empty?
+          #   literatur_batch << literaturen
+          # else
+          #   literatur_batch.each { |lits|
+          #     literaturen.each { |lit|
+          #       lit_exist = true if (lit.beschreibung == lits.beschreibung) && (lit.detail == lits.detail)
+          #     }
+          #   }
+          # end
+
+
+          # photo_batch << f.create_photos
+
           # if formulare_batch.size >= formulare_batch_size
           #   Formular.import formulare_batch # , :validate => true
           #   #Formular.create formulare_batch
@@ -210,7 +238,16 @@ class UploadsController < ApplicationController
           i += 1
         end
 
-        #Formular.import formulare_batch unless formulare_batch == nil
+        # literatur_batch.each { |lit|
+        #   lit.find_or_create_by(
+        #       beschreibung: lit.beschreibung,
+        #       detail: lit.detail
+        #   )
+        #
+        # }
+
+        Formular.import formulare_batch unless formulare_batch == nil
+
       }
     end
 

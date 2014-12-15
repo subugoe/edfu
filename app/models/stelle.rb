@@ -22,37 +22,41 @@ class Stelle < ActiveRecord::Base
     return "#{self[:band]}#{'%03i' % self[:seite_stop]}#{'%03i' % self[:zeile_stop]}"
   end
 
+  def to_solr_string
+    return {
+        :sql_uid => self[:id], # ---
+
+        :tempel => self.tempel, # ---
+        :band => self.band, # ---
+
+        :seite_start => self.seite_start, # ---
+        :seite_stop => self.seite_stop, # ---
+        :zeile_start => self.zeile_start, # ---
+        :zeile_stop => self.zeile_stop, # ---
+        :start => self.start, # ---
+        :stop => self.stop, # ---
+
+        :freigegeben => self.freigegeben, # ---
+        :zerstoerung => self.zerstoerung, # ---
+        :stelle_anmerkung => self.stelle_anmerkung, # ---
+        :stelle_unsicher => self.stelle_unsicher, # ---
+
+        :besitzer => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu.uid}", # ---
+
+        :typ => 'stelle', # ---
+        :id => "stelle-#{self[:id]}" # ---
+    }
+  end
+
+
   private
+
 
   def add_to_solr
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (
-                 {
-                     :sql_uid => self[:id], # ---
-
-                     :tempel => self.tempel, # ---
-                     :band => self.band, # ---
-
-                     :seite_start => self.seite_start, # ---
-                     :seite_stop => self.seite_stop, # ---
-                     :zeile_start => self.zeile_start, # ---
-                     :zeile_stop => self.zeile_stop, # ---
-                     :start => self.start, # ---
-                     :stop => self.stop, # ---
-
-                     :freigegeben => self.freigegeben, # ---
-                     :zerstoerung => self.zerstoerung, # ---
-                     :stelle_anmerkung => self.stelle_anmerkung, # ---
-                     :stelle_unsicher => self.stelle_unsicher, # ---
-
-                     :besitzer => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu.uid}", # ---
-
-                     :typ => 'stelle', # ---
-                     :id => "stelle-#{self[:id]}" # ---
-                 }
-             )
+    solr.add (to_solr_string)
     solr.commit
   end
 

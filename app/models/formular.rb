@@ -21,6 +21,134 @@ class Formular < ActiveRecord::Base
   after_commit :add_to_solr
   before_validation :check_data
 
+  def literatur_beschreibung_hash
+    return {
+        1 => 'Bedier, in: GM 162, 1998',
+        2 => 'Budde/Kurth, in: EB 4, 1994',
+        3 => 'Labrique, Stylistique',
+        4 => 'Aufrère, L’univers minéral I',
+        5 => 'Aufrère, L’univers minéral II'
+    }
+  end
+
+  def formular_literatur_relation_hash
+    {
+        1 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        2 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        3 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        4 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
+        5 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        6 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
+              {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        7 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        8 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        9 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        10 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        11 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        12 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        13 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        14 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        15 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        16 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
+    }
+  end
+
+  def to_solr_string
+    return {
+        :sql_uid => self[:uid], # ---
+
+        #:sort => "#{self.stellen.first.start}", # ---  todo
+
+        :transliteration => self[:transliteration], # ---
+
+        :transliteration_nosuffix => self[:transliteration], #
+        :uebersetzung => self[:uebersetzung], # ---
+        :texttyp => self[:texttyp], # ---
+        :szene_nummer => self[:szeneID], #  todo stimmt szene_nummer = SzeneID ?
+
+        :photo => self.photos.collect { |photo| photo.name }, # ---
+        :photo_kommentar => self.photos.collect { |photo| photo.kommentar }, # ---
+        :photo_pfad => self.photos.collect { |photo| photo.pfad }, # ---
+
+        :literatur => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
+
+        :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
+        :band => self.stellen.collect { |stelle| stelle.band }, # ---
+        :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
+        :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
+
+
+        :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
+        :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
+        :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
+        :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+        :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
+        :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
+        :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
+        :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+
+        :typ => 'formular', # ---
+        :id => "formular-#{self[:uid]}" # ---
+    }
+  end
+
+  def to_s
+    return "#{self[:uid]},
+
+        #{self[:transliteration]},
+        #{self[:transliteration]},
+        #{self[:uebersetzung]},
+        #{self[:texttyp]},
+        #{self[:szeneID]},
+        #{self.photos.collect { |photo| photo.name }},
+        #{self.photos.collect { |photo| photo.kommentar }},
+        #{self.photos.collect { |photo| photo.pfad }},
+        #{self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }},
+        #{self.stellen.collect { |stelle| "stelle-#{stelle.id}" }},
+        #{self.stellen.collect { |stelle| stelle.band }},
+        #{self.stellen.collect { |stelle| stelle.bandseite }},
+        #{self.stellen.collect { |stelle| stelle.bandseitezeile }},
+        #{self.stellen.collect { |stelle| stelle.seite_start }},
+        #{self.stellen.collect { |stelle| stelle.seite_stop }},
+        #{self.stellen.collect { |stelle| stelle.zeile_start }},
+        #{self.stellen.collect { |stelle| stelle.zeile_stop }},
+        #{self.stellen.collect { |stelle| stelle.zerstoerung }},
+        #{self.stellen.collect { |stelle| stelle.freigegeben }},
+        #{self.stellen.collect { |stelle| stelle.stelle_unsicher }},
+        #{self.stellen.collect { |stelle| stelle.stelle_anmerkung }},
+        'formular',
+        formular-#{self[:uid]}"
+  end
+
+  # # für bulk-upload
+  # # muss selbst aufgerufen werden
+  # # nicht per callback (zur unterscheidlichen Behandlung von Bulk-Upload und normalem Upload)
+  # # Objekte in Schleife per find_or_create_by in DB schreiben (sind nicht so viele), sonst ist
+  # # ein bulk-upload für formular nicht möglich
+  # def create_literaturen
+  #
+  #
+  #   if literatur_description_arr = formular_literatur_relation_hash[self[:uid].to_i]
+  #     literatur_description_arr.each { |desc|
+  #       lit = Literatur.new(
+  #           beschreibung: literatur_beschreibung_hash[desc['literatur_beschreibung_key']],
+  #           detail: desc['detail'],
+  #       )
+  #       self.literaturen << lit # unless self.literaturen.include? lit
+  #     }
+  #   end
+  #   return self.literaturen
+  # end
+
 
   private
 
@@ -45,44 +173,7 @@ class Formular < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (
-                 {
-                     :sql_uid => self[:uid], # ---
-
-                     #:sort => "#{self.stellen.first.start}", # ---  todo
-
-                     :transliteration => self[:transliteration], # ---
-
-                     :transliteration_nosuffix => self[:transliteration], #
-                     :uebersetzung => self[:uebersetzung], # ---
-                     :texttyp => self[:texttyp], # ---
-                     :szene_nummer => self[:szeneID], #  todo stimmt szene_nummer = SzeneID ?
-
-                     :photo => self.photos.collect { |photo| photo.name }, # ---
-                     :photo_kommentar => self.photos.collect { |photo| photo.kommentar }, # ---
-                     :photo_pfad => self.photos.collect { |photo| photo.pfad }, # ---
-
-                     :literatur => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
-
-                     :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
-                     :band => self.stellen.collect { |stelle| stelle.band }, # ---
-                     :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
-                     :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
-
-
-                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
-                     :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
-                     :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
-                     :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
-                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
-                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
-                     :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-                     :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
-
-                     :typ => 'formular', # ---
-                     :id => "formular-#{self[:uid]}" # ---
-                 }
-             )
+    solr.add (to_solr_string)
     solr.commit
   end
 
@@ -105,15 +196,15 @@ class Formular < ActiveRecord::Base
 
 
     @myFormular['uebersetzung'] = self[:uebersetzung].strip
-    .gsub(/dZtruit/, 'détruit')
-    .gsub(/enti\?rement/, 'entièrement')
-    .gsub(/moitiZ/, 'moitié')
-    .gsub(/premi\?re/, 'première')
-    .gsub(/placZe/, 'placée')
-    .gsub(/dZesse/, 'déesse')
-    .gsub(/mutilZs/, 'mutilés')
-    .gsub(/fen\?tre/, 'fenêtre')
-    .gsub(/ZtZ gravZe/, 'été gravée')
+                                      .gsub(/dZtruit/, 'détruit')
+                                      .gsub(/enti\?rement/, 'entièrement')
+                                      .gsub(/moitiZ/, 'moitié')
+                                      .gsub(/premi\?re/, 'première')
+                                      .gsub(/placZe/, 'placée')
+                                      .gsub(/dZesse/, 'déesse')
+                                      .gsub(/mutilZs/, 'mutilés')
+                                      .gsub(/fen\?tre/, 'fenêtre')
+                                      .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  @myFormular['uebersetzung'] != self[:uebersetzung]
       logger.info "\t[INFO]  [FL] uid: #{self[:uid]} String der Übersetzung verändert, von: #{self[:uebersetzung]} auf: #{@myFormular['uebersetzung']}"
@@ -234,7 +325,7 @@ class Formular < ActiveRecord::Base
     # 9741-9773
     if iphoto.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
       iphoto = iphoto.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
-                                   '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
+                           '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
       photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
@@ -482,7 +573,7 @@ class Formular < ActiveRecord::Base
           kommentar = photo_kommentar
         end
 
-        p = Photo.find_or_create_by(
+        p = Photo.build(
             name: name,
             typ: typ,
             pfad: pfad,
@@ -677,7 +768,7 @@ class Formular < ActiveRecord::Base
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
-    stelle = Stelle.create( #.update_or_create(
+    stelle = Stelle.build(#.update_or_create(
         :tempel => 'Edfu',
         :band => myStelle['band_uid'],
         :bandseite => myStelle['bandseite'],
@@ -704,58 +795,17 @@ class Formular < ActiveRecord::Base
   end
 
 
+  # per callback aufgerufen
   def find_or_create_literatur
 
-    literatur_beschreibung_hash = {
-        1 => 'Bedier, in: GM 162, 1998',
-        2 => 'Budde/Kurth, in: EB 4, 1994',
-        3 => 'Labrique, Stylistique',
-        4 => 'Aufrère, L’univers minéral I',
-        5 => 'Aufrère, L’univers minéral II'
-    }
-
-    formular_literatur_relation_hash = {
-        1 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        2 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        3 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        4 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
-        5 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        6 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
-              {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        7 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        8 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        9 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        10 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        11 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        12 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        13 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        14 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        15 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        16 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
-    }
-
-    # todo nicht besser fond_or_crate_by
+    # todo nicht besser find_or_crate_by
     if arr = formular_literatur_relation_hash[self[:uid].to_i]
       arr.each { |hash|
-        lit = Literatur.find_or_create_by(
-             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
-             detail: hash['detail'],
-         )
-         self.literaturen << lit unless self.literaturen.include? lit
-
-        self.literaturen.build(
+        lit = Literatur.build(
             beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
             detail: hash['detail'],
         )
+        self.literaturen << lit unless self.literaturen.include? lit
 
       }
     end

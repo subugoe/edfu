@@ -36,6 +36,19 @@ class Wbberlin < ActiveRecord::Base
 
   end
 
+  def to_solr_string
+    return {
+        :sql_uid => self.id,
+        :band => self[:band].to_i,
+        :seite_start => self[:seite_start].to_i,
+        :seite_stop => self[:seite_stop].to_i,
+        :zeile_start => self[:zeile_start].to_i,
+        :zeile_stop => self[:zeile_stop].to_i,
+        :typ => 'wb_berlin',
+        :id => "wb_berlin-#{self.id}"
+    }
+  end
+
 
   private
 
@@ -44,18 +57,7 @@ class Wbberlin < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (
-                 {
-                     :sql_uid => self.id,
-                     :band => self[:band].to_i,
-                     :seite_start => self[:seite_start].to_i,
-                     :seite_stop => self[:seite_stop].to_i,
-                     :zeile_start => self[:zeile_start].to_i,
-                     :zeile_stop => self[:zeile_stop].to_i,
-                     :typ => 'wb_berlin',
-                     :id => "wb_berlin-#{self.id}"
-                 }
-             )
+    solr.add (to_solr_string)
     solr.commit
   end
 

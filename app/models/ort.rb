@@ -18,7 +18,6 @@ class Ort < ActiveRecord::Base
   before_validation :check_data
 
 
-
   def transliteration_nosuffix
     return self.transliteration
   end
@@ -26,6 +25,39 @@ class Ort < ActiveRecord::Base
   def transliteration_nosuffix= tn
     self.transliteration= tn
   end
+
+  def to_solr_string
+    return {
+        :sql_uid => self[:uid],
+        #:sort => "#{self[:transliteration]}--#{self.stellen.first.start }", # --- todo
+
+        :transliteration => self[:transliteration], # ---
+
+        :transliteration_nosuffix => self[:transliteration], # ---
+        :ort => self[:ort], # ---
+        :lokalisation => self[:lokalisation], # ---
+        :anmerkung => self[:anmerkung], # ---
+
+        :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
+        :band => self.stellen.collect { |stelle| stelle.band }, # ---
+        :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
+        :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
+
+        :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
+        :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
+        :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
+        :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+
+        :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
+        :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
+        :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
+        :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+
+        :typ => 'ort', # ---
+        :id => "ort-#{self[:uid]}" # ---
+    }
+  end
+
 
   private
 
@@ -40,37 +72,7 @@ class Ort < ActiveRecord::Base
 
     # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (
-                 {
-                     :sql_uid => self[:uid],
-                     #:sort => "#{self[:transliteration]}--#{self.stellen.first.start }", # --- todo
-
-                     :transliteration => self[:transliteration], # ---
-
-                     :transliteration_nosuffix => self[:transliteration], # ---
-                     :ort => self[:ort], # ---
-                     :lokalisation => self[:lokalisation], # ---
-                     :anmerkung => self[:anmerkung], # ---
-
-                     :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
-                     :band => self.stellen.collect { |stelle| stelle.band }, # ---
-                     :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
-                     :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
-
-                     :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
-                     :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
-                     :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
-                     :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
-
-                     :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
-                     :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
-                     :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-                     :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
-
-                     :typ => 'ort', # ---
-                     :id => "ort-#{self[:uid]}" # ---
-                 }
-             )
+    solr.add (to_solr_string)
     solr.commit
   end
 
@@ -142,7 +144,7 @@ class Ort < ActiveRecord::Base
       self.iStelle = ''
     elsif self.iStelle == 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([]; wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
       # 619
-      self.iStelle=  'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
+      self.iStelle= 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
     elsif self.iStelle == 'VIII, 5, 11; (vergleiche auch 8, 9; V, 95, 12 ([]); 324, 5;'
       # 628
       self.iStelle= 'VIII, 5, 11 (vergleiche auch 8, 9); V, 95, 12 ([]); 324, 5'
@@ -224,7 +226,7 @@ class Ort < ActiveRecord::Base
             zeileStart = (m3[3].split(' - ')[0]).to_i
 
             begin
-            zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
+              zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
             rescue NoMethodError
               logger.debug "\t[DEBUG]  [OL] uid: #{self[:uid]}, Bandseitezeile: #{self[:bandseitezeile]}, Teil: #{teil}"
             end
