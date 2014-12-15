@@ -3,10 +3,10 @@
 require 'edfu_model_helper'
 require 'edfu_numerics_conversion_helper'
 require 'rsolr'
-
+#require 'celluloid/autostart'
 
 class Gott < ActiveRecord::Base
-  include EdfuNumericsConversionHelper
+  include EdfuNumericsConversionHelper # , Celluloid
   extend EdfuModelHelper
 
   # todo has_many or has_one?
@@ -184,6 +184,8 @@ class Gott < ActiveRecord::Base
       self[:seitezeile] = '018, 009'
     elsif self[:uid] == 9165
       self[:band] = 'V' # '5'
+    elsif self[:uid] == 7740
+      self[:band] = 'VII' # 'VIi'
     end
 
     # myGott = {
@@ -295,7 +297,7 @@ class Gott < ActiveRecord::Base
             end
           end
 
-          @band = roemisch_nach_dezimal(self[:band]).to_i
+          @band = roemisch_nach_dezimal(self[:band].strip).to_i
           #band = (self[:band]).to_i
 
           if startSeite > 0 and @band > 0

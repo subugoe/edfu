@@ -2,7 +2,7 @@
 
 require 'rsolr'
 
-class WbBerlin < ActiveRecord::Base
+class Wbberlin < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 

@@ -3,12 +3,13 @@
 require 'edfu_model_helper'
 require 'edfu_numerics_conversion_helper'
 require 'rsolr'
+#require 'celluloid/autostart'
 
 class Wort < ActiveRecord::Base
-  include EdfuNumericsConversionHelper
+  include EdfuNumericsConversionHelper #, Celluloid
   extend EdfuModelHelper
 
-  belongs_to :wb_berlin
+  belongs_to :wbberlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   after_commit :add_to_solr
@@ -51,14 +52,14 @@ class Wort < ActiveRecord::Base
                      :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
                      :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
 
-                     #:sort => "Ddt--#{self.wb_berlin.sort}", # ---  todo
-                     :berlin_display => self.wb_berlin.berlin_display, # ---
-                     :berlin_band => self.wb_berlin.band.to_i, # ---
-                     :berlin_seite_start => self.wb_berlin.seite_start.to_i, # ---
-                     :berlin_seite_stop => self.wb_berlin.seite_stop.to_i, # ---
-                     :berlin_zeile_start => self.wb_berlin.zeile_start.to_i, # ---
-                     :berlin_zeile_stop => self.wb_berlin.zeile_stop.to_i, # ---
-                     :stelle_berlin_id => self.wb_berlin.id,
+                     #:sort => "Ddt--#{self.wbberlin.sort}", # ---  todo
+                     :berlin_display => self.wbberlin.berlin_display, # ---
+                     :berlin_band => self.wbberlin.band.to_i, # ---
+                     :berlin_seite_start => self.wbberlin.seite_start.to_i, # ---
+                     :berlin_seite_stop => self.wbberlin.seite_stop.to_i, # ---
+                     :berlin_zeile_start => self.wbberlin.zeile_start.to_i, # ---
+                     :berlin_zeile_stop => self.wbberlin.zeile_stop.to_i, # ---
+                     :stelle_berlin_id => self.wbberlin.id,
 
                      :typ => 'wort',
                      :id => "wort-#{self[:uid]}"
@@ -346,7 +347,7 @@ class Wort < ActiveRecord::Base
     # unless bereitsVorhanden
 
 
-    dbWB = WbBerlin.create(
+    dbWB = Wbberlin.create(
         :band => wbBand || 'unbekannt',
         :seite_start => wbStart[0] || '',
         :seite_stop => wbStop[0] || '',
@@ -354,7 +355,7 @@ class Wort < ActiveRecord::Base
         :zeile_stop => wbStop[1] || '',
         :notiz => wbAnmerkung || ''
     )
-    self.wb_berlin = dbWB # unless self.wb_berlin == dbWB
+    self.wbberlin = dbWB # unless self.wb_berlin == dbWB
 
     #end
 
@@ -368,6 +369,7 @@ class Wort < ActiveRecord::Base
       else
         self[:anmerkung] = "#{edfuAnmerkung.strip()}; #{self[:anmerkung].strip() || ''}"
       end
+
     else
       self[:anmerkung] = "#{self[:anmerkung].strip() || ''}"
     end

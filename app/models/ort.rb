@@ -3,9 +3,10 @@
 require 'edfu_model_helper'
 require 'edfu_numerics_conversion_helper'
 require 'rsolr'
+# require 'celluloid/autostart'
 
 class Ort < ActiveRecord::Base
-  include EdfuNumericsConversionHelper
+  include EdfuNumericsConversionHelper # , Celluloid
   extend EdfuModelHelper
 
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all

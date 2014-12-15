@@ -1,10 +1,10 @@
-<%= form_for(@wb_berlin) do |f| %>
-  <% if @wb_berlin.errors.any? %>
+<%= form_for(@wbberlin) do |f| %>
+  <% if @wbberlin.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@wb_berlin.errors.count, "error") %> prohibited this wb_berlin from being saved:</h2>
+      <h2><%= pluralize(@wbberlin.errors.count, "error") %> prohibited this wbberlin from being saved:</h2>
 
       <ul>
-      <% @wb_berlin.errors.full_messages.each do |message| %>
+      <% @wbberlin.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>

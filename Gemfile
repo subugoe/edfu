@@ -56,8 +56,8 @@ gem 'bootstrap_form'
 
 gem 'jquery-datatables-rails', '~> 3.1.0'
 
-
-
+# support for cuncurrent processing
+gem 'celluloid'
 
 
 # gems required by Heroku

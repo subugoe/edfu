@@ -2,7 +2,9 @@ require 'roo'
 require 'securerandom'
 require 'benchmark'
 
+
 class UploadsController < ApplicationController
+
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -95,11 +97,11 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    # prepareDB
-    # process_formular
-    # process_ort
-    # process_gott
-    # process_wort
+    prepareDB
+    process_formular
+    process_ort
+    process_gott
+    process_wort
 
   end
 
@@ -113,7 +115,7 @@ class UploadsController < ApplicationController
         Gott.destroy_all
         Ort.destroy_all
         Wort.destroy_all
-        WbBerlin.destroy_all
+        Wbberlin.destroy_all
       }
 
       #--- solr
@@ -160,7 +162,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          # break if i>1000
+          break if i>15
 
           # if SzeneID doesn't exist
           if row[7] != nil and row[7] != ''
@@ -177,6 +179,7 @@ class UploadsController < ApplicationController
             uID = SecureRandom.random_number(100000000)
           end
 
+          #puts  "formular uid: #{uID}"
 
           #formulare_batch << Formular.new(
           f = Formular.create(
@@ -187,7 +190,10 @@ class UploadsController < ApplicationController
                   transliteration_nosuffix: row[3] || '',
                   uebersetzung: row[4] || '',
                   texttyp: row[5] || '',
-                  iphoto: row[6] || '',
+                  iphoto: row[6].to_s || '',
+                  #photo_pfad: '',
+                  #photo_kommentar: '',
+                  # szeneID changed to string from integer
                   szeneID: szID, # row[7] != '', # Integer(row[7]) || -1,
                   iliteratur: row[8] || '',
                   uid: uID
@@ -233,7 +239,9 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i==15
+          break if i==15
+
+          #puts  "topo uid: #{Integer(row[5])}"
 
           Ort.create(
 
@@ -276,7 +284,9 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i==15
+          break if i==15
+
+          #puts  "god uid: #{Integer(row[9])}"
 
           Gott.create(
 
@@ -331,7 +341,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i==15
+          break if i==15
 
 
           if row[2] != nil and row[2] != ''
@@ -350,7 +360,9 @@ class UploadsController < ApplicationController
             uid = i-1
           end
 
-          uid changed to string from integer
+          #puts  "word uid: #{uid}"
+
+          #uid changed to string from integer
           Wort.create(
 
               uid: uid,
@@ -367,7 +379,7 @@ class UploadsController < ApplicationController
           )
 
 
-          logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
+          # logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
 
 
           i += 1

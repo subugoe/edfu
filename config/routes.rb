@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   resources :stellen
 
-  resources :wb_berlins
+  resources :wbsberlin
 
   resources :worte
 

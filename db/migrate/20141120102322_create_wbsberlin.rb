@@ -1,6 +1,6 @@
-class CreateWbBerlins < ActiveRecord::Migration
+class CreateWbsberlin < ActiveRecord::Migration
   def change
-    create_table :wb_berlins do |t|
+    create_table :wbsberlin do |t|
       # t.string :uid
       t.string :band
       t.string :seite_start

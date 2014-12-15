@@ -20,7 +20,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'Stelle', 'Stellen'
   inflect.irregular 'Gott', 'Goetter'
   inflect.irregular 'Ort', 'Orte'
-  inflect.irregular 'WbBerlin', 'WbsBerlin'
+  inflect.irregular 'Wbberlin', 'Wbsberlin'
   inflect.irregular 'Wort', 'Worte'
   inflect.irregular 'Szene', 'Szenen'
   inflect.irregular 'Photo', 'Photos'

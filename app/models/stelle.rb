@@ -3,6 +3,7 @@
 require 'rsolr'
 require 'edfu_model_helper'
 require 'edfu_numerics_conversion_helper'
+require 'celluloid/autostart'
 
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper

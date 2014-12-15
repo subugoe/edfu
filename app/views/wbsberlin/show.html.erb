@@ -1,0 +1,40 @@
+<h1>WB_Berlin</h1>
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Id:</strong>
+  <%= @wbberlin.id %>
+</p>
+
+<p>
+  <strong>Band:</strong>
+  <%= @wbberlin.band %>
+</p>
+
+<p>
+  <strong>Seite start:</strong>
+  <%= @wbberlin.seite_start %>
+</p>
+
+<p>
+  <strong>Seite stop:</strong>
+  <%= @wbberlin.seite_stop %>
+</p>
+
+<p>
+  <strong>Zeile start:</strong>
+  <%= @wbberlin.zeile_start %>
+</p>
+
+<p>
+  <strong>Zeile stop:</strong>
+  <%= @wbberlin.zeile_stop %>
+</p>
+
+<p>
+  <strong>Wort:</strong>
+  <%= link_to "wort-#{@wbberlin.wort.uid}", @wbberlin.wort %>
+</p>
+
+<%= link_to 'Zurück zur Liste', wbsberlin_path %>

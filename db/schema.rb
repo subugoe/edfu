@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 20141209145651) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
-  create_table "wb_berlins", force: true do |t|
+  create_table "wbsberlin", force: true do |t|
     t.string   "band"
     t.string   "seite_start"
     t.string   "seite_stop"
@@ -191,11 +191,11 @@ ActiveRecord::Schema.define(version: 20141209145651) do
     t.string   "belegstellenEdfu"
     t.string   "belegstellenWb"
     t.string   "anmerkung"
-    t.integer  "wb_berlin_id"
+    t.integer  "wbberlin_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "worte", ["wb_berlin_id"], name: "index_worte_on_wb_berlin_id"
+  add_index "worte", ["wbberlin_id"], name: "index_worte_on_wbberlin_id"
 
 end
