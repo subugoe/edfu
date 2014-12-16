@@ -14,7 +14,7 @@ class Gott < ActiveRecord::Base
 
   attr_accessor :transliteration_nosuffix
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
   #before_validation :check_data
 
 

@@ -106,9 +106,9 @@ class UploadsController < ApplicationController
     deleteDB
 
     #process_formular
-    #process_ort
+    process_ort
     #process_gott
-    process_wort
+    #process_wort
 
     updateSolr
 
@@ -142,8 +142,23 @@ class UploadsController < ApplicationController
         solr.update :data => '<commit/>'
       }
 
+
       x.report("add to solr:") {
-        add_to_solr(@word_solr_batch)
+#        add_to_solr(@word_solr_batch)
+      }
+      x.report("add to solr:") {
+        add_to_solr(@gott_solr_batch)
+      }
+      x.report("add to solr:") {
+ #       add_to_solr(@ort_solr_batch)
+      }
+      x.report("add to solr:") {
+  #      add_to_solr(@formular_solr_batch)
+      }
+
+      # todo: was ist schneller? zuvor, oder so?
+      x.report("add to solr:") {
+   #     add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
       }
 
     end
@@ -317,10 +332,12 @@ class UploadsController < ApplicationController
     logger.debug "\t[DEBUG]  [UploadController] Processing gods table"
 
     excel = Roo::Excel.new("public/uploads/Gods.xls")
-
     excel.default_sheet = excel.sheets.first
-
     i = 1
+
+    @gott_solr_batch = Array.new
+
+
     Benchmark.bm(7) do |x|
       x.report("create all gods:") {
         excel.each do |row|
@@ -340,7 +357,7 @@ class UploadsController < ApplicationController
           seitezeile = row[7] || ''
           band = row[6] || ''
 
-          g = Gott.create(
+          g = Gott.new(
 
               uid: uid,
               transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
@@ -357,6 +374,10 @@ class UploadsController < ApplicationController
 
           manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
 
+          g.save
+
+          @gott_solr_batch << g.to_solr_string
+          @gott_solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
 
           i += 1
         end
@@ -370,22 +391,15 @@ class UploadsController < ApplicationController
     logger.debug "\t[DEBUG]  [UploadController] Processing word table"
 
     excel = Roo::Excel.new("public/uploads/WL.xls")
-
     excel.default_sheet = excel.sheets.first
-
     i = 1
     uniqueId = false
 
     @word_solr_batch = Array.new
 
-    wort_batch = Array.new
-    stellen_batch = Array.new
-    wbberlin_batch = Array.new
-
     Benchmark.bm(7) do |x|
       x.report("create all words:") {
         excel.each do |row|
-
 
           # ignore the header
           if i==1
@@ -399,10 +413,6 @@ class UploadsController < ApplicationController
             next
 
           end
-
-          # todo replace this
-          #break if i==15
-
 
           if row[2] != nil and row[2] != ''
             begin
@@ -420,24 +430,8 @@ class UploadsController < ApplicationController
             uid = i-1
           end
 
-          #puts  "word uid: #{uid}"
-
           belegstellenEdfu = row[4] || ''
           belegstellenWb = row[5] || ''
-
-          #uid changed to string from integer
-          # w = Wort.create(
-          #     uid: uid,
-          #     transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
-          #     transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
-          #     uebersetzung: row[1] || '',
-          #     # hieroglyph changed to string from integer
-          #     hieroglyph: hierogl || '',
-          #     weiteres: row[3] || '',
-          #     belegstellenEdfu: belegstellenEdfu, # todo in was indexiert? stelle_id?
-          #     belegstellenWb: belegstellenWb, # todo in was indexiert? stelle_berlin_id?
-          #     anmerkung: row[6] || ''
-          # )
 
           w = Wort.new
           w.uid = uid
@@ -451,48 +445,17 @@ class UploadsController < ApplicationController
           w.belegstellenWb = belegstellenWb # todo in was indexiert? stelle_berlin_id?
           w.anmerkung = row[6] || ''
 
-
-          #wort_batch << w
-
-
-
-          #result = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
           manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
 
           w.save
-
-          # stellen_batch += result[0]
-          # wbberlin_batch << result[1]
 
           @word_solr_batch << w.to_solr_string
           @word_solr_batch << w.wbberlin.to_solr_string
           @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
 
-          # logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
-
-
           i += 1
         end
-
-        # x.report("import wort batch:") {
-        #   #Wort.import wort_batch
-        # }
-
-        # x.report("import wbberlin batch:") {
-        #   Wbberlin.import wbberlin_batch
-        # }
-        #
-        # x.report("import stellen batch:") {
-        #   Stelle.import stellen_batch
-        # }
-
-
-
-
       }
     end
   end
-
-
-
 end

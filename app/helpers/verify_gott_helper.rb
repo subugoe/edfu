@@ -119,17 +119,6 @@ module VerifyGottHelper
       band = 'VII' # 'VIi'
     end
 
-    # myGott = {
-    #     'uid' => uid,
-    #     #'id' => uid,
-    #     'transliteration' => self[:transliteration],
-    #     'ort' => self[:ort],
-    #     'eponym' => self[:eponym],
-    #     'beziehung' => self[:beziehung],
-    #     'funktion' => self[:funktion],
-    #     'anmerkung' => self[:anmerkung]
-    # }
-    # gott += [myGott]
 
     # gelegentlich ist der Inhalt doppelt vorhanden
 
@@ -234,38 +223,23 @@ module VerifyGottHelper
 
           if startSeite > 0 and dezimal_band > 0
 
-            # myStelle = {
-            #     # todo prüfen uid = stellenlönge ?
-            #     'uid' => stelle.length,
-            #     'band_uid' => band,
-            #     'seite_start' => startSeite,
-            #     'seite_stop' => stopSeite,
-            #     'zeile_start' => startZeile,
-            #     'zeile_stop' => stopZeile,
-            #     'stop_unsicher' => stopUnsicher,
-            #     'zerstoerung' => false,
-            #     'anmerkung' => stelleAnmerkung
-            # }
-            # stelle += [myStelle]
-
-
-
             # todo extract to module
-            stelle = Stelle.create(
-                :tempel => 'Edfu',
-                :band => dezimal_band,
-                :bandseite => "#{band}, #{'%03i' % (startSeite)}",
-                :bandseitezeile => "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}",
-                :seite_start => startSeite,
-                :seite_stop => stopSeite,
-                :zeile_start => startZeile,
-                :zeile_stop => stopZeile,
-                :stelle_anmerkung => stelleAnmerkung,
-                :stelle_unsicher => stopUnsicher,
-                :zerstoerung => false,
-                :freigegeben => bandDict[dezimal_band]['freigegeben'],
-                :zugehoerigZu => gott
-            )
+            stelle = Stelle.new
+            stelle.tempel = 'Edfu'
+            stelle.band = dezimal_band
+            stelle.bandseite = "#{band}, #{'%03i' % (startSeite)}"
+            stelle.bandseitezeile = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
+            stelle.seite_start = startSeite
+            stelle.seite_stop = stopSeite
+            stelle.zeile_start = startZeile
+            stelle.zeile_stop = stopZeile
+            stelle.stelle_anmerkung = stelleAnmerkung
+            stelle.stelle_unsicher = stopUnsicher
+            stelle.zerstoerung = false
+            stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
+            #stelle.zugehoerigZu = gott
+            gott.stellen << stelle
+
             #self.stellen << stelle unless self.stellen.include? stelle
 
 
