@@ -33,9 +33,6 @@ module VerifyOrtHelper
     }
 
 
-    # ort = []
-    # stelle = []
-
     re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
     originalStelle = stelle
@@ -163,21 +160,22 @@ module VerifyOrtHelper
 
           end
 
-          stelle = Stelle.create(
-              :tempel => 'Edfu',
-              :band => bandNr,
-              :bandseite => "#{myBand}, #{'%03i' % (seiteStart)}",
-              :bandseitezeile => "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}",
-              :seite_start => seiteStart,
-              :seite_stop => seiteStop,
-              :zeile_start => zeileStart,
-              :zeile_stop => zeileStop,
-              :stelle_anmerkung => kommentar,
-              :stelle_unsicher => false,
-              :zerstoerung => false,
-              :freigegeben => bandDict[(bandNr).to_i]['freigegeben'],
-              :zugehoerigZu => ort
-          )
+          stelle = Stelle.new
+          stelle.tempel = 'Edfu'
+          stelle.band = bandNr
+          stelle.bandseite = "#{myBand}, #{'%03i' % (seiteStart)}"
+          stelle.bandseitezeile = "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
+          stelle.seite_start = seiteStart
+          stelle.seite_stop = seiteStop
+          stelle.zeile_start = zeileStart
+          stelle.zeile_stop = zeileStop
+          stelle.stelle_anmerkung = kommentar
+          stelle.stelle_unsicher = false
+          stelle.zerstoerung = false
+          stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
+          #stelle.zugehoerigZu = ort
+          ort.stellen << stelle
+
           #self.stellen << stelle unless self.stellen.include? stelle
 
           if zeileStart > 30
@@ -193,9 +191,6 @@ module VerifyOrtHelper
 
         end
       end
-
     end
   end
-
-
 end

@@ -147,10 +147,10 @@ class UploadsController < ApplicationController
 #        add_to_solr(@word_solr_batch)
       }
       x.report("add to solr:") {
-        add_to_solr(@gott_solr_batch)
+       # add_to_solr(@gott_solr_batch)
       }
       x.report("add to solr:") {
- #       add_to_solr(@ort_solr_batch)
+        add_to_solr(@ort_solr_batch)
       }
       x.report("add to solr:") {
   #      add_to_solr(@formular_solr_batch)
@@ -278,14 +278,12 @@ class UploadsController < ApplicationController
 
     logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
 
-    stellen = Array.new
-
     # todo replace this with uploaded file
     excel = Roo::Excel.new("public/uploads/Topo.xls")
-
     excel.default_sheet = excel.sheets.first
-
     i = 1
+
+    @ort_solr_batch = Array.new
 
     Benchmark.bm(7) do |x|
       x.report("create all topos:") {
@@ -297,15 +295,10 @@ class UploadsController < ApplicationController
             next
           end
 
-          # todo replace this
-          #break if i==15
-
-          #puts  "topo uid: #{Integer(row[5])}"
-
           iStelle = row[0] || ''
           uid = Integer(row[5]) || ''
 
-          o = Ort.create(
+          o = Ort.new(
 
               # changed to string from integer
               uid: uid,
@@ -319,6 +312,12 @@ class UploadsController < ApplicationController
           )
 
           manipulate_stelle_string_and_create(iStelle, uid, o)
+
+          o.save
+
+          @ort_solr_batch << o.to_solr_string
+          @ort_solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
+
 
           i += 1
         end
