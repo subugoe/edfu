@@ -12,7 +12,7 @@ class Ort < ActiveRecord::Base
   # imported Stelle (is equivalent to bandseitezeile)
   #attr_accessor :iStelle # , :transliteration_nosuffix
 
-  #after_commit :add_to_solr
+  after_commit :add_to_solr
   #before_validation :check_data
 
 

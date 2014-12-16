@@ -13,7 +13,7 @@ class Wort < ActiveRecord::Base
   #belongs_to :wbberlin
 
 
-  #after_commit :add_to_solr
+  after_commit :add_to_solr
   #before_validation :check_data
 
   def to_solr_string

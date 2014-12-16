@@ -104,10 +104,10 @@ class UploadsController < ApplicationController
   def process_files
 
     prepareDB
-    process_formular
+    #process_formular
     #process_ort
     #process_gott
-    #process_wort
+    process_wort
 
   end
 
@@ -117,9 +117,9 @@ class UploadsController < ApplicationController
       #--- DB
 
       x.report("delete data from db:") {
-        Formular.destroy_all
-        Gott.destroy_all
-        Ort.destroy_all
+        #Formular.destroy_all
+        #Gott.destroy_all
+        #Ort.destroy_all
         Wort.destroy_all
         Wbberlin.destroy_all
       }
