@@ -103,7 +103,8 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    prepareDB
+    deleteDB
+    deleteSolr
     #process_formular
     #process_ort
     #process_gott
@@ -111,20 +112,27 @@ class UploadsController < ApplicationController
 
   end
 
-  def prepareDB
+  def deleteDB
     Benchmark.bm(7) do |x|
 
-      #--- DB
-
       x.report("delete data from db:") {
-        #Formular.destroy_all
-        #Gott.destroy_all
-        #Ort.destroy_all
-        Wort.destroy_all
-        Wbberlin.destroy_all
-      }
+        Formular.delete_all
+        FormulareLiteraturen.delete_all
+        FormularePhotos.delete_all
+        Gott.delete_all
+        Literatur.delete_all
+        Ort.delete_all
+        Photo.delete_all
+        Stelle.delete_all
+        Wort.delete_all
+        Wbberlin.delete_all
 
-      #--- solr
+      }
+    end
+  end
+
+  def deleteSolr
+    Benchmark.bm(7) do |x|
 
       x.report("delete solr docs:") {
         solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
@@ -221,7 +229,7 @@ class UploadsController < ApplicationController
           manipulate_photo_string_and_create(photo, uID, f)
           create_literaturen(uID, f)
           create_stellen(seitezeile, band, uID, f)
-                                # ... }
+          # ... }
 
           i += 1
         end
@@ -318,7 +326,7 @@ class UploadsController < ApplicationController
           seitezeile = row[7] || ''
           band = row[6] || ''
 
-          g  = Gott.create(
+          g = Gott.create(
 
               uid: uid,
               transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
@@ -353,6 +361,12 @@ class UploadsController < ApplicationController
 
     i = 1
     uniqueId = false
+
+    solr_string_batch = Array.new
+
+    wort_batch = Array.new
+    stellen_batch = Array.new
+    wbberlin_batch = Array.new
 
     Benchmark.bm(7) do |x|
       x.report("create all words:") {
@@ -398,29 +412,77 @@ class UploadsController < ApplicationController
           belegstellenWb = row[5] || ''
 
           #uid changed to string from integer
-          w = Wort.create(
-              uid: uid,
-              transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
-              transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
-              uebersetzung: row[1] || '',
-              # hieroglyph changed to string from integer
-              hieroglyph: hierogl || '',
-              weiteres: row[3] || '',
-              belegstellenEdfu: belegstellenEdfu, # todo in was indexiert? stelle_id?
-              belegstellenWb: belegstellenWb, # todo in was indexiert? stelle_berlin_id?
-              anmerkung: row[6] || ''
-          )
+          # w = Wort.create(
+          #     uid: uid,
+          #     transliteration: row[0] || '', # todo transliteration_highlight hinzufügen
+          #     transliteration_nosuffix: row[0] || '', # todo identisch mit transliteration ?
+          #     uebersetzung: row[1] || '',
+          #     # hieroglyph changed to string from integer
+          #     hieroglyph: hierogl || '',
+          #     weiteres: row[3] || '',
+          #     belegstellenEdfu: belegstellenEdfu, # todo in was indexiert? stelle_id?
+          #     belegstellenWb: belegstellenWb, # todo in was indexiert? stelle_berlin_id?
+          #     anmerkung: row[6] || ''
+          # )
 
-          manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
+          w = Wort.new
+          w.uid = uid
+          w.transliteration = row[0] || '' # todo transliteration_highlight hinzufügen
+          w.transliteration_nosuffix = row[0] || '' # todo identisch mit transliteration ?
+          w.uebersetzung = row[1] || ''
+          # hieroglyph changed to string from integer
+          w.hieroglyph = hierogl || ''
+          w.weiteres = row[3] || ''
+          w.belegstellenEdfu = belegstellenEdfu # todo in was indexiert? stelle_id?
+          w.belegstellenWb = belegstellenWb # todo in was indexiert? stelle_berlin_id?
+          w.anmerkung = row[6] || ''
 
+
+          wort_batch << w
+
+          result = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
+
+
+          # stellen_batch += result[0]
+          # wbberlin_batch << result[1]
+
+          solr_string_batch << w.to_solr_string
+          solr_string_batch << w.wbberlin.to_solr_string
+          solr_string_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
 
           # logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
 
 
           i += 1
         end
+
+        x.report("import wort batch:") {
+          #Wort.import wort_batch
+        }
+
+        # x.report("import wbberlin batch:") {
+        #   Wbberlin.import wbberlin_batch
+        # }
+        #
+        # x.report("import stellen batch:") {
+        #   Stelle.import stellen_batch
+        # }
+
+        x.report("add to solr:") {
+          add_to_solr(solr_string_batch)
+        }
+
+
       }
     end
+  end
+
+  def add_to_solr(solr_string_array)
+
+    # todo extract
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr.add (solr_string_array)
+    solr.commit
   end
 
 end

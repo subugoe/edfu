@@ -11,7 +11,7 @@ class Stelle < ActiveRecord::Base
 
   belongs_to :zugehoerigZu, polymorphic: true
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
 
 
   def start

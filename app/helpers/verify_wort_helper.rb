@@ -5,12 +5,15 @@ require 'edfu_numerics_conversion_helper'
 module VerifyWortHelper
   include EdfuNumericsConversionHelper
 
-
+  #attr_accessor :dbWB, :stellen
 
   private
 
 
   def manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, wort)
+
+    stellen = Array.new
+
 
     # todo extract to module
     # Einträge für die 8 Chassinat Bände.
@@ -298,7 +301,19 @@ module VerifyWortHelper
         :notiz => wbAnmerkung || '',
         :wort => wort
     )
-    #self.wbberlin = dbWB # unless self.wb_berlin == dbWB
+
+
+    # dbWB = Wbberlin.new
+    # dbWB.band = wbBand || 'unbekannt'
+    # dbWB.seite_start = wbStart[0] || ''
+    # dbWB.seite_stop = wbStop[0] || ''
+    # dbWB.zeile_start = wbStart[1] || ''
+    # dbWB.zeile_stop = wbStop[1] || ''
+    # dbWB.notiz = wbAnmerkung || ''
+    # dbWB.wort = wort
+
+
+    #wort.wbberlin = dbWB
 
     #end
 
@@ -408,14 +423,32 @@ module VerifyWortHelper
               :zeile_stop => edfuZeileStop,
               :stelle_anmerkung => edfuAnmerkung,
               :stelle_unsicher => false,
-              # :start => "#{edfuBandNr}#{'%03i' % (edfuSeiteStart)}#{'%03i' % (edfuZeileStart)}",
-              # :stop => "#{edfuBandNr}#{'%03i' % (edfuSeiteStop)}#{'%03i' % (edfuZeileStop)}",
               :zerstoerung => false,
               :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben'],
-              :zugehoerigZu =>  wort
+              :zugehoerigZu => wort
           )
-          #self.stellen << stelle unless self.stellen.include? stelle
 
+
+          # stelle = Stelle.new
+          # stelle.tempel = 'Edfu'
+          # stelle.band = edfuBandNr
+          # stelle.bandseite = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
+          # stelle.bandseitezeile = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
+          # stelle.seite_start = edfuSeiteStart
+          # stelle.seite_stop = edfuSeiteStop
+          # stelle.zeile_start = edfuZeileStart
+          # stelle.zeile_stop = edfuZeileStop
+          # stelle.stelle_anmerkung = edfuAnmerkung
+          # stelle.stelle_unsicher = false
+          # stelle.zerstoerung = false
+          # stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
+          # stelle.zugehoerigZu = wort
+
+          #wort.stellen << dbWB
+
+
+
+          #stellen << stelle
 
           if edfuZeileStart == nil
             logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_start == nil; #{b}"
@@ -435,6 +468,9 @@ module VerifyWortHelper
         end
       }
     end
+
+
+    #return stellen, dbWB
   end
 
   def szSplit(s)
