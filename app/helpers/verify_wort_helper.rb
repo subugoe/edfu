@@ -292,25 +292,25 @@ module VerifyWortHelper
     # unless bereitsVorhanden
 
 
-    dbWB = Wbberlin.create(
-        :band => wbBand || 'unbekannt',
-        :seite_start => wbStart[0] || '',
-        :seite_stop => wbStop[0] || '',
-        :zeile_start => wbStart[1] || '',
-        :zeile_stop => wbStop[1] || '',
-        :notiz => wbAnmerkung || '',
-        :wort => wort
-    )
+    # dbWB = Wbberlin.create(
+    #     :band => wbBand || 'unbekannt',
+    #     :seite_start => wbStart[0] || '',
+    #     :seite_stop => wbStop[0] || '',
+    #     :zeile_start => wbStart[1] || '',
+    #     :zeile_stop => wbStop[1] || '',
+    #     :notiz => wbAnmerkung || '',
+    #     :wort => wort
+    # )
 
 
-    # dbWB = Wbberlin.new
-    # dbWB.band = wbBand || 'unbekannt'
-    # dbWB.seite_start = wbStart[0] || ''
-    # dbWB.seite_stop = wbStop[0] || ''
-    # dbWB.zeile_start = wbStart[1] || ''
-    # dbWB.zeile_stop = wbStop[1] || ''
-    # dbWB.notiz = wbAnmerkung || ''
-    # dbWB.wort = wort
+    dbWB = Wbberlin.new
+    dbWB.band = wbBand || 'unbekannt'
+    dbWB.seite_start = wbStart[0] || ''
+    dbWB.seite_stop = wbStop[0] || ''
+    dbWB.zeile_start = wbStart[1] || ''
+    dbWB.zeile_stop = wbStop[1] || ''
+    dbWB.notiz = wbAnmerkung || ''
+    dbWB.wort = wort
 
 
     #wort.wbberlin = dbWB
@@ -412,39 +412,38 @@ module VerifyWortHelper
           end
 
           # todo nicht korrekt
-          stelle = Stelle.create(
-              :tempel => 'Edfu',
-              :band => edfuBandNr,
-              :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
-              :bandseitezeile => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
-              :seite_start => edfuSeiteStart,
-              :seite_stop => edfuSeiteStop,
-              :zeile_start => edfuZeileStart,
-              :zeile_stop => edfuZeileStop,
-              :stelle_anmerkung => edfuAnmerkung,
-              :stelle_unsicher => false,
-              :zerstoerung => false,
-              :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben'],
-              :zugehoerigZu => wort
-          )
+          # stelle = Stelle.create(
+          #     :tempel => 'Edfu',
+          #     :band => edfuBandNr,
+          #     :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
+          #     :bandseitezeile => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
+          #     :seite_start => edfuSeiteStart,
+          #     :seite_stop => edfuSeiteStop,
+          #     :zeile_start => edfuZeileStart,
+          #     :zeile_stop => edfuZeileStop,
+          #     :stelle_anmerkung => edfuAnmerkung,
+          #     :stelle_unsicher => false,
+          #     :zerstoerung => false,
+          #     :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben'],
+          #     :zugehoerigZu => wort
+          # )
 
 
-          # stelle = Stelle.new
-          # stelle.tempel = 'Edfu'
-          # stelle.band = edfuBandNr
-          # stelle.bandseite = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
-          # stelle.bandseitezeile = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
-          # stelle.seite_start = edfuSeiteStart
-          # stelle.seite_stop = edfuSeiteStop
-          # stelle.zeile_start = edfuZeileStart
-          # stelle.zeile_stop = edfuZeileStop
-          # stelle.stelle_anmerkung = edfuAnmerkung
-          # stelle.stelle_unsicher = false
-          # stelle.zerstoerung = false
-          # stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
-          # stelle.zugehoerigZu = wort
-
-          #wort.stellen << dbWB
+          stelle = Stelle.new
+          stelle.tempel = 'Edfu'
+          stelle.band = edfuBandNr
+          stelle.bandseite = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
+          stelle.bandseitezeile = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
+          stelle.seite_start = edfuSeiteStart
+          stelle.seite_stop = edfuSeiteStop
+          stelle.zeile_start = edfuZeileStart
+          stelle.zeile_stop = edfuZeileStop
+          stelle.stelle_anmerkung = edfuAnmerkung
+          stelle.stelle_unsicher = false
+          stelle.zerstoerung = false
+          stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
+          #stelle.zugehoerigZu = wort
+          wort.stellen << stelle
 
 
 

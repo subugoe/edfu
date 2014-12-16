@@ -104,11 +104,13 @@ class UploadsController < ApplicationController
   def process_files
 
     deleteDB
-    deleteSolr
+
     #process_formular
     #process_ort
     #process_gott
     process_wort
+
+    updateSolr
 
   end
 
@@ -131,7 +133,7 @@ class UploadsController < ApplicationController
     end
   end
 
-  def deleteSolr
+  def updateSolr
     Benchmark.bm(7) do |x|
 
       x.report("delete solr docs:") {
@@ -140,7 +142,19 @@ class UploadsController < ApplicationController
         solr.update :data => '<commit/>'
       }
 
+      x.report("add to solr:") {
+        add_to_solr(@word_solr_batch)
+      }
+
     end
+  end
+
+  def add_to_solr(solr_string_array)
+
+    # todo extract
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr.add (solr_string_array)
+    solr.commit
   end
 
   # todo move to Formular/Helper (Formular.xls)
@@ -362,7 +376,7 @@ class UploadsController < ApplicationController
     i = 1
     uniqueId = false
 
-    solr_string_batch = Array.new
+    @word_solr_batch = Array.new
 
     wort_batch = Array.new
     stellen_batch = Array.new
@@ -438,17 +452,21 @@ class UploadsController < ApplicationController
           w.anmerkung = row[6] || ''
 
 
-          wort_batch << w
+          #wort_batch << w
 
-          result = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
 
+
+          #result = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
+          manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
+
+          w.save
 
           # stellen_batch += result[0]
           # wbberlin_batch << result[1]
 
-          solr_string_batch << w.to_solr_string
-          solr_string_batch << w.wbberlin.to_solr_string
-          solr_string_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
+          @word_solr_batch << w.to_solr_string
+          @word_solr_batch << w.wbberlin.to_solr_string
+          @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
 
           # logger.error "\t[DEBUG]  [UploadController]  uid: #{uid}\n transliteration: #{row[0] || ''}\n transliteration_nosuffix: #{row[0] || ''}\n uebersetzung: #{row[1] || ''}\n hieroglyph: #{hierogl || ''}\n weiteres: #{row[3] || ''}\n belegstellenEdfu: #{row[4] || ''}\n belegstellenWb: #{row[5] || ''}\n anmerkung: #{row[6] || ''}"
 
@@ -456,9 +474,9 @@ class UploadsController < ApplicationController
           i += 1
         end
 
-        x.report("import wort batch:") {
-          #Wort.import wort_batch
-        }
+        # x.report("import wort batch:") {
+        #   #Wort.import wort_batch
+        # }
 
         # x.report("import wbberlin batch:") {
         #   Wbberlin.import wbberlin_batch
@@ -468,21 +486,13 @@ class UploadsController < ApplicationController
         #   Stelle.import stellen_batch
         # }
 
-        x.report("add to solr:") {
-          add_to_solr(solr_string_batch)
-        }
+
 
 
       }
     end
   end
 
-  def add_to_solr(solr_string_array)
 
-    # todo extract
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (solr_string_array)
-    solr.commit
-  end
 
 end
