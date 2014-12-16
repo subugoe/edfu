@@ -13,7 +13,7 @@ gem 'activerecord-jdbcsqlite3-adapter',  group: :development
 gem 'activerecord-jdbc-adapter'
 gem 'activerecord-jdbcpostgresql-adapter'
 gem 'jdbc-postgres'
-# gem 'sqlite3'
+gem 'jdbc-sqlite3'
 gem 'puma'
 
 # supports batchimport
