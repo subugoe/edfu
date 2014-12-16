@@ -105,10 +105,10 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    #process_formular
+    process_formular
     process_ort
-    #process_gott
-    #process_wort
+    process_gott
+    process_wort
 
     updateSolr
 
@@ -144,22 +144,22 @@ class UploadsController < ApplicationController
 
 
       x.report("add to solr:") {
-#        add_to_solr(@word_solr_batch)
+        add_to_solr(@word_solr_batch)
       }
       x.report("add to solr:") {
-       # add_to_solr(@gott_solr_batch)
+        add_to_solr(@gott_solr_batch)
       }
       x.report("add to solr:") {
         add_to_solr(@ort_solr_batch)
       }
       x.report("add to solr:") {
-  #      add_to_solr(@formular_solr_batch)
+        add_to_solr(@formular_solr_batch)
       }
 
       # todo: was ist schneller? zuvor, oder so?
-      x.report("add to solr:") {
-   #     add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
-      }
+      # x.report("add to solr:") {
+      #     add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
+      #}
 
     end
   end
@@ -176,31 +176,33 @@ class UploadsController < ApplicationController
   def process_formular
 
     logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
-
-    formulare_batch = Array.new()
-
-    literaturen = Array.new
-    literatur_batch = Array.new()
-    literatur_hash = Hash.new()
-
-
-    photos = Array.new
-    photo_batch = Array.new()
-
-    stellen = Array.new
-    stellen_batch = Array.new
+    #
+    # formulare_batch = Array.new()
+    #
+    # literaturen = Array.new
+    # literatur_batch = Array.new()
+    # literatur_hash = Hash.new()
+    #
+    #
+    # photos = Array.new
+    # photo_batch = Array.new()
+    #
+    # stellen = Array.new
+    # stellen_batch = Array.new
 
     #formulare_batch_size = 1000
 
     n = 50000
     i = 1
-    Benchmark.bm(7) do |x|
 
+    @formular_solr_batch = Array.new
+
+    Benchmark.bm(7) do |x|
 
       logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
-      file = Rails.root.join('public', 'uploads', 'Formular.xls')
-      excel = nil
+      # file = Rails.root.join('public', 'uploads', 'Formular.xls')
+      # excel = nil
 
 
       #excel = Roo::Excel.new(file.to_s)
@@ -215,9 +217,6 @@ class UploadsController < ApplicationController
             i += 1
             next
           end
-
-          # todo replace this
-          #break if i>15
 
           # if SzeneID doesn't exist
           if row[7] != nil and row[7] != ''
@@ -242,23 +241,30 @@ class UploadsController < ApplicationController
           band = Integer(row[1]) || -1
 
           # in batch und dann bulk ingest, nebenläufig ausführen
-          f = Formular.create (
-                                  {
-                                      uid: uID,
-                                      transliteration: row[0] || '',
-                                      band: band,
-                                      seitezeile: seitezeile,
-                                      transliteration_nosuffix: row[3] || '',
-                                      uebersetzung: check_uebersetzungs_string(uebersetzung, uID),
-                                      texttyp: row[5] || '',
-                                      szeneID: szID
-                                  }
-                              )
+          f = Formular.new (
+                               {
+                                   uid: uID,
+                                   transliteration: row[0] || '',
+                                   band: band,
+                                   seitezeile: seitezeile,
+                                   transliteration_nosuffix: row[3] || '',
+                                   uebersetzung: check_uebersetzungs_string(uebersetzung, uID),
+                                   texttyp: row[5] || '',
+                                   szeneID: szID
+                               }
+                           )
           # formulare.each ... {
+          create_stellen(seitezeile, band, uID, f)
           manipulate_photo_string_and_create(photo, uID, f)
           create_literaturen(uID, f)
-          create_stellen(seitezeile, band, uID, f)
+
           # ... }
+
+          f.save
+
+          @formular_solr_batch << f.to_solr_string
+          @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
+
 
           i += 1
         end

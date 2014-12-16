@@ -256,27 +256,23 @@ module VerifyFormularHelper
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
-    # todo create or find_or_create ???
-    stelle = Stelle.create(#.update_or_create(
-        :tempel => 'Edfu',
-        :band => band_uid,
-        :bandseite => bandseite,
-        :bandseitezeile => bandseitezeile,
-        :seite_start => seite_start,
-        :seite_stop => seite_stop,
-        :zeile_start => zeile_start,
-        :zeile_stop => zeile_stop,
-        :stelle_anmerkung => anmerkung,
-        :stelle_unsicher => stop_unsicher,
-        :zerstoerung => zerstoerung,
-        :freigegeben => freigegeben,
-        :zugehoerigZu => formular
-    )
 
-    #formular.stellen << stelle
+    stelle = Stelle.new
+    stelle.tempel = 'Edfu'
+    stelle.band = band_uid
+    stelle.bandseite = bandseite
+    stelle.bandseitezeile = bandseitezeile
+    stelle.seite_start = seite_start
+    stelle.seite_stop = seite_stop
+    stelle.zeile_start = zeile_start
+    stelle.zeile_stop = zeile_stop
+    stelle.stelle_anmerkung = anmerkung
+    stelle.stelle_unsicher = stop_unsicher
+    stelle.zerstoerung = zerstoerung
+    stelle.freigegeben = freigegeben
+    #stelle.zugehoerigZu = formular
+    formular.stellen << stelle
 
-
-    #return stelle # unless self.stellen.include? stelle
   end
 
 
@@ -623,14 +619,13 @@ module VerifyFormularHelper
         end
 
         # todo ggf. in array sammeln und als batch speichern
-        p = Photo.find_or_create_by(pfad: pfad) do  |photo|
-            photo.name = name
-            photo.typ = typ
-            #pfad: pfad
-            photo.kommentar = kommentar
+        p = Photo.find_or_create_by(pfad: pfad) do |photo|
+          photo.name = name
+          photo.typ = typ
+          #pfad: pfad
+          photo.kommentar = kommentar
         end
         formular.photos << p unless formular.photos.include? p
-        #photos << p # unless self.photos.include? p
 
       end
 
@@ -642,8 +637,6 @@ module VerifyFormularHelper
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
-
-    #return photos
 
   end
 
@@ -681,25 +674,4 @@ module VerifyFormularHelper
 
     return uebersetzung
   end
-
-# # für bulk-upload
-# # muss selbst aufgerufen werden
-# # nicht per callback (zur unterscheidlichen Behandlung von Bulk-Upload und normalem Upload)
-# # Objekte in Schleife per find_or_create_by in DB schreiben (sind nicht so viele), sonst ist
-# # ein bulk-upload für formular nicht möglich
-# def create_literaturen
-#
-#
-#   if literatur_description_arr = formular_literatur_relation_hash[uid.to_i]
-#     literatur_description_arr.each { |desc|
-#       lit = Literatur.new(
-#           beschreibung: literatur_beschreibung_hash[desc['literatur_beschreibung_key']],
-#           detail: desc['detail'],
-#       )
-#       self.literaturen << lit # unless self.literaturen.include? lit
-#     }
-#   end
-#   return self.literaturen
-# end
-
 end
