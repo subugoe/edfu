@@ -1,4 +1,4 @@
-ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.17'
+ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.16.1'  #'1.7.17'
 
 source 'https://rubygems.org'
 
@@ -13,7 +13,7 @@ gem 'activerecord-jdbcsqlite3-adapter',  group: :development
 gem 'activerecord-jdbc-adapter'
 gem 'activerecord-jdbcpostgresql-adapter'
 gem 'jdbc-postgres'
-gem 'jdbc-sqlite3'
+# gem 'sqlite3'
 gem 'puma'
 
 # supports batchimport

@@ -6,7 +6,7 @@ class WorteController < ApplicationController
   # GET /worte
   # GET /worte.json
   def index
-    @worte = Wort.all
+    @worte = Wort.all.limit(100)
   end
 
   # GET /worte/1

@@ -249,7 +249,6 @@ DEPENDENCIES
   devise
   jbuilder (~> 2.0)
   jdbc-postgres
-  jdbc-sqlite3
   jquery-datatables-rails (~> 3.1.0)
   jquery-rails
   newrelic_rpm

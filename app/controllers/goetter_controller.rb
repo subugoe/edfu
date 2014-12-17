@@ -6,7 +6,7 @@ class GoetterController < ApplicationController
   # GET /goetter
   # GET /goetter.json
   def index
-    @goetter = Gott.all
+    @goetter = Gott.all.limit(100)
   end
 
   # GET /goetter/1

@@ -66,7 +66,8 @@ class UploadsController < ApplicationController
     #}
     # end
 
-    processed = process_files
+    processed = true
+    #processed = process_files
 
     respond_to do |format|
       #if @upload.save

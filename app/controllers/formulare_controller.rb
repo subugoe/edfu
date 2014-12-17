@@ -6,7 +6,9 @@ class FormulareController < ApplicationController
   # GET /formulare
   # GET /formulare.json
   def index
-    @formulare = Formular.all
+    @formulare = Formular.all.limit(100)
+
+
   end
 
   # GET /formulare/1
