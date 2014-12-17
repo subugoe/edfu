@@ -231,6 +231,7 @@ class UploadsController < ApplicationController
             uID = Integer(row[9])
           else
             uID = SecureRandom.random_number(100000000)
+            # todo logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
           end
 
 
