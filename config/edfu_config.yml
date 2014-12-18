@@ -1,0 +1,17 @@
+defaults: &defaults
+  users: # user_name/e-mail must be unique in the db, password length >= 8)
+    -
+      user_name: admin@edfu.de
+      user_password: adminadmin
+    -
+      user_name: jp@edfu.de
+      user_password: adminadmin
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

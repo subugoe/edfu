@@ -1,17 +1,11 @@
-require 'bcrypt'
-require 'app/models/user'
-
 module Edfu
   class Application < Rails::Application
 
     config.before_initialize do
-      # initialization code goes here
-
-      User.find_or_create_by(email: 'admin@edfu.de') do
-
-      password = 'adminadmin'
-      password_confirmation = 'adminadmin'
-
+      config = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
+      config['users'].each do |user|
+        u = User.create(email: user['user_name'], password: user['user_password'], password_confirmation: user['user_password'])
+        #puts u.errors.full_messages
       end
     end
 
