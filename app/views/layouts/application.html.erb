@@ -43,16 +43,19 @@
                         </li>
 
                         <li>
+
                             <%= link_to 'Benutzer', admin_dashboard_path %>
                         </li>
+
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
 
 
                         <li>
                             <% if user_signed_in? %>
-                                <%="Hallo, #{current_user.email}"%> <%= link_to 'Sign out', destroy_user_session_path, :method => :delete %>
+                                <%= link_to "#{current_user.email} abmelden", destroy_user_session_path, :method => :delete %>
                             <% else %>
-                                <%= link_to 'Sign in', new_user_session_path %>
-
+                                <%= link_to 'Log in', new_user_session_path %>
                             <% end %>
                         </li>
                     </ul>
