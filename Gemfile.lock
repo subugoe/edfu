@@ -241,6 +241,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   autoprefixer-rails
+  bcrypt (~> 3.1.5)
   bootstrap-sass (~> 3.3.1)
   bootstrap_form
   celluloid

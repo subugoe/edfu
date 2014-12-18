@@ -1,4 +1,4 @@
-ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.16.1'  #'1.7.17'
+ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.17'
 
 source 'https://rubygems.org'
 
@@ -47,6 +47,7 @@ gem 'progress_bar'
 # Authentication/Authorization
 gem 'activeadmin', github: 'activeadmin'
 gem 'devise'
+gem 'bcrypt', '~> 3.1.5'
 
 gem 'bootstrap-sass', '~> 3.3.1'
 
