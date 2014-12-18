@@ -7,7 +7,7 @@ require 'verify_formular_helper'
 require 'verify_ort_helper'
 require 'verify_gott_helper'
 require 'verify_wort_helper'
-require 'bcrypt'
+
 
 class UploadsController < ApplicationController
   include VerifyFormularHelper
@@ -17,11 +17,6 @@ class UploadsController < ApplicationController
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
-
-
-  def initialize
-    add_default_user
-  end
 
   # todo add multifile upload
   # todo add email for notification
@@ -120,33 +115,6 @@ class UploadsController < ApplicationController
     process_wort
 
     updateSolr
-
-  end
-
-  # todo extract in config file
-  def add_default_user
-
-    User.create(email: 'admin@edfu.de', password: 'adminadmin', password_confirmation: 'adminadmin')
-
-    #puts user.valid?
-
-    # User.delete_all
-    #
-    # user = User.new(email: "admin@edfu.de", password: 'secret')
-    #
-    # #user.encrypted_password =  BCrypt::Password.create('secret')
-    #
-    #  user.created_at = :today
-    #  user.current_sign_in_at = :today
-    #  user.sign_in_count = 0
-    #  user.created_at = :today
-    #  user.updated_at = :today
-    #
-    # user.save
-    #
-    # puts user.valid?
-
-    #puts user.errors.full_messages
 
   end
 
