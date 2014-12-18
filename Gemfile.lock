@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/activeadmin/activeadmin.git
-  revision: c6c435b82ed82e645fae60bd4fa95d3d0d47e4f9
+  revision: f51d96dddb5e5be182220037f2d70117b9350303
   specs:
     activeadmin (1.0.0.pre)
       arbre (~> 1.0, >= 1.0.2)
@@ -104,7 +104,7 @@ GEM
       has_scope (~> 0.6.0.rc)
       railties (>= 3.2, < 4.2)
       responders (~> 1.0)
-    jbuilder (2.2.5)
+    jbuilder (2.2.6)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
     jdbc-postgres (9.3.1102)
@@ -255,7 +255,7 @@ DEPENDENCIES
   newrelic_rpm
   progress_bar
   puma
-  rails (= 4.1.8)
+  rails (~> 4.1.8)
   rails_12factor
   roo (~> 1.13.2)
   rsolr (~> 1.0.10)

@@ -6,13 +6,15 @@ source 'https://rubygems.org'
 gem 'roo', '~> 1.13.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.8'
+gem 'rails', '~> 4.1.8'
 
 # Use jdbcsqlite3 as the database for Active Record
 gem 'activerecord-jdbcsqlite3-adapter',  group: :development
 gem 'activerecord-jdbc-adapter'
 gem 'activerecord-jdbcpostgresql-adapter'
 gem 'jdbc-postgres'
+# gem 'sqlite3'
+# gem 'jdbc-sqlite3'
 # gem 'sqlite3'
 gem 'puma'
 
@@ -62,7 +64,7 @@ gem 'celluloid'
 
 
 # gems required by Heroku
-#gem 'pg', group: :production
+# gem 'pg', group: :production
 
 gem 'rails_12factor', group: :production
 gem 'newrelic_rpm'
