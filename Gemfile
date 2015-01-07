@@ -68,3 +68,6 @@ gem 'celluloid'
 
 gem 'rails_12factor', group: :production
 gem 'newrelic_rpm'
+
+# for image processing (4.x doesn't work with jruby)
+gem 'mini_magick', '~> 3.8.1'

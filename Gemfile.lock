@@ -129,6 +129,8 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     mime-types (2.4.3)
+    mini_magick (3.8.1)
+      subexec (~> 0.2.1)
     mini_portile (0.6.1)
     minitest (5.5.0)
     multi_json (1.10.1)
@@ -209,6 +211,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    subexec (0.2.3)
     therubyrhino (2.0.4)
       therubyrhino_jar (>= 1.7.3)
     therubyrhino_jar (1.7.4)
@@ -252,6 +255,7 @@ DEPENDENCIES
   jdbc-postgres
   jquery-datatables-rails (~> 3.1.0)
   jquery-rails
+  mini_magick (~> 3.8.1)
   newrelic_rpm
   progress_bar
   puma

@@ -1,29 +1,26 @@
 <h2>Log in</h2>
 
-<%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name), layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-6") do |f| %>
+<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.email_field :email, autofocus: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :password %><br />
+    <%= f.password_field :password, autocomplete: "off" %>
+  </div>
+
+  <% if devise_mapping.rememberable? -%>
     <div class="field">
-        <%= f.email_field :email, autofocus: true, label: "E-Mail" %>
+      <%= f.check_box :remember_me %>
+      <%= f.label :remember_me %>
     </div>
+  <% end -%>
 
-    <div class="field">
-        <%= f.password_field :password, autocomplete: "off", label: "Passwort" %>
-    </div>
-
-    <% if devise_mapping.rememberable? -%>
-        <%= f.form_group :terms do %>
-            <%= f.check_box :remember_me %>
-        <% end -%>
-    <% end -%>
-
-    <div class="form-group">
-        <div class="col-sm-offset-7 col-sm-10">
-            <%= f.submit "Log in" %>
-        </div>
-    </div>
+  <div class="actions">
+    <%= f.submit "Log in" %>
+  </div>
 <% end %>
 
-<div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-        <%= render "devise/shared/links" %>
-    </div>
-</div>
+<%= render "devise/shared/links" %>
