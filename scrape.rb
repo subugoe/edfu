@@ -24,7 +24,6 @@ class Scrape
 
         # todo: remove this
         next if File.extname(room['url']).sub('.', '') == "gif"
-        puts room
 
         data = run(room, config['lists'])
         createCsv(data, room['fileName'])
@@ -55,7 +54,7 @@ class Scrape
 
       data.each do |fields|
 
-         file << fields.values
+        file << fields.values
 
       end
 
@@ -97,20 +96,20 @@ class Scrape
     if (type == 'html')
       site = Nokogiri::HTML(open(room['url']))
 
-      href = Array.new
+#      href = Array.new
 
-      imageMaps = checkForImageMaps(site)
+#      imageMaps = checkForImageMaps(site)
     end
 
 
     if (type == 'gif')
 
       # todo: gif not yet implemented
-      # areas = findAreasFromImage(room['url'], array(2, 0), 1, room['cut'])
-      # if (isset(room['onlyWhite']))
-      #   #only white areas:
-      #   areas = findAreasFromImage(room['url'], array(0), 1, room['cut'])
-      # end
+      areas = findAreasFromImage(room['url'], array(2, 0), 1, room['cut'])
+      if (isset(room['onlyWhite']))
+        #only white areas:
+        areas = findAreasFromImage(room['url'], array(0), 1, room['cut'])
+      end
 
       next
 
@@ -133,36 +132,52 @@ class Scrape
             # todo: remove this
             puts area
 
-            description = ''
-            volume      = ''
-            page        = ''
-            plate       = ''
+            # description = ''
+            # volume      = ''
+            # page        = ''
+            # plate       = ''
 
             title = area.attr('title')
             if title == nil || title == ''
               # todo: uncomment for logging in the controller implementation
               # logger.error "\t[ERROR]  [SCRAPE] title is nil for area element: #{area} in #{room['url']}"
               puts "\t[ERROR]  [SCRAPE] title is nil for area element: #{area} in #{room['url']}"
+
             else
-              parts       = area.attr('title').split("-")
-              description = parts[0].strip if parts[0] != nil
 
-              if parts[1] == nil || parts[1].strip == ''
-                puts "\t[ERROR]  [SCRAPE] no volume, page and plate info in title for area element: #{area} in #{room['url']}"
-              else
-                p      = parts[1].split(',') if parts[1] != nil
-                volume = p[0].match(/Edfou (\d*)/)[1].strip.to_i if p[0] != nil
-                page   = p[1].match(/p. (\d*)/)[1].strip.to_i if p[1] != nil
-                if p.size == 3
-                  plate  = p[2].match(/pl. (.*)\)/)[1].strip if p[2] != nil
-                elsif p.size == 4
-                  puts "\t[ERROR]  [SCRAPE] probleme with plate info in title for area element: #{area} in #{room['url']}"
-                  plate  = p[2].match(/pl. (.*)/)[1].strip if p[2] != nil
+              # handle different formats
+              # e.g. in
+              # Polygon.html: title="Wein darreichen"
+              # Wall.html: title="Edfou 7, p. 330"
+              #
+              unless match = title.match(/(.*) - Edfou (\d*), p. (\d*), \(pl. (.*)\)/)
+                unless match = title.match(/(.*) - Edfou (\d*), p. (\d*)/)
+                  unless match = title.match(/Edfou (\d*), p. (\d*)/)
+                    unless match = title.match(/(.*)/)
+                      match = nil
+                    end
+                  end
                 end
-
-
               end
 
+              # todo: remove this
+              puts "0: #{match[0]}, 1: #{match[1]}, 2: #{match[2]}, 3: #{match[3]}"
+
+              if match[1] != nil
+                description = match[1].strip
+              end
+
+              if match[2] != nil
+                volume = match[2].strip.to_i
+              end
+
+              if match[3] != nil
+                page = match[3].to_i
+              end
+
+              if match[4] != nil
+                plate = match[4].strip
+              end
             end
 
             data[i] = {'description' => description,
@@ -559,16 +574,16 @@ class Scrape
 #
 #   site -> URL of site
 # return the found imagemaps
-  def checkForImageMaps(site)
-
-    # Find all imagemaps on actual html site
-    if maps = site.xpath('//map')
-      return maps
-    else
-      return false
-    end
-
-  end
+#   def checkForImageMaps(site)
+#
+#     # Find all imagemaps on actual html site
+#     if maps = site.xpath('//map')
+#       return maps
+#     else
+#       return false
+#     end
+#
+#   end
 
   def checkForAreas(site)
 
