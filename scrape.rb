@@ -22,6 +22,10 @@ class Scrape
           cut = false
         end
 
+        # todo: remove this
+        next if File.extname(room['url']).sub('.', '') == "gif"
+        puts room
+
         data = run(room, config['lists'])
         createCsv(data, room['fileName'])
 
@@ -108,6 +112,8 @@ class Scrape
       #   areas = findAreasFromImage(room['url'], array(0), 1, room['cut'])
       # end
 
+      next
+
     end
 
 
@@ -115,7 +121,7 @@ class Scrape
 
       areas.each do |area|
 
-        # todo: gif processing
+        # todo: add gif processing
         if (type == 'gif' || area.attr('href'))
 
           if (type == 'html')
@@ -124,6 +130,9 @@ class Scrape
             # (.*) - Edfou (\d*), p. (\d*), \(pl. (\d*)\)
             #
 
+            # todo: remove this
+            puts area
+
             description = ''
             volume      = ''
             page        = ''
@@ -131,7 +140,7 @@ class Scrape
 
             title = area.attr('title')
             if title == nil || title == ''
-              # todo uncomment if realized as controller
+              # todo: uncomment for logging in the controller implementation
               # logger.error "\t[ERROR]  [SCRAPE] title is nil for area element: #{area} in #{room['url']}"
               puts "\t[ERROR]  [SCRAPE] title is nil for area element: #{area} in #{room['url']}"
             else
@@ -144,7 +153,14 @@ class Scrape
                 p      = parts[1].split(',') if parts[1] != nil
                 volume = p[0].match(/Edfou (\d*)/)[1].strip.to_i if p[0] != nil
                 page   = p[1].match(/p. (\d*)/)[1].strip.to_i if p[1] != nil
-                plate  = p[2].match(/pl. (.*)\)/)[1].strip if p[2] != nil
+                if p.size == 3
+                  plate  = p[2].match(/pl. (.*)\)/)[1].strip if p[2] != nil
+                elsif p.size == 4
+                  puts "\t[ERROR]  [SCRAPE] probleme with plate info in title for area element: #{area} in #{room['url']}"
+                  plate  = p[2].match(/pl. (.*)/)[1].strip if p[2] != nil
+                end
+
+
               end
 
             end
