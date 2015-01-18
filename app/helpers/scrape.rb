@@ -1,11 +1,35 @@
+require 'rubygems'
 require 'yaml'
 require 'nokogiri'
 require 'csv'
+require 'rubygems'
 
+require 'mini_magick'
+
+# use rmagick for ruby and rmagick4j for jruby
+# require 'RMagick'
+# require 'rmagick4j'
 
 class Scrape
 
   def initialize
+
+    # todo: remove this test section
+    # File.open(File.join(Dir.pwd,'data/Plans/Raum_A.gif'), 'rb') do |fi|
+    #
+    #   im = Magick::Image.read(File.join(Dir.pwd,'data/Plans/Raum_A.gif')).first
+    #   #width  = im['width'] # image width
+    #   #height = im['height'] # image height
+    #
+    #   im.resize "4x4"
+    #
+    #   im.color_point
+    #
+    #   scanline = im.export_pixels(0, 0, im.columns, im.rows, "RGB");
+    #
+    #   puts scanline.size
+
+
 
     file = File.join('config', 'edfu_mappings.yml')
 
@@ -27,7 +51,7 @@ class Scrape
         # next if File.extname(room['url']).sub('.', '') == "gif"
 
         data = run(room, config['lists'])
-        createCsv(data, room['fileName'])
+        createCsv(data, File.join("Daten/szenen", room['fileName']))
 
       end
     }
@@ -131,7 +155,7 @@ class Scrape
             #
 
             # todo: remove this
-            puts area
+            # puts area
 
             # description = ''
             # volume      = ''
@@ -162,7 +186,7 @@ class Scrape
               end
 
               # todo: remove this
-              puts "0: #{match[0]}, 1: #{match[1]}, 2: #{match[2]}, 3: #{match[3]}"
+              # puts "0: #{match[0]}, 1: #{match[1]}, 2: #{match[2]}, 3: #{match[3]}"
 
               if match[1] != nil
                 description = match[1].strip
@@ -607,9 +631,25 @@ class Scrape
 # # return the areas with the specific color(s)
   def findAreasFromImage(fileName, colors = Array.new(2), border = 0, cut = false)
 
-    im     = MiniMagick::Image.open(fileName)
-    width  = im.width # image width
-    height = im.height # image height
+    # for mini_magick
+    # im     = MiniMagick::Image.open(File.join(Dir.pwd, fileName))
+    # width  = im['width'] # image width
+    # height = im['height'] # image height
+
+
+    im = Magick::Image.read(fileName).first
+    #width  = im['width'] # image width
+    #height = im['height'] # image height
+
+    pixels = Array.new
+
+    im.each_pixel do |pixel, c, r|
+      pixels.push(pixel)
+    end
+
+    # todo: remove this
+    # puts pixels.min
+    # puts pixels.max
 
     # set starting coordinate default
     startx = 0
@@ -633,6 +673,7 @@ class Scrape
     i           = 0
     firstLoop   = true
     wasDetected = false
+    myi = 0
 
     # process the image line for line
     colors.each do |color|
@@ -640,62 +681,64 @@ class Scrape
       y = starty
       x = startx
 
-      until  y < height do
-        until x < width
+      while  y < height do
+        while x < width
           # check if pixel has the correct color
-          if (imagecolorat(im, x, y) == color)
-            # stdOut("Color color found at x:x, y:y");
-            if !firstLoop
-              # check if area is already detected
-              areas.each do |area|
-                if ((x>=area['x1']) &&
-                    (x<=area['x2']) &&
-                    (y>=area['y1']) &&
-                    (y<=area['y2']) &&
-                    (color==area['color']))
-                  wasDetected = true;
-                  break;
-                else
-                  wasDetected = false;
 
-                end
-              end
-            end
-            tempX = x
-            tempY = y
-            # define first coordinate
-            if (!wasDetected)
-              # stdOut("Creating new area with starting coordinates tempX and tempY with index i");
-              areas[i]['x1'] = tempX - border
-              areas[i]['y1'] = tempY - border
-            end
-            # find last correct color of area
-            while (imagecolorat(im, tempX, tempY)==color)
-              tempX += 1
-            end
-            tempX -= 1
-            if (!wasDetected)
-              # stdOut("Last x coordinate for area with index i is at tempX")
-              areas[i]['x2'] = tempX + border
 
-            end
-
-            while (imagecolorat(im, tempX, tempY)==color)
-              tempY += 1
-            end
-            if (!wasDetected)
-              areas[i]['y2']    = tempY + border
-              areas[i]['color'] = color
-              # stdOut("Last y coordinate for area with index i is at tempY")
-            end
-
-            x         = tempX+1
-            firstLoop = false
-            if (!wasDetected)
-              i += 1
-            end
-
-          end
+          # if (imagecolorat(im, x, y) == color)
+          #   # stdOut("Color color found at x:x, y:y");
+          #   if !firstLoop
+          #     # check if area is already detected
+          #     areas.each do |area|
+          #       if ((x>=area['x1']) &&
+          #           (x<=area['x2']) &&
+          #           (y>=area['y1']) &&
+          #           (y<=area['y2']) &&
+          #           (color==area['color']))
+          #         wasDetected = true;
+          #         break;
+          #       else
+          #         wasDetected = false;
+          #
+          #       end
+          #     end
+          #   end
+          #   tempX = x
+          #   tempY = y
+          #   # define first coordinate
+          #   if (!wasDetected)
+          #     # stdOut("Creating new area with starting coordinates tempX and tempY with index i");
+          #     areas[i]['x1'] = tempX - border
+          #     areas[i]['y1'] = tempY - border
+          #   end
+          #   # find last correct color of area
+          #   while (imagecolorat(im, tempX, tempY)==color)
+          #     tempX += 1
+          #   end
+          #   tempX -= 1
+          #   if (!wasDetected)
+          #     # stdOut("Last x coordinate for area with index i is at tempX")
+          #     areas[i]['x2'] = tempX + border
+          #
+          #   end
+          #
+          #   while (imagecolorat(im, tempX, tempY)==color)
+          #     tempY += 1
+          #   end
+          #   if (!wasDetected)
+          #     areas[i]['y2']    = tempY + border
+          #     areas[i]['color'] = color
+          #     # stdOut("Last y coordinate for area with index i is at tempY")
+          #   end
+          #
+          #   x         = tempX+1
+          #   firstLoop = false
+          #   if (!wasDetected)
+          #     i += 1
+          #   end
+          #
+          # end
 
           x += 1
 
@@ -703,13 +746,13 @@ class Scrape
         y += 1
       end
     end
-    imagedestroy(im)
+    im.destroy!
     return areas
   end
 
 end
 
 
-# remove this
-# Scrape.new
+# todo: remove this
+Scrape.new
 

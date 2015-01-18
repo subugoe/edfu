@@ -10,6 +10,7 @@ class Stelle < ActiveRecord::Base
 
 
   belongs_to :zugehoerigZu, polymorphic: true
+  has_and_belongs_to_many :szenen, :dependent => :delete_all
 
   #after_commit :add_to_solr
 
@@ -38,10 +39,12 @@ class Stelle < ActiveRecord::Base
 
         :freigegeben => self.freigegeben, # ---
         :zerstoerung => self.zerstoerung, # ---
-        :stelle_anmerkung => self.stelle_anmerkung, # ---
+        # todo: check if to_s meet the requirements
+        :stelle_anmerkung => self.stelle_anmerkung.to_s, # ---
         :stelle_unsicher => self.stelle_unsicher, # ---
 
-        :besitzer => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu.uid}", # ---
+        # todo: uncomment this
+        # :besitzer => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu.uid}", # ---
 
         :typ => 'stelle', # ---
         :id => "stelle-#{self[:id]}" # ---

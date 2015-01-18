@@ -16,7 +16,7 @@ class Formular < ActiveRecord::Base
   has_and_belongs_to_many :photos, :dependent => :delete_all
   has_and_belongs_to_many :literaturen, :dependent => :delete_all
 
-  after_commit :add_to_solr
+  #after_commit :add_to_solr
   #before_validation :check_data
 
   def to_solr_string

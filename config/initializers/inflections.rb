@@ -25,4 +25,6 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'Szene', 'Szenen'
   inflect.irregular 'Photo', 'Photos'
   inflect.irregular 'Literatur', 'Literaturen'
+  inflect.irregular 'Szene', 'Szenen'
+  inflect.irregular 'Szenebild', 'Szenebilder'
 end

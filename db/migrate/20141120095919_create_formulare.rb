@@ -2,9 +2,9 @@ class CreateFormulare < ActiveRecord::Migration
   def change
     create_table :formulare do |t|
       t.string :uid
-      t.string :transliteration
-      t.string :transliteration_nosuffix
-      t.string :uebersetzung
+      t.text :transliteration
+      t.text :transliteration_nosuffix
+      t.text :uebersetzung
       t.string :texttyp
       #t.string :photo        # über photo tabelle und per assoziation referenziert
       #t.string :photo_pfad

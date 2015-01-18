@@ -6,7 +6,7 @@ source 'https://rubygems.org'
 gem 'roo', '~> 1.13.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 4.1.8'
+gem 'rails', '~> 4.2.0'
 
 # Use jdbcsqlite3 as the database for Active Record
 gem 'activerecord-jdbcsqlite3-adapter',  group: :development
@@ -47,7 +47,7 @@ gem 'rsolr', '~> 1.0.10'
 gem 'progress_bar'
 
 # Authentication/Authorization
-gem 'activeadmin', github: 'activeadmin'
+# gem 'activeadmin', github: 'activeadmin'
 gem 'devise'
 gem 'bcrypt', '~> 3.1.5'
 
@@ -69,5 +69,10 @@ gem 'celluloid'
 gem 'rails_12factor', group: :production
 gem 'newrelic_rpm'
 
+
 # for image processing (4.x doesn't work with jruby)
 gem 'mini_magick', '~> 3.8.1'
+
+# use rmagick for ruby and rmagick4j for jruby
+# gem 'rmagick4j', '~> 0.3.8'
+# gem 'rmagick', '~> 2.13.4'
