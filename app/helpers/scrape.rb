@@ -2,6 +2,7 @@ require 'yaml'
 require 'nokogiri'
 require 'csv'
 
+
 class Scrape
 
   def initialize
@@ -23,7 +24,7 @@ class Scrape
         end
 
         # todo: remove this
-        next if File.extname(room['url']).sub('.', '') == "gif"
+        # next if File.extname(room['url']).sub('.', '') == "gif"
 
         data = run(room, config['lists'])
         createCsv(data, room['fileName'])
@@ -105,10 +106,10 @@ class Scrape
     if (type == 'gif')
 
       # todo: gif not yet implemented
-      areas = findAreasFromImage(room['url'], array(2, 0), 1, room['cut'])
-      if (isset(room['onlyWhite']))
+      areas = findAreasFromImage(room['url'], [2, 0], 1, room['cut'])
+      if (room.has_key?('onlyWhite'))
         #only white areas:
-        areas = findAreasFromImage(room['url'], array(0), 1, room['cut'])
+        areas = findAreasFromImage(room['url'], [0], 1, room['cut'])
       end
 
       next
@@ -710,5 +711,5 @@ end
 
 
 # remove this
-Scrape.new
+# Scrape.new
 
