@@ -10,7 +10,7 @@ class CreateWbsberlin < ActiveRecord::Migration
       t.string :notiz
       t.belongs_to :wort
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

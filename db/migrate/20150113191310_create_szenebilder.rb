@@ -15,7 +15,7 @@ class CreateSzenebilder < ActiveRecord::Migration
 
       t.belongs_to :szene, index: true
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

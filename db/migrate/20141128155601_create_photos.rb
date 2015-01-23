@@ -7,7 +7,7 @@ class CreatePhotos < ActiveRecord::Migration
       t.string :pfad, index: true
       t.text :kommentar
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

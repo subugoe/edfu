@@ -17,7 +17,7 @@ class CreateSzenen < ActiveRecord::Migration
       t.string :grau
       #t.references :stellen, polymorphic: true
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

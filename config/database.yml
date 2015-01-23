@@ -24,22 +24,25 @@
 
 default: &default
   adapter: postgresql
+    encoding: unicode
+    pool: 5
+    username: postgres
+    password: postgres
+    host: edfudb
+    port: 5432
 
 development:
   <<: *default
   encoding: unicode
-  database: mydb
+  database: edfudb_dev
   pool: 5
-  username: jpanzer
-  password: edfudaten
 
 test:
   <<: *default
   encoding: unicode
-  database: mydb
+  database: edfudb_test
   pool: 5
-  username: jpanzer
-  password: edfudaten
 
 production:
-#  <<: *default
+  <<: *default
+  database: edfudb_prod

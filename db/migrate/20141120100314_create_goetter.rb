@@ -12,7 +12,7 @@ class CreateGoetter < ActiveRecord::Migration
       t.string :seitezeile
       t.string :anmerkung
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

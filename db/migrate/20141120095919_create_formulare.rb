@@ -14,7 +14,7 @@ class CreateFormulare < ActiveRecord::Migration
       t.string :band        # bestandteil von stelle
       t.string :seitezeile  # bestandteil von stelle
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

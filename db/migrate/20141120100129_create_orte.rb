@@ -10,7 +10,7 @@ class CreateOrte < ActiveRecord::Migration
       t.string :anmerkung
       # t.string :iStelle
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

@@ -1,0 +1,44 @@
+edfudb:
+  image: postgres:9.4
+  # build: ./postgres
+  environment:
+    - POSTGRESQL_USER=postgres
+    - POSTGRESQL_PASS=postgres
+  ports:
+    - "5432"
+edfuredis:
+   image: redis:2.8.19
+   ports:
+     - "6379:6379"
+web:
+   build: .
+   command: rails s
+   # command: bundle exec rails server -p 3000
+   hostname: edfu
+   volumes:
+     - .:/edfu
+   ports:
+     - "3000:3000"
+   links:
+     - edfudb:edfudb
+     - edfuredis:edfuredis
+#solr:  # https://github.com/ckan/ckan-docker
+#  build: docker/solr
+#  hostname: solr
+#  domainname: localdomain
+#  ports:
+#    - "8983:8983"
+#  volumes:
+#    - ./_src/ckan/ckan/config/solr/schema.xml:/opt/solr/example/solr/ckan/conf/schema.xml
+#
+#memcache:
+#  image: memcached
+#  ports:
+#    - "11211:11211"
+#
+#mongo:
+#  image: mongodb
+#  ports:
+#    - "28017:28017"
+#    - "27018:27018"
+#    - "27017:27017"

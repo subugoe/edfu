@@ -18,7 +18,7 @@ class CreateStellen < ActiveRecord::Migration
       t.string :freigegeben         # myStelle['freigegeben']
       t.references :zugehoerigZu, polymorphic: true
 
-      t.timestamps
+      #t.timestamps
     end
     add_index :stellen, :bandseitezeile # , :unique => true
     add_index :stellen, :band # , :unique => true

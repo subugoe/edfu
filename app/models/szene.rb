@@ -9,45 +9,85 @@ class Szene < ActiveRecord::Base
   #after_commit :add_to_solr
   #before_validation :check_data
 
+
+  def self.fetch(
+      nummer,
+          beschreibung,
+          rect,
+          koordinate_x,
+          koordinate_y,
+          blickwinkel,
+          breite,
+          prozent_z,
+          hoehe,
+          grau,
+          polygon
+  )
+
+    Rails.cache.fetch("szene_#{nummer}") {
+
+      sz = Szene.new(
+          nummer:       nummer,
+          beschreibung: beschreibung,
+          rect:         rect,
+          koordinate_x: koordinate_x,
+          koordinate_y: koordinate_y,
+          blickwinkel:  blickwinkel,
+          breite:       breite,
+          prozent_z:    prozent_z,
+          hoehe:        hoehe,
+          grau:         grau,
+          polygon:      polygon
+      )
+
+      sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
+
+      Rails.cache.write("szene_#{nummer}", sz)
+      return [sz]
+    }
+
+
+  end
+
+
   def to_solr_string
     return {
 
         # from szenebild
-        :szene_bild_name => self.szenebilder[0].name, # --
+        :szene_bild_name      => self.szenebilder[0].name, # --
         :szene_bild_dateiname => self.szenebilder[0].dateiname, # --
 
-        :szene_bild_breite => self.szenebilder[0].breite, #  # --
-        :szene_bild_hoehe => self.szenebilder[0].hoehe, #  # --
+        :szene_bild_breite    => self.szenebilder[0].breite, #  # --
+        :szene_bild_hoehe     => self.szenebilder[0].hoehe, #  # --
 
-        :szene_bild_offset_x => self.szenebilder[0].offset_x, # --
-        :szene_bild_offset_y => self.szenebilder[0].offset_y, # --
+        :szene_bild_offset_x  => self.szenebilder[0].offset_x, # --
+        :szene_bild_offset_y  => self.szenebilder[0].offset_y, # --
 
         # from szene
 
-        :typ => 'szene',# --
-        :id => "szene-#{self[:id]}", # --
-        :szene_uid => self[:id], # --
+        :typ                  => 'szene', # --
+        :id                   => "szene-#{self[:id]}", # --
+        :szene_uid            => self[:id], # --
 
-        :szene_nummer => self[:nummer], # --
-        :szene_beschreibung => self[:beschreibung], # --
+        :szene_nummer         => self[:nummer], # --
+        :szene_beschreibung   => self[:beschreibung], # --
 
-        :szene_grau => self[:grau], # --
+        :szene_grau           => self[:grau], # --
 
-        :szene_blickwinkel => self[:blickwinkel], # --
-        :szene_prozent_z => self[:prozent_z], # --
-        :szene_hoehe => self[:hoehe], # --
-        :szene_breite => self[:breite], # --
-        :szene_koordinate_x => self[:koordinate_x], # --
-        :szene_koordinate_y => self[:koordinate_y], # --
+        :szene_blickwinkel    => self[:blickwinkel], # --
+        :szene_prozent_z      => self[:prozent_z], # --
+        :szene_hoehe          => self[:hoehe], # --
+        :szene_breite         => self[:breite], # --
+        :szene_koordinate_x   => self[:koordinate_x], # --
+        :szene_koordinate_y   => self[:koordinate_y], # --
 
-        :szene_bild_polygon => self[:polygon], # --
-        :szene_bild_rect => self[:rect], # --
+        :szene_bild_polygon   => self[:polygon], # --
+        :szene_bild_rect      => self[:rect], # --
 
-        :stelle_uid => self.stellen.collect { |stelle| stelle.id}, # --
-        :stelle_count => self.stellen.size, # --
+        :stelle_uid           => self.stellen.collect { |stelle| stelle.id }, # --
+        :stelle_count         => self.stellen.size, # --
     }
   end
-
 
 
   private

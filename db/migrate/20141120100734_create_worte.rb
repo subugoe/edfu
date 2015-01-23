@@ -12,7 +12,7 @@ class CreateWorte < ActiveRecord::Migration
       t.string :anmerkung
       #t.references :wbberlin, index: true
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

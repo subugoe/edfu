@@ -1,4 +1,4 @@
-ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.17'
+## ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.17'
 
 source 'https://rubygems.org'
 
@@ -9,17 +9,20 @@ gem 'roo', '~> 1.13.2'
 gem 'rails', '~> 4.2.0'
 
 # Use jdbcsqlite3 as the database for Active Record
-gem 'activerecord-jdbcsqlite3-adapter',  group: :development
-gem 'activerecord-jdbc-adapter'
-gem 'activerecord-jdbcpostgresql-adapter'
-gem 'jdbc-postgres'
+# gem 'activerecord-jdbcsqlite3-adapter',  group: :development
+# gem 'activerecord-jdbc-adapter'
+# gem 'activerecord-jdbcpostgresql-adapter'
+# gem 'jdbc-postgres'
 # gem 'sqlite3'
 # gem 'jdbc-sqlite3'
 # gem 'sqlite3'
-gem 'puma'
+gem 'pg', '~> 0.18.1'
+
+# gem 'puma'
+gem 'puma', '~> 2.11.0'
 
 # supports batchimport
-gem 'activerecord-import', '~> 0.6.0'
+gem 'activerecord-import', '~> 0.7.0'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
@@ -27,8 +30,12 @@ gem 'sass-rails', '~> 4.0.3'
 gem 'closure-compiler'
 # Use CoffeeScript for .js.coffee assets and views
 gem 'coffee-rails', '~> 4.0.0'
+
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-gem 'therubyrhino'
+# alternativ javascript lib's (therubyrhino or therubyracer)
+# gem 'therubyrhino', '~> 2.0.4'
+gem 'therubyracer', '~> 0.12.1'
+
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
@@ -51,9 +58,10 @@ gem 'progress_bar'
 gem 'devise'
 gem 'bcrypt', '~> 3.1.5'
 
-gem 'bootstrap-sass', '~> 3.3.1'
+gem 'bootstrap-sass', '~> 3.3.3'
 
-gem 'autoprefixer-rails'
+# gem 'autoprefixer-rails'
+gem 'autoprefixer-rails', '~> 5.0.0.1'
 
 gem 'bootstrap_form'
 
@@ -61,10 +69,6 @@ gem 'jquery-datatables-rails', '~> 3.1.0'
 
 # support for cuncurrent processing
 gem 'celluloid'
-
-
-# gems required by Heroku
-# gem 'pg', group: :production
 
 gem 'rails_12factor', group: :production
 gem 'newrelic_rpm'

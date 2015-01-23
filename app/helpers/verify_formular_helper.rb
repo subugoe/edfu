@@ -7,22 +7,22 @@ module VerifyFormularHelper
 
   def formular_literatur_relation_hash
     {
-        1 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        2 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        3 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        4 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
-        5 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        6 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
-              {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        7 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        8 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        9 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-              {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        1  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        2  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        3  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        4  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
+        5  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
+        6  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
+               {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        7  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        8  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
+        9  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
+               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
         10 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
                {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
         11 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
@@ -70,47 +70,56 @@ module VerifyFormularHelper
 
     if arr = formular_literatur_relation_hash[uid.to_i]
       arr.each { |hash|
-        lit = Literatur.find_or_create_by(
-            beschreibung: literatur_beschreibung_hash[hash['literatur_beschreibung_key']],
-            detail: hash['detail'],
+
+        beschreibung = literatur_beschreibung_hash[hash['literatur_beschreibung_key']]
+        detail       = hash['detail']
+
+        lit = Literatur.fetch(
+            beschreibung,
+            detail
         )
+
+        if lit.class == Array
+          lit = lit[0]
+          literaturen << lit
+        end
 
         #literaturen << lit # unless self.literaturen.include? lit
         formular.literaturen << lit unless formular.literaturen.include? lit
       }
     end
 
-    #return literaturen
+    return literaturen
   end
 
 
-  def create_stellen(seitezeile, band, uid, formular)
+  def create_stellen(seitezeile, band, uid)# , formular)
 
     # todo extract to module
     # Einträge für die 8 Chassinat Bände.
-    bandDict = {
-        1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
+    bandDict    = {
+        1 => {'uid'        => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
               'tempel_uid' => 0},
-        2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
+        2 => {'uid'        => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
               'tempel_uid' => 0},
-        3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
+        3 => {'uid'        => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
               'tempel_uid' => 0},
-        4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
+        4 => {'uid'        => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
               'tempel_uid' => 0},
-        5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
+        5 => {'uid'        => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
               'tempel_uid' => 0},
-        6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
+        6 => {'uid'        => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
               'tempel_uid' => 0},
-        7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
+        7 => {'uid'        => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
               'tempel_uid' => 0},
-        8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
+        8 => {'uid'        => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
               'tempel_uid' => 0}
     }
 
     #band = []
     #stelle = []
 
-    anmerkung = ''
+    anmerkung   = ''
 
     # Felder
     #@myFormular['texttyp'] = self[:texttyp]
@@ -119,13 +128,13 @@ module VerifyFormularHelper
 
     # todo Konversion absichern Integer("1")
 
-    myStelle = {}
+    myStelle    = {}
     # todo entfernen? Gehört zur Normalisierung
-    band_uid = band #bandDict[(self[:band]).to_i]['nummer']
+    band_uid    = band #bandDict[(self[:band]).to_i]['nummer']
     freigegeben = bandDict[band.to_i]['freigegeben']
 
     ## Sonderfälle
-    szOriginal = seitezeile
+    szOriginal  = seitezeile
     if uid == 3416
       seitezeile = "011, 09 - 012, 01"
     end
@@ -139,17 +148,17 @@ module VerifyFormularHelper
     kommentar = []
 
     if seitezeile.index('nach ') == 0
-      kommentar += ['nach']
+      kommentar  += ['nach']
       seitezeile = seitezeile.gsub('nach ', '')
     end
 
     if seitezeile.index(', Z') != nil
-      kommentar += [seitezeile[seitezeile.index(', Z') + 2..-1]]
+      kommentar  += [seitezeile[seitezeile.index(', Z') + 2..-1]]
       seitezeile = seitezeile[0..seitezeile.index(', Z')]
     end
 
     if seitezeile.index(' / Z') != nil
-      kommentar += [seitezeile[seitezeile.index(' / Z') + 3..-1]]
+      kommentar  += [seitezeile[seitezeile.index(' / Z') + 3..-1]]
       seitezeile = seitezeile[0..seitezeile.index(' / Z')]
     end
 
@@ -186,7 +195,7 @@ module VerifyFormularHelper
 
     result = []
 
-    seitezeile = seitezeile
+    seitezeile    = seitezeile
     band_roemisch = dezimal_nach_roemisch(band)
 
 
@@ -201,7 +210,7 @@ module VerifyFormularHelper
         zeilen = parts[1].split('-') # ["08","09"]
         result = [[seite, (zeilen[0]).to_i], [seite, (zeilen[1]).to_i]] # [[008,08],[008,09]]
       else
-        zeile = (parts[1]).to_i
+        zeile  = (parts[1]).to_i
         result = [[seite, zeile], [seite, zeile]]
       end
     else
@@ -234,8 +243,8 @@ module VerifyFormularHelper
 
     seite_start = result[0][0]
     zeile_start = result[0][1]
-    seite_stop = result[1][0]
-    zeile_stop = result[1][1]
+    seite_stop  = result[1][0]
+    zeile_stop  = result[1][1]
 
     if zeile_start > 30
       logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler, zeile_start > 30,  #{seitezeile}"
@@ -247,7 +256,7 @@ module VerifyFormularHelper
 
 
     stop_unsicher = false
-    zerstoerung = false
+    zerstoerung   = false
 
     # # todo Teil der Normalisierung ?
     # uid = stelle.length
@@ -256,22 +265,24 @@ module VerifyFormularHelper
     # stelle << [myStelle]
     # @formularDict[@myFormular['uid']] = @myFormular
 
+    stelle        = Stelle.fetch(
+        'Edfu',
+        band_uid,
+        bandseite,
+        bandseitezeile,
+        seite_start,
+        seite_stop,
+        zeile_start,
+        zeile_stop,
+        anmerkung,
+        stop_unsicher,
+        zerstoerung,
+        freigegeben
+    )
 
-    stelle = Stelle.new
-    stelle.tempel = 'Edfu'
-    stelle.band = band_uid
-    stelle.bandseite = bandseite
-    stelle.bandseitezeile = bandseitezeile
-    stelle.seite_start = seite_start
-    stelle.seite_stop = seite_stop
-    stelle.zeile_start = zeile_start
-    stelle.zeile_stop = zeile_stop
-    stelle.stelle_anmerkung = anmerkung
-    stelle.stelle_unsicher = stop_unsicher
-    stelle.zerstoerung = zerstoerung
-    stelle.freigegeben = freigegeben
-    #stelle.zugehoerigZu = formular
-    formular.stellen << stelle
+    #formular.stellen << stelle
+
+    return stelle
 
   end
 
@@ -312,7 +323,7 @@ module VerifyFormularHelper
         photo = 'D05_5391, D05_5395, D05_5396, D05_5397, D05_5398, D05_5399, D05_5400, ( 3112 )*'
       # 1711-1713
       when 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983 (Z 6), D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        photo = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
+        photo           = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
         photo_kommentar = 'D05_4983 (Z 6)'
       # 1818-1820
       when 'D05_6097, D05_6098, D05_6100, D05_6101, D06_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
@@ -371,20 +382,20 @@ module VerifyFormularHelper
 
     # 9741-9773
     if photo.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
-      photo = photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
-                         '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
+      photo           = photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
+                                   '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
       photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
     # 8399, 9011, 9012
     if uid == 8399 or uid == 9011 or uid == 9012
-      photo = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
+      photo           = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
       photo_kommentar = 'E. VII, 252, 5'
     end
 
     # 9950
     if uid == 9950
-      photo = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
+      photo           = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
       photo_kommentar = 'E VIII, 122, 5 - 124, 18'
     end
 
@@ -411,33 +422,33 @@ module VerifyFormularHelper
 
     # Sonderfälle
 
-    photo_name = Array.new
-    photo_typ = Array.new
-    photo_pfad = Array.new
+    photo_name      = Array.new
+    photo_typ       = Array.new
+    photo_pfad      = Array.new
     photo_kommentar = Array.new
 
-    photosDict = {}
+    photosDict   = {}
     photoTypDict = {
-        'alt' => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
-        'D03' => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
-        'D05' => {'uid' => 2, 'name' => '2005', 'jahr' => 2005},
-        'e' => {'uid' => 3, 'name' => 'e', 'jahr' => 1900},
-        'G' => {'uid' => 4, 'name' => 'G', 'jahr' => 1950},
-        'e-o' => {'uid' => 5, 'name' => 'e-o', 'jahr' => 1960},
+        'alt'                   => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
+        'D03'                   => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
+        'D05'                   => {'uid' => 2, 'name' => '2005', 'jahr' => 2005},
+        'e'                     => {'uid' => 3, 'name' => 'e', 'jahr' => 1900},
+        'G'                     => {'uid' => 4, 'name' => 'G', 'jahr' => 1950},
+        'e-o'                   => {'uid' => 5, 'name' => 'e-o', 'jahr' => 1960},
         'Labrique, Stylistique' => {'uid' => 6, 'name' => 'Labrique, Stylistique', 'jahr' => 1912},
-        'E. XIII' => {'uid' => 7, 'name' => 'Edfou XIII', 'jahr' => 1913},
-        'E. XIV' => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
+        'E. XIII'               => {'uid' => 7, 'name' => 'Edfou XIII', 'jahr' => 1913},
+        'E. XIV'                => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
     }
 
-    re1 = Regexp.new('[0-9]+a*')
-    re2 = Regexp.new('D03_[0-9]+')
-    re3 = Regexp.new('D05_[0-9]+a*')
-    re4 = Regexp.new('e[0-9]+')
-    re5 = Regexp.new('(E. [XVI]+), (pl. [DCLXVI0-9]+)')
-    re6 = Regexp.new('\([^)]*\)(\s*\**)')
-    re7 = Regexp.new('[DCLXVI]+')
-    re8 = Regexp.new('\)\s*\**')
-    re9 = Regexp.new('(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
+    re1  = Regexp.new('[0-9]+a*')
+    re2  = Regexp.new('D03_[0-9]+')
+    re3  = Regexp.new('D05_[0-9]+a*')
+    re4  = Regexp.new('e[0-9]+')
+    re5  = Regexp.new('(E. [XVI]+), (pl. [DCLXVI0-9]+)')
+    re6  = Regexp.new('\([^)]*\)(\s*\**)')
+    re7  = Regexp.new('[DCLXVI]+')
+    re8  = Regexp.new('\)\s*\**')
+    re9  = Regexp.new('(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
     re10 = Regexp.new('e-onr-[0-9]+')
     re11 = Regexp.new(';*\s*Labrique, Stylistique, (pl. [0-9.]*)')
     re12 = Regexp.new('\s*\*') # beginnt mit beliebiege whitesp. und '*'
@@ -447,20 +458,20 @@ module VerifyFormularHelper
 
 
     bildString = photo
-    klammern = false
-    stern = false
+    klammern   = false
+    stern      = false
 
     while bildString.size > 0
 
 
-      name = ''
-      typ = '---'
-      pfad = ''
+      name      = ''
+      typ       = '---'
+      pfad      = ''
       kommentar = ''
 
       if uid == 9562
         if bildString.match('VIII')
-          m15 = re15.match(bildString)
+          m15       = re15.match(bildString)
           kommentar = m15[1]
         else
           kommentar = ''
@@ -485,77 +496,77 @@ module VerifyFormularHelper
 
         # Spezielfälle mit Kommentieren
 
-        m14 = re14.match(bildString)
+        m14        = re14.match(bildString)
 
         if m14 and uid < 9000
           # 6344-6356
           bildString = m14[1] + m14[3]
-          kommentar = m14[2]
+          kommentar  = m14[2]
 
         elsif uid == 9834
           bildString = '3911 )*'
-          kommentar = 'E. VIII, 108, nach 3'
+          kommentar  = 'E. VIII, 108, nach 3'
 
         elsif uid == 9951
           bildString = '2374, 2375, 2376 )*'
-          kommentar = 'E VIII, 122, 5 - 124, 18'
+          kommentar  = 'E VIII, 122, 5 - 124, 18'
 
         elsif uid == 9562 and bildString.match('VIII')
           # hinter schließenden klammer weiter
           bildString = bildString[(bildString.index(')') + 1)..-1]
-          klammern = false
+          klammern   = false
 
         elsif uid == 9671
-          kommentar = 'E. VIII, 87, 5'
+          kommentar  = 'E. VIII, 87, 5'
           bildString = '141, 142, E. XIV, pl. DCLXIX, DCLXX )*'
 
         elsif uid == 9870
-          kommentar = 'E. VIII, 111, 16'
+          kommentar  = 'E. VIII, 111, 16'
           bildString = '114, 115, 116, 117)*'
 
         end
 
       elsif re8.match(bildString)
         # Klammer zu
-        klammern = false
+        klammern   = false
         bildString = bildString[((re8.match(bildString)[0]).length)..-1]
 
       elsif re2.match(bildString)
         # Fall 2: Dateiname der Form D03_XXXXX
-        name = re2.match(bildString)[0]
-        typ = 'D03'
+        name       = re2.match(bildString)[0]
+        typ        = 'D03'
         bildString = bildString[(name.length)..-1]
 
       elsif re3.match(bildString)
         # Fall 3: Dateiname der Form D05_XXXXX
-        name = re3.match(bildString)[0]
-        typ = 'D05'
+        name       = re3.match(bildString)[0]
+        typ        = 'D05'
         bildString = bildString[(name.length)..-1]
 
       elsif re4.match(bildString)
         # Fall 4: Dateiname der Form eXXX
-        name = re4.match(bildString)[0]
-        typ = 'e'
+        name       = re4.match(bildString)[0]
+        typ        = 'e'
         bildString = bildString[(name.length)..-1]
 
       elsif re9.match(bildString)
         # Fall 5: Name der Form GXXX [ff.]
-        name = re9.match(bildString)[1]
-        typ = 'G'
-        kommentar = re9.match(bildString)[2]
+        name       = re9.match(bildString)[1]
+        typ        = 'G'
+        kommentar  = re9.match(bildString)[2]
         bildString = bildString[((re9.match(bildString)[0]).length)..-1]
 
       elsif re10.match(bildString)
         # Fall 6: Name der Form e-onr-XXX
-        name = re10.match(bildString)[0]
-        typ = 'e-o'
+        name       = re10.match(bildString)[0]
+        typ        = 'e-o'
         bildString = bildString[(name.length)..-1]
 
       elsif re1.match(bildString)
         # Fall 1: Dateiname nur aus Ziffern (am Ende beliebig viele 'a')
         # name = erstes Auftreten des match
-        name = re1.match(bildString)[0]
-        typ = 'alt'
+        name       = re1.match(bildString)[0]
+        typ        = 'alt'
         # schneidet aktuelle zahl vorn ab
         #
         bildString = bildString[(name.length)..-1]
@@ -563,15 +574,15 @@ module VerifyFormularHelper
 
       elsif re11.match(bildString)
         # Fall 7: Labrique, Stylistique
-        name = re11.match(bildString)[1]
-        typ = 'Labrique, Stylistique'
+        name       = re11.match(bildString)[1]
+        typ        = 'Labrique, Stylistique'
         bildString = bildString[((re11.match(bildString)[0]).length)..-1]
 
       elsif re5.match(bildString)
         # Fall (n+1): Verweis auf Tafeln im Edfou Buch
-        m = re5.match(bildString)
-        typ = m[1]
-        name = m[2]
+        m          = re5.match(bildString)
+        typ        = m[1]
+        name       = m[2]
         # rest = m.group(3)
 
         # kombi aus strip & führendes/endende Komma abschneiden
@@ -591,17 +602,17 @@ module VerifyFormularHelper
         if re12.match(bildString)
           # ist gefolgt von *
           # prüfen, matched auch ohne *
-          stern = true
+          stern      = true
           bildString = bildString[((re12.match(bildString))[0]).length..-1]
         end
 
         if re13.match(bildString)
-          kommentar = 'teilweise'
+          kommentar  = 'teilweise'
           bildString = bildString[(re13.match(bildString)[0]).length..-1]
         end
 
         if uid == 9910 and bildString.match('103')
-          kommentar = 'E. VIII, 118, 7'
+          kommentar  = 'E. VIII, 118, 7'
           bildString = ''
         end
 
@@ -619,12 +630,18 @@ module VerifyFormularHelper
         end
 
         # todo ggf. in array sammeln und als batch speichern
-        p = Photo.find_or_create_by(pfad: pfad) do |photo|
-          photo.name = name
-          photo.typ = typ
-          #pfad: pfad
-          photo.kommentar = kommentar
+        p = Photo.fetch(
+            pfad,
+            name,
+            typ,
+            kommentar
+        )
+
+        if p.class == Array
+          p = p[0]
+          photos << p
         end
+
         formular.photos << p unless formular.photos.include? p
 
       end
@@ -637,6 +654,8 @@ module VerifyFormularHelper
 
     # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
     # finishCollection(PRIMARY)
+
+    return photos
 
   end
 
@@ -674,4 +693,5 @@ module VerifyFormularHelper
 
     return uebersetzung
   end
+
 end
