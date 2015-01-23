@@ -703,7 +703,7 @@ class UploadsController < ApplicationController
               row[columnDict['angleOfView']],
               row[columnDict['extent-width']],
               row[columnDict['height-percent']],
-              row[columnDict['extent-height-percent']]).to_f,
+              row[columnDict['extent-height-percent']].to_f,
               grau,
               polygon
           )
@@ -801,14 +801,9 @@ class UploadsController < ApplicationController
       end
     end
 
-
-  end
-
   # wird unter der Tabelle SZENE_BILD hinzugefügt
   #szene_bild = szene_bildDict.values()
 
-  puts "process_szene size: #{@szene_solr_batch.size}"
-
-end
+  end
 
 end

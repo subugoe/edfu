@@ -10,7 +10,7 @@ edfuredis:
    image: redis:2.8.19
    ports:
      - "6379:6379"
-web:
+edfuweb:
    build: .
    command: rails s
    # command: bundle exec rails server -p 3000

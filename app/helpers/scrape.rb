@@ -136,7 +136,7 @@ class Scrape
         areas = findAreasFromImage(room['url'], [0], 1, room['cut'])
       end
 
-      next
+      # next
 
     end
 
