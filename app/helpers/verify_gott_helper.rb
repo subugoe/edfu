@@ -239,6 +239,8 @@ module VerifyGottHelper
             stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
             #stelle.zugehoerigZu = gott
             gott.stellen << stelle
+            gott.bandseite = stelle.bandseite
+            gott.bandseitezeile = stelle.bandseitezeile
 
             #self.stellen << stelle unless self.stellen.include? stelle
 

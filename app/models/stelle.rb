@@ -8,6 +8,7 @@ require 'celluloid/autostart'
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper
 
+  attr_accessor :bandseite, :bandseitezeile
 
   belongs_to :zugehoerigZu, polymorphic: true
   has_and_belongs_to_many :szenen, :dependent => :delete_all

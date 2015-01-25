@@ -444,8 +444,8 @@ module VerifyWortHelper
           stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
           #stelle.zugehoerigZu = wort
           wort.stellen << stelle
-
-
+          wort.bandseite = stelle.bandseite
+          wort.bandseitezeile = stelle.bandseitezeile
 
           #stellen << stelle
 

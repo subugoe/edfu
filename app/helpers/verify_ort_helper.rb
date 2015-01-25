@@ -175,6 +175,8 @@ module VerifyOrtHelper
           stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
           #stelle.zugehoerigZu = ort
           ort.stellen << stelle
+          ort.bandseite = stelle.bandseite
+          ort.bandseitezeile = stelle.bandseitezeile
 
           #self.stellen << stelle unless self.stellen.include? stelle
 

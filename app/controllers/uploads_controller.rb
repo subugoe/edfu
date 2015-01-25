@@ -321,6 +321,8 @@ class UploadsController < ApplicationController
           end
           s.zugehoerigZu = f
 
+          f.bandseite = s.bandseite
+          f.bandseitezeile = s.bandseitezeile
 
           # --- Photos
 
