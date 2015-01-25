@@ -10,7 +10,13 @@ class CreateOrte < ActiveRecord::Migration
       t.string :anmerkung
       # t.string :iStelle
 
+      t.string :band        # bestandteil von stelle
+      t.string :bandseite
+      t.string :bandseitezeile
+
+
       #t.timestamps
     end
+    add_index :orte, :bandseitezeile # , :unique => true
   end
 end

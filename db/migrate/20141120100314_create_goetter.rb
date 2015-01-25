@@ -8,11 +8,17 @@ class CreateGoetter < ActiveRecord::Migration
       t.string :eponym
       t.string :beziehung
       t.string :funktion
-      t.string :band
-      t.string :seitezeile
+
+      t.string :band        # bestandteil von stelle
+      t.string :bandseite
+      t.string :bandseitezeile
+
+      #t.string :seitezeile
+
       t.string :anmerkung
 
       #t.timestamps
     end
+    add_index :goetter, :bandseitezeile # , :unique => true
   end
 end

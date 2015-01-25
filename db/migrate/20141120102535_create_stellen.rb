@@ -4,8 +4,6 @@ class CreateStellen < ActiveRecord::Migration
       #t.string :uid              #   myStelle['uid']
       t.string :tempel
       t.string :band             # myStelle['band_uid']
-      t.string :bandseite
-      t.string :bandseitezeile
       t.string :seite_start        # myStelle['seite_start']
       t.string :seite_stop         # myStelle['seite_stop']
       t.string :zeile_start        # myStelle['zeile_start']
@@ -20,7 +18,7 @@ class CreateStellen < ActiveRecord::Migration
 
       #t.timestamps
     end
-    add_index :stellen, :bandseitezeile # , :unique => true
+    # add_index :stellen, :bandseitezeile # , :unique => true
     add_index :stellen, :band # , :unique => true
     add_index :stellen, :seite_start # , :unique => true
   end
