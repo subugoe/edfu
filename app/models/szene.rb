@@ -11,7 +11,8 @@ class Szene < ActiveRecord::Base
 
 
   def self.fetch(
-      nummer,
+      filepath,
+          nummer,
           beschreibung,
           rect,
           koordinate_x,
@@ -21,28 +22,40 @@ class Szene < ActiveRecord::Base
           prozent_z,
           hoehe,
           grau,
-          polygon
+          polygon,
+          recordSzeneBild
   )
 
-    Rails.cache.fetch("szene_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}") {
+    Rails.cache.fetch("szene_#{filepath}_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}") {
 
       sz = Szene.new(
-          nummer:       nummer,
-          beschreibung: beschreibung,
-          rect:         rect,
-          koordinate_x: koordinate_x,
-          koordinate_y: koordinate_y,
-          blickwinkel:  blickwinkel,
-          breite:       breite,
-          prozent_z:    prozent_z,
-          hoehe:        hoehe,
-          grau:         grau,
-          polygon:      polygon
+          nummer:          nummer,
+          beschreibung:    beschreibung,
+          rect:            rect,
+          koordinate_x:    koordinate_x,
+          koordinate_y:    koordinate_y,
+          blickwinkel:     blickwinkel,
+          breite:          breite,
+          prozent_z:       prozent_z,
+          hoehe:           hoehe,
+          grau:            grau,
+          polygon:         polygon,
+          name:            recordSzeneBild.name,
+          dateiname:       recordSzeneBild.dateiname,
+          imagemap:        recordSzeneBild.imagemap,
+          breite:          recordSzeneBild.breite,
+          hoehe:           recordSzeneBild.hoehe,
+          offset_x:        recordSzeneBild.offset_x,
+          offset_y:        recordSzeneBild.offset_y,
+          breite_original: recordSzeneBild.breite_original,
+          hoehe_original:  recordSzeneBild.hoehe_original
       )
 
       sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
-      Rails.cache.write("szene_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}", sz)
+      puts sz.id
+
+      Rails.cache.write("szene_#{filepath}_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}", sz)
       return [sz]
     }
 

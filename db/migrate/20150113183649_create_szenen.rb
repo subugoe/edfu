@@ -15,6 +15,16 @@ class CreateSzenen < ActiveRecord::Migration
       t.string :prozent_z
       t.string :hoehe
       t.string :grau
+      t.string :name
+      t.string :dateiname
+      t.string :imagemap
+      t.string :breite
+      t.string :hoehe
+      t.string :offset_x
+      t.string :offset_y
+      t.string :breite_original
+      t.string :hoehe_original
+
       #t.references :stellen, polymorphic: true
 
       #t.timestamps

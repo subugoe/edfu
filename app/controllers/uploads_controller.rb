@@ -321,12 +321,12 @@ class UploadsController < ApplicationController
           end
           s.zugehoerigZu = f
 
-          f.bandseite = s.bandseite
+          f.bandseite      = s.bandseite
           f.bandseitezeile = s.bandseitezeile
 
           # --- Photos
 
-          @photo_batch   += manipulate_photo_string_and_create(photo, uID, f)
+          @photo_batch     += manipulate_photo_string_and_create(photo, uID, f)
 
           f.photos.each { |p|
             fp          = FormularePhotos.new
@@ -592,10 +592,10 @@ class UploadsController < ApplicationController
 
     # Szeneninformation aus CSV Dateien (aus Imagemap)
 
-    max_batch_size     = 1500
-    szene_bildDict     = Hash.new
-    bilderColumnDict   = Hash.new
-    @szene_solr_batch  = Array.new
+    max_batch_size    = 1500
+    szene_bildDict    = Hash.new
+    bilderColumnDict  = Hash.new
+    @szene_solr_batch = Array.new
 
     @szenebilder_batch = Array.new
     @szene_batch       = Array.new
@@ -632,25 +632,19 @@ class UploadsController < ApplicationController
         # hoehe_original -> orig_size_y
         # offset_x -> offset_x
         # offset_y -> offset_y
-        # name -> label
 
-
-        recordSzeneBild = Szenebild.fetch(
-            bildRow[bilderColumnDict['image']],
-            bildRow[bilderColumnDict['label']],
-            bildRow[bilderColumnDict['imagemap']],
-            bildRow[bilderColumnDict['new_size_x']],
-            bildRow[bilderColumnDict['new_size_y']],
-            bildRow[bilderColumnDict['orig_size_x']],
-            bildRow[bilderColumnDict['orig_size_y']],
-            bildRow[bilderColumnDict['offset_x']],
-            bildRow[bilderColumnDict['offset_y']]
+        recordSzeneBild = Szenebild.new(
+            dateiname: bildRow[bilderColumnDict['image']],
+            name: bildRow[bilderColumnDict['label']],
+            imagemap: bildRow[bilderColumnDict['imagemap']],
+            breite: bildRow[bilderColumnDict['new_size_x']],
+            hoehe: bildRow[bilderColumnDict['new_size_y']],
+            breite_original: bildRow[bilderColumnDict['orig_size_x']],
+            hoehe_original: bildRow[bilderColumnDict['orig_size_y']],
+            offset_x: bildRow[bilderColumnDict['offset_x']],
+            offset_y: bildRow[bilderColumnDict['offset_y']]
         )
-        if recordSzeneBild.class == Array
-          # szeneBild is new
-          recordSzeneBild = recordSzeneBild[0]
-          @szenebilder_batch << recordSzeneBild
-        end
+
 
       end
 
@@ -658,7 +652,7 @@ class UploadsController < ApplicationController
       # szene_bildDict[recordSzeneBild.dateiname] = recordSzeneBild
       # szene_bild_ID                                = recordSzeneBild.id
 
-      filePath = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
+      filePath   = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
       # with open(filePath, 'r') as csvFile:
       #                                  print u 'INFO CSV Datei »' + filePath + u '«'
 
@@ -678,6 +672,7 @@ class UploadsController < ApplicationController
             j                 += 1
           }
 
+          next
 
         elsif row.size >= 12
 
@@ -702,7 +697,7 @@ class UploadsController < ApplicationController
           if row[columnDict['volume']] != nil && row[columnDict['volume']] != ''
 
 
-            band          = row[columnDict['volume']]
+            band = row[columnDict['volume']]
 
 
             if band.to_i > 8
@@ -746,29 +741,28 @@ class UploadsController < ApplicationController
             freigegeben = StellenHelper.getFromBanddicet(band.to_i, 'freigegeben')
 
 
-            stelle = Stelle.fetch(
-                'Edfu',
-                band,
-                bandseite,
-                bandseitezeile,
-                seiteStart,
-                seiteStop,
-                zeileStart,
-                zeileStop,
-                anmerkung,
-                stopunsicher,
-                zerstoerung,
-                freigegeben
-            )
-
-            if stelle.class == Array
-              # szeneBild is new
-              stelle = stelle[0]
-              @stelle_batch << stelle
-            end
+            # stelle = Stelle.fetch(
+            #     'Edfu',
+            #     band,
+            #     bandseite,
+            #     bandseitezeile,
+            #     seiteStart,
+            #     seiteStop,
+            #     zeileStart,
+            #     zeileStop,
+            #     anmerkung,
+            #     stopunsicher,
+            #     zerstoerung,
+            #     freigegeben
+            # )
+            #
+            # if stelle.class == Array
+            #   # szeneBild is new
+            #   stelle = stelle[0]
+            #   @stelle_batch << stelle
+            # end
 
           end
-
 
 
           # -- szenen
@@ -808,6 +802,7 @@ class UploadsController < ApplicationController
 
           # todo is plate unique? NO, e.g. there are 17 Szenes with szene_nummer = 113
           rSzene = Szene.fetch(
+              filePath,
               nummer,
               beschreibung,
               rect,
@@ -818,17 +813,19 @@ class UploadsController < ApplicationController
               row[columnDict['height-percent']],
               row[columnDict['extent-height-percent']].to_f,
               grau,
-              polygon
+              polygon,
+              recordSzeneBild
           )
 
           if rSzene.class == Array
             # szeneBild is new
             rSzene = rSzene[0]
+            rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
             @szene_batch << rSzene unless @szene_batch.include? rSzene
           end
 
-          rSzene.stellen << stelle unless (stelle == nil || rSzene.stellen.include?(stelle))
-          rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
+          #rSzene.stellen << stelle unless (stelle == nil || rSzene.stellen.include?(stelle))
+          # rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
 
 
           @szene_solr_batch << rSzene.to_solr_string
@@ -836,14 +833,13 @@ class UploadsController < ApplicationController
 
           if @szene_batch.size == max_batch_size
 
+            puts "---> import"
+
             Szene.import @szene_batch if @szene_batch.size > 0
             @szene_batch.clear
 
-            Szenebild.import @szenebilder_batch if @szenebilder_batch.size > 0
-            @szenebilder_batch.clear
-
-            Stelle.import @stelle_batch if @stelle_batch.size > 0
-            @stelle_batch.clear
+            #Stelle.import @stelle_batch if @stelle_batch.size > 0
+            #@stelle_batch.clear
 
           end
 
@@ -853,8 +849,7 @@ class UploadsController < ApplicationController
       end
 
       Szene.import @szene_batch if @szene_batch.size > 0
-      Szenebild.import @szenebilder_batch if @szenebilder_batch.size > 0
-      Stelle.import @stelle_batch if @stelle_batch.size > 0
+      # Stelle.import @stelle_batch if @stelle_batch.size > 0
 
     end
 
