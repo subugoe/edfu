@@ -8,6 +8,7 @@ require 'verify_ort_helper'
 require 'verify_gott_helper'
 require 'verify_wort_helper'
 require 'scrape'
+require 'stellen_helper'
 
 
 class UploadsController < ApplicationController
@@ -76,9 +77,14 @@ class UploadsController < ApplicationController
 
     #}
     # end
+    processed = false
 
+    Benchmark.bm(7) do |x|
+      x.report("process all:") {
+        processed = process_files
+      }
+    end
 
-    processed = process_files
 
     respond_to do |format|
       #if @upload.save
@@ -118,12 +124,12 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    process_formular
+    #process_formular
     # process_ort
     # process_gott
     # process_wort
     #
-    # process_szene
+    process_szene
     #
     cleanupSolr
     updateSolr
@@ -150,6 +156,8 @@ class UploadsController < ApplicationController
         Stelle.delete_all
         Wort.delete_all
         Wbberlin.delete_all
+        Szene.delete_all
+        Szenebild.delete_all
 
       }
     end
@@ -271,7 +279,7 @@ class UploadsController < ApplicationController
           end
 
           # todo: remove this
-          # break if i==1000
+          break if i==10
 
           # if uid doesn't exist
           # todo use string
@@ -304,50 +312,44 @@ class UploadsController < ApplicationController
           f.texttyp                  = row[5] || ''
           f.szeneID                  = szID
 
+          # --- Stellen
 
-          s = create_stellen(seitezeile, band, uID) # , f)
+          s                          = create_stellen(seitezeile, band, uID) # , f)
           if s.class == Array
             s = s[0]
             @stelle_batch << s
           end
-
-
-          # f.stellen << s
           s.zugehoerigZu = f
 
-          @formular_batch << f
 
+          # --- Photos
 
-          # f.stellen << stelle
-          # stelle.zugehoerigZu = f
-          #f.save
-
-          @photo_batch += manipulate_photo_string_and_create(photo, uID, f)
+          @photo_batch   += manipulate_photo_string_and_create(photo, uID, f)
 
           f.photos.each { |p|
             fp          = FormularePhotos.new
             fp.formular = f
             fp.photo    = p
-
             @formular_photo_batch << fp
-
           }
+
+          # --- Literaturen
 
           f.literaturen.each { |lit|
             fl           = FormulareLiteraturen.new
             fl.formular  = f
             fl.literatur = lit
-
             @formular_literatur_batch << fl
-
           }
-
-
           @literatur_batch += create_literaturen(uID, f)
+
+
+          @formular_batch << f
 
           @formular_solr_batch << f.to_solr_string
           @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
 
+          # --- check batch size and write to db if max_size reached
 
           if @formular_batch.size == max_batch_size
             Formular.import @formular_batch
@@ -385,17 +387,14 @@ class UploadsController < ApplicationController
       }
 
 
+      # --- write batches to db
+
       Stelle.import @stelle_batch if @stelle_batch.size > 0
       Photo.import @photo_batch if @photo_batch.size > 0
       Literatur.import @literatur_batch if @literatur_batch.size > 0
       FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
       FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
       Formular.import @formular_batch if @photo_batch.size > 0
-
-
-      #x.report("write formular batch to db:") {
-      #  Formular.import formulare_batch #unless formulare_batch == nil
-      #}
 
     end
 
@@ -591,9 +590,15 @@ class UploadsController < ApplicationController
 
     # Szeneninformation aus CSV Dateien (aus Imagemap)
 
-    szene_bildDict    = Hash.new
-    bilderColumnDict  = Hash.new
-    @szene_solr_batch = Array.new
+    max_batch_size     = 1500
+    szene_bildDict     = Hash.new
+    bilderColumnDict   = Hash.new
+    @szene_solr_batch  = Array.new
+
+    @szenebilder_batch = Array.new
+    @szene_batch       = Array.new
+    @stelle_batch      = Array.new
+
 
     CSV.foreach("Daten/tempelplan.csv", :col_sep => ';') do |bildRow|
       # with open('Daten/tempelplan.csv', 'rb') as bilderListeCSV:
@@ -603,6 +608,7 @@ class UploadsController < ApplicationController
       # for bildRow in bilderListeReader :
 
       if bildRow[0] == 'image'
+
         # Spaltennummern für Felder feststellen
         i = 0
         bildRow.each { |value|
@@ -610,7 +616,23 @@ class UploadsController < ApplicationController
           i                       += 1
         }
 
+        next
+
       else
+
+
+        # name -> label
+        # dateiname -> image
+        # imagemap -> imagemap
+        # breite -> new_size_x
+        # hoehe -> new_size_y
+        # breite_original -> orig_size_x
+        # hoehe_original -> orig_size_y
+        # offset_x -> offset_x
+        # offset_y -> offset_y
+        # name -> label
+
+
         recordSzeneBild = Szenebild.fetch(
             bildRow[bilderColumnDict['image']],
             bildRow[bilderColumnDict['label']],
@@ -623,33 +645,30 @@ class UploadsController < ApplicationController
             bildRow[bilderColumnDict['offset_y']]
         )
         if recordSzeneBild.class == Array
+          # szeneBild is new
           recordSzeneBild = recordSzeneBild[0]
           @szenebilder_batch << recordSzeneBild
         end
 
       end
 
-
       # todo is the dateiname unique?
-      szene_bildDict[recordSzeneBild['dateiname']] = recordSzeneBild
-      szene_bild_ID                                = recordSzeneBild['uid']
+      # szene_bildDict[recordSzeneBild.dateiname] = recordSzeneBild
+      # szene_bild_ID                                = recordSzeneBild.id
 
-      filePath   = 'Daten/szenen/' + recordSzeneBild['dateiname'].gsub('.gif', '.csv')
+      filePath = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
       # with open(filePath, 'r') as csvFile:
       #                                  print u 'INFO CSV Datei »' + filePath + u '«'
 
 
       columnDict = {}
 
+
       CSV.foreach(filePath, :col_sep => ';') do |row|
         logger.info "\t[INFO]  [UploadController] CSV Datei: #{filePath}"
 
-
-        #reader = UnicodeReader(csvFile, delimiter=';')
-
-        #for row in reader :
-
         if row[0] == 'description'
+
           # Spaltennummern für Felder feststellen
           j = 0
           row.each { |value|
@@ -657,18 +676,110 @@ class UploadsController < ApplicationController
             j                 += 1
           }
 
+
         elsif row.size >= 12
-          #szeneID  = szene.size
-          #stelleID = stelle.size
+
+
+          # --- stellen
+
+
+          band           = ''
+          bandseite      = ''
+          bandseitezeile = ''
+          seiteStart     = ''
+          seiteStop      = ''
+          zeileStart     = ''
+          zeileStop      = ''
+          anmerkung      = ''
+          stopunsicher   = ''
+          zerstoerung    = ''
+          freigegeben    = ''
+
+          stelle = nil
+
+          if row[columnDict['volume']] != nil && row[columnDict['volume']] != ''
+
+
+            band          = row[columnDict['volume']]
+
+
+            if band.to_i > 8
+
+              logger.error "\t[Error]  [UploadController] Fehlerhafter Band: #{row} (in #{filePath})."
+
+              next
+            end
+
+            band_roemisch = dezimal_nach_roemisch(band)
+
+
+            unless seiteStart = row[columnDict['page']]
+              seiteStart = 0
+            end
+
+            if row.size >= 15
+              seiteStop  = row[columnDict['page-to']]
+              zeileStart = row[columnDict['line']]
+              zeileStop  = row[columnDict['line-to']]
+
+              bandseitezeile = "#{band_roemisch}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)} - #{'%03i' % (seiteStop)}, #{'%02i' % (zeileStop)}"
+
+
+            else
+              seiteStop  = seiteStart
+              zeileStart = 0
+              zeileStop  = 30
+
+              bandseitezeile = "#{band_roemisch}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
+
+
+            end
+
+            bandseite = "#{band_roemisch}, #{'%03i' % (seiteStart)}"
+
+            anmerkung    = ''
+            stopunsicher = 0
+            zerstoerung  = 0
+
+            freigegeben = StellenHelper.getFromBanddicet(band.to_i, 'freigegeben')
+
+
+            stelle = Stelle.fetch(
+                'Edfu',
+                band,
+                bandseite,
+                bandseitezeile,
+                seiteStart,
+                seiteStop,
+                zeileStart,
+                zeileStop,
+                anmerkung,
+                stopunsicher,
+                zerstoerung,
+                freigegeben
+            )
+
+            if stelle.class == Array
+              # szeneBild is new
+              stelle = stelle[0]
+              @stelle_batch << stelle
+            end
+
+          end
+
+
+
+          # -- szenen
 
 
           unless nummer = row[columnDict['plate']]
             nummer = 0
           end
 
-          if nummer.match(/[,\s]+/)
-            logger.error "\t[Error]  [UploadController] Szenennummer '#{nummer}' enthält Komma oder Leerzeichen #{row} (in #{filePath})"
-            nummer = nummer.to_i
+          if nummer.to_s.match(/[,\/\s]+/)
+            temp = nummer.to_i
+            logger.error "\t[Error]  [UploadController] Szenennummer (Plate) '#{nummer}' enthält Komma ',', slash '/' oder Leerzeichen #{row} (in #{filePath}). Verwendet wird #{temp}"
+            nummer = temp
           end
 
 
@@ -708,101 +819,46 @@ class UploadsController < ApplicationController
               polygon
           )
 
-          # rSzene.save
+          if rSzene.class == Array
+            # szeneBild is new
+            rSzene = rSzene[0]
+            @szene_batch << rSzene unless @szene_batch.include? rSzene
+          end
 
-          # formular.photos << p unless formular.photos.include? p
+          rSzene.stellen << stelle unless (stelle == nil || rSzene.stellen.include?(stelle))
           rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
 
-          #            @szene_solr_batch << rSzene.to_solr_string
 
-          #szene      += [rSzene]
+          @szene_solr_batch << rSzene.to_solr_string
 
-          # szene created
 
-          seiteStart = row[columnDict['page']]
-          seiteStop  = seiteStart
-          zeileStart = 0
-          zeileStop  = 30
-          if row.size >= 15
-            seiteStop  = row[columnDict['page-to']]
-            zeileStart = row[columnDict['line']]
-            zeileStop  = row[columnDict['line-to']]
+          if @szene_batch.size == max_batch_size
+
+            Szene.import @szene_batch if @szene_batch.size > 0
+            @szene_batch.clear
+
+            Szenebild.import @szenebilder_batch if @szenebilder_batch.size > 0
+            @szenebilder_batch.clear
+
+            Stelle.import @stelle_batch if @stelle_batch.size > 0
+            @stelle_batch.clear
+
           end
-          if row[columnDict['volume']] != ''
 
-            # rStelle             = Stelle.new
-            # rStelle.band        = row[columnDict['volume']]
-            # rStelle.seite_start = seiteStart
-            # rStelle.zeile_start = zeileStart
-            # rStelle.seite_stop  = seiteStop
-            # rStelle.zeile_stop  = zeileStop
-            #
-            # rStelle.stelle_anmerkung = ''
-            # rStelle.stelle_unsicher  = 0
-            # rStelle.zerstoerung      = 0
-            # # todo: check: freigegeben? tempel?, bandseite?, bandseitezeile?
-            #
-            # rStelle.save
-
-            # todo: Stelle creation at other places with find_or_create_by
-            # rStelle = Stelle.find_or_create_by(
-            #     band:    row[columnDict['volume']],
-            #     seite_start: seiteStart,
-            #     zeile_start: zeileStart,
-            #     seite_stop:  seiteStop,
-            #     zeile_stop:  zeileStop
-            # ) do |stelle|
-            #   stelle.stelle_anmerkung     = ''
-            #   stelle.stelle_unsicher = 0
-            #   stelle.zerstoerung   = 0
-            #   # todo: check: freigegeben? tempel?, bandseite?, bandseitezeile?
-            # end
-
-            # rStelle = Stelle.find_by(
-            #     band:        row[columnDict['volume']],
-            #     seite_start: seiteStart
-            # )
-            #
-            # if rStelle != nil
-            #   puts rStelle
-            #   puts "#{rStelle.band}, #{rStelle.seite_start}"
-            #   rStelle.szenen << rSzene unless rStelle.szenen.include? rSzene
-            #   if rStelle.band == "5" && rStelle.seite_start == "86"
-            #     puts rStelle.szenen.size
-            #   end
-            #
-            #   @szene_solr_batch << rStelle.to_solr_string
-            #
-            # end
-
-            stellen = Stelle.where(seite_start: seiteStart, band: row[columnDict['volume']])
-
-            # todo: test existence?
-            #rStelle.szenen << rSzene unless rStelle.szenen.include? rSzene
-            rSzene.stellen << stellen
-
-            @szene_solr_batch << rSzene.to_solr_string
-            # @szene_solr_batch += rSzene.stellen.collect { |stelle| stelle.to_solr_string }
-
-
-            # stelle           += [rStelle]
-
-            # stelle created
-
-
-            # szene_has_stelle += [{
-            #                          'uid_local'   => szeneID,
-            #                          'uid_foreign' => stelleID
-            #                      }]
-          end
         else
           logger.error "\t[Error]  [UploadController] weniger als 12 Spalten in Zeile: #{row} (in #{filePath})"
         end
       end
+
+      Szene.import @szene_batch if @szene_batch.size > 0
+      Szenebild.import @szenebilder_batch if @szenebilder_batch.size > 0
+      Stelle.import @stelle_batch if @stelle_batch.size > 0
+
     end
 
-  # wird unter der Tabelle SZENE_BILD hinzugefügt
-  #szene_bild = szene_bildDict.values()
+
+    # wird unter der Tabelle SZENE_BILD hinzugefügt
+    #szene_bild = szene_bildDict.values()
 
   end
 

@@ -24,7 +24,7 @@ class Szene < ActiveRecord::Base
           polygon
   )
 
-    Rails.cache.fetch("szene_#{nummer}") {
+    Rails.cache.fetch("szene_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}") {
 
       sz = Szene.new(
           nummer:       nummer,
@@ -42,7 +42,7 @@ class Szene < ActiveRecord::Base
 
       sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
-      Rails.cache.write("szene_#{nummer}", sz)
+      Rails.cache.write("szene_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}", sz)
       return [sz]
     }
 

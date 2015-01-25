@@ -34,6 +34,7 @@ class Szenebild < ActiveRecord::Base
       sb.id = ActiveRecord::Base.connection.execute("select nextval('szenebilder_id_seq')").first['nextval']
 
       Rails.cache.write("szenebild_#{dateiname}", sb)
+
       return [sb]
     }
 

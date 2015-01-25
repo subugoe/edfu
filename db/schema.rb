@@ -16,55 +16,177 @@ ActiveRecord::Schema.define(version: 20150113191310) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-# Could not dump table "active_admin_comments" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "formulare", force: :cascade do |t|
+    t.string "uid"
+    t.text   "transliteration"
+    t.text   "transliteration_nosuffix"
+    t.text   "uebersetzung"
+    t.string "texttyp"
+    t.string "szeneID"
+    t.string "band"
+    t.string "seitezeile"
+  end
 
-# Could not dump table "admin_users" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "formulare_literaturen", id: false, force: :cascade do |t|
+    t.integer "formular_id"
+    t.integer "literatur_id"
+  end
 
-# Could not dump table "formulare" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "formulare_literaturen", ["formular_id", "literatur_id"], name: "index_formulare_literaturen_on_formular_id_and_literatur_id", unique: true, using: :btree
+  add_index "formulare_literaturen", ["formular_id"], name: "index_formulare_literaturen_on_formular_id", using: :btree
+  add_index "formulare_literaturen", ["literatur_id", "formular_id"], name: "index_formulare_literaturen_on_literatur_id_and_formular_id", unique: true, using: :btree
+  add_index "formulare_literaturen", ["literatur_id"], name: "index_formulare_literaturen_on_literatur_id", using: :btree
 
-# Could not dump table "formulare_literaturen" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "formulare_photos", id: false, force: :cascade do |t|
+    t.integer "formular_id"
+    t.integer "photo_id"
+  end
 
-# Could not dump table "formulare_photos" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "formulare_photos", ["formular_id", "photo_id"], name: "index_formulare_photos_on_formular_id_and_photo_id", unique: true, using: :btree
+  add_index "formulare_photos", ["formular_id"], name: "index_formulare_photos_on_formular_id", using: :btree
+  add_index "formulare_photos", ["photo_id", "formular_id"], name: "index_formulare_photos_on_photo_id_and_formular_id", unique: true, using: :btree
+  add_index "formulare_photos", ["photo_id"], name: "index_formulare_photos_on_photo_id", using: :btree
 
-# Could not dump table "goetter" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "goetter", force: :cascade do |t|
+    t.string "uid"
+    t.string "transliteration"
+    t.string "ort"
+    t.string "eponym"
+    t.string "beziehung"
+    t.string "funktion"
+    t.string "band"
+    t.string "seitezeile"
+    t.string "anmerkung"
+  end
 
-# Could not dump table "literaturen" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "literaturen", force: :cascade do |t|
+    t.string "beschreibung"
+    t.string "detail"
+  end
 
-# Could not dump table "orte" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "literaturen", ["beschreibung", "detail"], name: "index_literaturen_on_beschreibung_and_detail", using: :btree
 
-# Could not dump table "photos" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "orte", force: :cascade do |t|
+    t.string "uid"
+    t.string "transliteration"
+    t.string "ort"
+    t.string "lokalisation"
+    t.string "anmerkung"
+  end
 
-# Could not dump table "stellen" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "photos", force: :cascade do |t|
+    t.string "name"
+    t.string "typ"
+    t.string "pfad"
+    t.text   "kommentar"
+  end
 
-# Could not dump table "stellen_szenen" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "photos", ["pfad"], name: "index_photos_on_pfad", using: :btree
 
-# Could not dump table "szenebilder" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "stellen", force: :cascade do |t|
+    t.string  "tempel"
+    t.string  "band"
+    t.string  "bandseite"
+    t.string  "bandseitezeile"
+    t.string  "seite_start"
+    t.string  "seite_stop"
+    t.string  "zeile_start"
+    t.string  "zeile_stop"
+    t.string  "stelle_anmerkung"
+    t.string  "stelle_unsicher"
+    t.string  "zerstoerung"
+    t.string  "freigegeben"
+    t.integer "zugehoerigZu_id"
+    t.string  "zugehoerigZu_type"
+  end
 
-# Could not dump table "szenen" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "stellen", ["band"], name: "index_stellen_on_band", using: :btree
+  add_index "stellen", ["bandseitezeile"], name: "index_stellen_on_bandseitezeile", using: :btree
+  add_index "stellen", ["seite_start"], name: "index_stellen_on_seite_start", using: :btree
 
-# Could not dump table "uploads" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "stellen_szenen", id: false, force: :cascade do |t|
+    t.integer "stelle_id"
+    t.integer "szene_id"
+  end
 
-# Could not dump table "users" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "stellen_szenen", ["stelle_id", "szene_id"], name: "index_stellen_szenen_on_stelle_id_and_szene_id", unique: true, using: :btree
+  add_index "stellen_szenen", ["stelle_id"], name: "index_stellen_szenen_on_stelle_id", using: :btree
+  add_index "stellen_szenen", ["szene_id", "stelle_id"], name: "index_stellen_szenen_on_szene_id_and_stelle_id", unique: true, using: :btree
+  add_index "stellen_szenen", ["szene_id"], name: "index_stellen_szenen_on_szene_id", using: :btree
 
-# Could not dump table "wbsberlin" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "szenebilder", force: :cascade do |t|
+    t.string  "name"
+    t.string  "dateiname"
+    t.string  "imagemap"
+    t.string  "breite"
+    t.string  "hoehe"
+    t.string  "offset_x"
+    t.string  "offset_y"
+    t.string  "breite_original"
+    t.string  "hoehe_original"
+    t.integer "szene_id"
+  end
 
-# Could not dump table "worte" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  add_index "szenebilder", ["szene_id"], name: "index_szenebilder_on_szene_id", using: :btree
+
+  create_table "szenen", force: :cascade do |t|
+    t.string "nummer"
+    t.string "beschreibung"
+    t.string "rect"
+    t.string "polygon"
+    t.string "koordinate_x"
+    t.string "koordinate_y"
+    t.string "blickwinkel"
+    t.string "breite"
+    t.string "prozent_z"
+    t.string "hoehe"
+    t.string "grau"
+  end
+
+  create_table "uploads", force: :cascade do |t|
+    t.string "formular"
+    t.string "ort"
+    t.string "gott"
+    t.string "wort"
+    t.string "email"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+  end
+
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "wbsberlin", force: :cascade do |t|
+    t.string  "band"
+    t.string  "seite_start"
+    t.string  "seite_stop"
+    t.string  "zeile_start"
+    t.string  "zeile_stop"
+    t.string  "notiz"
+    t.integer "wort_id"
+  end
+
+  create_table "worte", force: :cascade do |t|
+    t.string "uid"
+    t.string "transliteration"
+    t.string "transliteration_nosuffix"
+    t.string "uebersetzung"
+    t.string "hieroglyph"
+    t.string "weiteres"
+    t.string "belegstellenEdfu"
+    t.string "belegstellenWb"
+    t.string "anmerkung"
+  end
 
 end

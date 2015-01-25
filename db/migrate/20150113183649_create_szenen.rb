@@ -5,7 +5,7 @@ class CreateSzenen < ActiveRecord::Migration
       #t.string :uid
       t.string :nummer
       t.string :beschreibung
-      t.string :szene_bild_uid
+      #t.string :szene_bild_uid
       t.string :rect
       t.string :polygon
       t.string :koordinate_x
