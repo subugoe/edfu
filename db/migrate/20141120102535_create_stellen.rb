@@ -12,8 +12,8 @@ class CreateStellen < ActiveRecord::Migration
       t.string :zeile_stop         # myStelle['zeile_stop']
       t.string :stelle_anmerkung    # myStelle['anmerkung']
       t.string :stelle_unsicher     # myStelle['stop_unsicher']
-      # t.string :start
-      # t.string :stop
+      #t.string :start
+      #t.string :stop
       t.string :zerstoerung         # myStelle['zerstoerung']
       t.string :freigegeben         # myStelle['freigegeben']
       t.references :zugehoerigZu, polymorphic: true

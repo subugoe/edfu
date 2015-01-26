@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 20150113191310) do
     t.string "eponym"
     t.string "beziehung"
     t.string "funktion"
+    t.string "band"
     t.string "anmerkung"
   end
 

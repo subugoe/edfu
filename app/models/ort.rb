@@ -25,35 +25,43 @@ class Ort < ActiveRecord::Base
   end
 
   def to_solr_string
-    return {
-        :sql_uid => self[:uid],
-        #:sort => "#{self[:transliteration]}--#{self.stellen.first.start }", # --- todo
 
-        :transliteration => self[:transliteration], # ---
+    begin
+      stelle = self.stellen.first.start
+    rescue NoMethodError
+      puts "problem mit solr-sort: für uid: #{self.uid} (gott)"
+      stelle = ''
+    end
+
+    return {
+        :sql_uid                  => self[:uid],
+        :sort                     => "#{self[:transliteration]}--#{stelle}", # --- todo
+
+        :transliteration          => self[:transliteration], # ---
 
         :transliteration_nosuffix => self[:transliteration], # ---
-        :ort => self[:ort], # ---
-        :lokalisation => self[:lokalisation], # ---
-        :anmerkung => self[:anmerkung], # ---
+        :ort                      => self[:ort], # ---
+        :lokalisation             => self[:lokalisation], # ---
+        :anmerkung                => self[:anmerkung], # ---
 
-        :stelle_id => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
-        :band => self.stellen.collect { |stelle| stelle.band }, # ---
-        :bandseite => self.stellen.collect { |stelle| stelle.bandseite }, # ---
-        :bandseitezeile => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
+        :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
+        :band                     => self.stellen.collect { |stelle| stelle.band }, # ---
+        :bandseite                => self.stellen.collect { |stelle| stelle.bandseite }, # ---
+        :bandseitezeile           => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
 
-        :seite_start => self.stellen.collect { |stelle| stelle.seite_start }, # ---
-        :seite_stop => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
-        :zeile_start => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
-        :zeile_stop => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+        :seite_start              => self.stellen.collect { |stelle| stelle.seite_start }, # ---
+        :seite_stop               => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
+        :zeile_start              => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
+        :zeile_stop               => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
 
-        :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
-        :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
-        :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-        :stelle_anmerkung => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+        :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
+        :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
+        :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
+        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
 
 
-        :typ => 'ort', # ---
-        :id => "ort-#{self[:uid]}" # ---
+        :typ                      => 'ort', # ---
+        :id                       => "ort-#{self[:uid]}" # ---
     }
   end
 

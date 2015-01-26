@@ -13,7 +13,7 @@ module VerifyWortHelper
 
   def manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, wort)
 
-    stellen = Array.new
+    stellen       = Array.new
 
 
     # # todo extract to module
@@ -45,22 +45,22 @@ module VerifyWortHelper
     # Wörterbuch Berlin mit Datensatz für 'nicht belegt'
 
     # wird unter der Tabelle BERLIN (WB_BERLIN) hinzugefügt
-    berlin = [
+    berlin        = [
         {
-            'uid' => 0,
-            'band' => 0,
+            'uid'         => 0,
+            'band'        => 0,
             'seite_start' => 0,
-            'seite_stop' => 0,
+            'seite_stop'  => 0,
             'zeile_start' => 0,
-            'zeile_stop' => 0,
-            'notiz' => nil
+            'zeile_stop'  => 0,
+            'notiz'       => nil
         }
     ]
 
     # Tabelle WL
 
 
-    re20 = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
+    re20          = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
 
     #--- edfu
 
@@ -70,7 +70,7 @@ module VerifyWortHelper
     bEdfu = belegstellenEdfu
 
     if bEdfu.strip().end_with? (';')
-      i = bEdfu.rindex(';')
+      i     = bEdfu.rindex(';')
       bEdfu = bEdfu[0..i-1]
     end
 
@@ -86,7 +86,7 @@ module VerifyWortHelper
 
     if bEdfu.index('zum Beispiel') == 0
       # 1266, 1296, 2781, 2811
-      bEdfu = bEdfu.gsub(/zum Beispiel/, '')
+      bEdfu         = bEdfu.gsub(/zum Beispiel/, '')
       edfuAnmerkung = '(Beispiele) '
 
     elsif bEdfu == 'VIII, 026, 4; 033 16 '
@@ -160,16 +160,16 @@ module VerifyWortHelper
     #-- wb_berlin
 
 
-    wb = belegstellenWb
-    wbID = nil
+    wb          = belegstellenWb
+    wbID        = nil
     wbAnmerkung = nil
-    notiz = nil
+    notiz       = nil
 
     if wb == 'nicht im Wb belegt'
       wbID = 0
     elsif wb.length > 0
       if wb == 'nach II, 123, 12 - 124*'
-        wb = 'nach II, 123, 12 - 124, 1'
+        wb          = 'nach II, 123, 12 - 124, 1'
         wbAnmerkung = '*'
 
       elsif wb == 'I, 171, 03 - 12; 18 - 21'
@@ -204,10 +204,10 @@ module VerifyWortHelper
       vornach = 0
       if wb.index('nach ') == 0
         vornach = 1
-        wb = wb.gsub(/nach /, '')
+        wb      = wb.gsub(/nach /, '')
       elsif wb.index('vor ') == 0
         vornach = -1
-        wb = wb.gsub(/vor /, '')
+        wb      = wb.gsub(/vor /, '')
       end
 
       wbBand_roemisch = wb[0 .. wb.index(',')-1]
@@ -227,7 +227,7 @@ module VerifyWortHelper
       if wbTeile.length == 2
         wbSeiteZeile = wbTeile[0].split(',')
         wbSeiteStart = (wbSeiteZeile[0].strip()).to_i
-        wbSeiteStop = wbSeiteStart
+        wbSeiteStop  = wbSeiteStart
 
 
         #logger.debug "\t[DEBUG]  [WL] uid: #{uid} wb: #{wb}, seitezeile: #{wbSeiteZeile}, start: #{wbSeiteStart}, stop: #{wbSeiteStop}"
@@ -246,8 +246,8 @@ module VerifyWortHelper
         if wbTeile[1].index(',') != nil
           # Komma im zweiten Teil: unterschiedliche Seiten
           wbSeiteZeile2 = wbTeile[1].split(',')
-          wbSeiteStop = (wbSeiteZeile2[0].strip()).to_i
-          wbZeileStop = (wbSeiteZeile2[1].strip()).to_i
+          wbSeiteStop   = (wbSeiteZeile2[0].strip()).to_i
+          wbZeileStop   = (wbSeiteZeile2[1].strip()).to_i
         else
           # Range innerhalb einer Seite
           wbZeileStop = (wbTeile[1].strip()).to_i
@@ -257,7 +257,7 @@ module VerifyWortHelper
         # von: stop = [seiteStart, zeileStop]
         # nach: stop = [seiteStop, zeileStop]
         wbStart = [wbSeiteStart, wbZeileStart]
-        wbStop = [wbSeiteStop, wbZeileStop]
+        wbStop  = [wbSeiteStop, wbZeileStop]
 
       else
         logger.error "\t[ERROR]  [WL] uid: #{uid} BelegstellenWb Formatfehler #{wb}"
@@ -304,14 +304,14 @@ module VerifyWortHelper
     # )
 
 
-    dbWB = Wbberlin.new
-    dbWB.band = wbBand || 'unbekannt'
+    dbWB             = Wbberlin.new
+    dbWB.band        = wbBand || 'unbekannt'
     dbWB.seite_start = wbStart[0] || ''
-    dbWB.seite_stop = wbStop[0] || ''
+    dbWB.seite_stop  = wbStop[0] || ''
     dbWB.zeile_start = wbStart[1] || ''
-    dbWB.zeile_stop = wbStop[1] || ''
-    dbWB.notiz = wbAnmerkung || ''
-    dbWB.wort = wort
+    dbWB.zeile_stop  = wbStop[1] || ''
+    dbWB.notiz       = wbAnmerkung || ''
+    dbWB.wort        = wort
 
 
     #wort.wbberlin = dbWB
@@ -321,7 +321,7 @@ module VerifyWortHelper
 
     #--- edfu
 
-    anmerkung = ''
+    anmerkung        = ''
 
     if edfuAnmerkung != '' or edfuAnmerkung.length != 0
       if anmerkung == nil or anmerkung == ''
@@ -335,11 +335,11 @@ module VerifyWortHelper
     end
 
 
-    edfuBandNr = 0
+    edfuBandNr     = 0
     edfuSeiteStart = 0
-    zerstoerung = false
-    bandRoemisch = ''
-    bandDezimal = 0
+    zerstoerung    = false
+    bandRoemisch   = ''
+    bandDezimal    = 0
 
     if bEdfu.length > 0
       belegstellen = bEdfu.split(';')
@@ -348,11 +348,11 @@ module VerifyWortHelper
         b = b.strip()
 
         klammer = false
-        stern = false
+        stern   = false
 
         if b.index('%') != nil
           zerstoerung = true
-          b = b.gsub('%', '').gsub('&', '')
+          b           = b.gsub('%', '').gsub('&', '')
 
         end
 
@@ -372,31 +372,31 @@ module VerifyWortHelper
           if (m20[1]).length > 0
 
             bandRoemisch = m20[1].strip()
-            bandDezimal = roemisch_nach_dezimal bandRoemisch
-            edfuBandNr = bandDezimal # roemisch[m20[1].strip()]
+            bandDezimal  = roemisch_nach_dezimal bandRoemisch
+            edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
           elsif edfuBandNr == 0
             logger.error "\t[ERROR]  [WL] uid: #{uid} FEHLER", "fehlende Bandangabe #{b}"
           end
 
           edfuSeiteStart = m20[3].to_i
-          edfuSeiteStop = edfuSeiteStart
-          edfuAnmerkung = ''
+          edfuSeiteStop  = edfuSeiteStart
+          edfuAnmerkung  = ''
 
           if m20[4].index(' - ') != nil
             edfuZeileStart = (m20[4].split(' - ')[0]).to_i
-            edfuZeileStop = (m20[4].split(' - ')[1]).to_i
+            edfuZeileStop  = (m20[4].split(' - ')[1]).to_i
           else
             zeilenString = m20[4]
             zeilenString = zeilenString.gsub('/', '-').gsub(' ', '')
-            zeilen = zeilenString.split('-')
+            zeilen       = zeilenString.split('-')
 
             if zeilen.length == 1
               edfuZeileStart = zeilen[0].to_i
-              edfuZeileStop = edfuZeileStart
+              edfuZeileStop  = edfuZeileStart
 
             elsif zeilen.length == 2
               edfuZeileStart = (zeilen[0]).to_i
-              edfuZeileStop = (zeilen[1]).to_i
+              edfuZeileStop  = (zeilen[1]).to_i
             else
               logger.error "\t[ERROR]  [WL] uid: #{uid} zu viele Komponenten in Zeilenangabe: #{b}"
             end
@@ -430,24 +430,26 @@ module VerifyWortHelper
           # )
 
 
-          stelle = Stelle.new
-          stelle.tempel = 'Edfu'
-          stelle.band = edfuBandNr
-          stelle.bandseite = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
-          stelle.bandseitezeile = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
-          stelle.seite_start = edfuSeiteStart
-          stelle.seite_stop = edfuSeiteStop
-          stelle.zeile_start = edfuZeileStart
-          stelle.zeile_stop = edfuZeileStop
+          stelle                  = Stelle.new
+          stelle.tempel           = 'Edfu'
+          stelle.band             = edfuBandNr
+          stelle.bandseite        = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
+          stelle.bandseitezeile   = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
+          stelle.seite_start      = edfuSeiteStart
+          stelle.seite_stop       = edfuSeiteStop
+          stelle.zeile_start      = edfuZeileStart
+          stelle.zeile_stop       = edfuZeileStop
           stelle.stelle_anmerkung = edfuAnmerkung
-          stelle.stelle_unsicher = false
-          stelle.zerstoerung = false
+          stelle.stelle_unsicher  = false
+          stelle.zerstoerung      = false
           #stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
-          stelle.freigegeben = StellenHelper.getFromBanddict((edfuBandNr).to_i, 'freigegeben')
+          stelle.freigegeben      = StellenHelper.getFromBanddict((edfuBandNr).to_i, 'freigegeben')
           #stelle.zugehoerigZu = wort
+
+          #wort.bandseite = stelle.bandseite
+          #wort.bandseitezeile = stelle.bandseitezeile
+
           wort.stellen << stelle
-          wort.bandseite = stelle.bandseite
-          wort.bandseitezeile = stelle.bandseitezeile
 
           #stellen << stelle
 

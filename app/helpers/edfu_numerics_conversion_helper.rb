@@ -12,7 +12,13 @@ module EdfuNumericsConversionHelper
         7 => 'VII',
         8 => 'VIII'
     }
-    return hsh[dezimal.to_i]
+
+    begin
+      return hsh[dezimal.to_i]
+    rescue NoMethodError
+      return nil
+    end
+
   end
 
   def roemisch_nach_dezimal (roemisch)
@@ -27,6 +33,12 @@ module EdfuNumericsConversionHelper
         'VII' => 7,
         'VIII' => 8
     }
-    return hsh[roemisch.to_i]
+
+    begin
+      return hsh[roemisch]
+    rescue NoMethodError
+      return nil
+    end
+
   end
 end

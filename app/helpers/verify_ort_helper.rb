@@ -38,6 +38,8 @@ module VerifyOrtHelper
 
     originalStelle = stelle
 
+
+
     if stelle == 'VIII, 73, 5; 73, 7 (sic; statt   lies wohl  , gegen Anm. 6);'
       # 240
       stelle = 'VIII, 73, 5; 73, 7 (sic - statt   lies wohl  , gegen Anm. 6)'
@@ -103,7 +105,6 @@ module VerifyOrtHelper
       ort.anmerkung = anm || ''
     end
 
-
     # ort << [myOrt]
 
     # match als strip(char)-Ersatz
@@ -112,6 +113,8 @@ module VerifyOrtHelper
 
     myBand = ''
     bandNr = 0
+
+
 
     teile.each do |teil|
 
@@ -174,11 +177,15 @@ module VerifyOrtHelper
           stelle.stelle_unsicher = false
           stelle.zerstoerung = false
           stelle.freigegeben = StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
+
+
           # stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
           #stelle.zugehoerigZu = ort
+
+          #ort.bandseite = stelle.bandseite
+          #ort.bandseitezeile = stelle.bandseitezeile
+
           ort.stellen << stelle
-          ort.bandseite = stelle.bandseite
-          ort.bandseitezeile = stelle.bandseitezeile
 
           #self.stellen << stelle unless self.stellen.include? stelle
 

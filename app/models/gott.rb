@@ -19,6 +19,13 @@ class Gott < ActiveRecord::Base
 
 
   def to_solr_string
+    begin
+      stelle = self.stellen.first.start
+    rescue NoMethodError
+      puts "problem mit solr-sort: für uid: #{self.uid} (gott)"
+      stelle = ''
+    end
+
     return {
         :sql_uid => self[:uid], # ---
         :transliteration => self[:transliteration], # ---
@@ -30,7 +37,7 @@ class Gott < ActiveRecord::Base
         :band => roemisch_nach_dezimal(band.to_s.strip).to_i,
 
         :anmerkung => self[:anmerkung], # ---
-        #:sort => "Act--#{self.stellen.first.start}", # --- todo
+        :sort => "Act--#{stelle}", # --- todo
 
         :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---

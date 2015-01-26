@@ -24,12 +24,13 @@ module StellenHelper
 
 
     begin
-      el = bandDict[bandId][element]
+      return bandDict[bandId][element]
     rescue NoMethodError
-      puts "NoMethodError: bandId=#{bandId}, element=#{element}"
-    end
 
-    return el
+
+
+      return nil
+    end
 
   end
 

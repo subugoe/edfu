@@ -18,6 +18,13 @@ class Wort < ActiveRecord::Base
 
   def to_solr_string
 
+    begin
+      stelle = self.stellen.first.start
+    rescue NoMethodError
+      puts "problem mit solr-sort: für uid: #{self.uid} (wort)"
+      stelle = ''
+    end
+
     return {
         :sql_uid => self[:uid],
 
@@ -40,7 +47,7 @@ class Wort < ActiveRecord::Base
         :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
 
-        #:sort => "Ddt--#{self.wbberlin.sort}", # ---  todo
+        :sort => "Ddt--#{stelle}", # ---  todo
         :berlin_display => self.wbberlin.berlin_display, # ---
         :berlin_band => self.wbberlin.band.to_i, # ---
         :berlin_seite_start => self.wbberlin.seite_start.to_i, # ---

@@ -21,10 +21,18 @@ class Formular < ActiveRecord::Base
 
 
   def to_solr_string
+
+    begin
+      stelle = self.stellen.first.start
+    rescue NoMethodError
+      puts "problem mit solr-sort: für uid: #{self.uid} (formular)"
+      stelle = ''
+    end
+
     return {
         :sql_uid                  => self[:uid], # ---
 
-        #:sort => "#{self.stellen.first.start}", # ---  todo
+        :sort => stelle, # ---  todo
 
         :transliteration          => self[:transliteration], # ---
 

@@ -126,13 +126,13 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    #process_formular
+    process_formular
     process_ort
     process_gott
     process_wort
-    #
+
     process_szene
-    #
+
     cleanupSolr
     updateSolr
 
@@ -325,6 +325,7 @@ class UploadsController < ApplicationController
             addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
           end
           s.zugehoerigZu = f
+          f.stellen << s
 
           f.bandseite      = s.bandseite
           f.bandseitezeile = s.bandseitezeile
@@ -438,8 +439,9 @@ class UploadsController < ApplicationController
             next
           end
 
-          iStelle = row[0] || ''
-          uid     = Integer(row[5]) || ''
+          iStelle = row[0] ||= ''
+
+          uid = Integer(row[5]) || ''
 
           o = Ort.new(
 
@@ -454,7 +456,14 @@ class UploadsController < ApplicationController
 
           )
 
-          manipulate_stelle_string_and_create(iStelle, uid, o)
+
+
+          if (iStelle == '')
+            logger.error "\t[Error]  [OL] uid: #{uid} Fehler mit STELLE, '#{iStelle }'"
+          else
+            manipulate_stelle_string_and_create(iStelle, uid, o)
+          end
+
 
           o.save
 
@@ -493,7 +502,6 @@ class UploadsController < ApplicationController
           # todo replace this
           #break if i==15
 
-          #puts  "god uid: #{Integer(row[9])}"
 
           uid        = Integer(row[9]) || ''
           seitezeile = row[7] || ''
@@ -515,8 +523,8 @@ class UploadsController < ApplicationController
           )
 
           stelle = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
-          g.bandseite = stelle.bandseite
-          g.bandseitezeile = stelle.bandseitezeile
+          #g.bandseite = stelle.bandseite
+          #g.bandseitezeile = stelle.bandseitezeile
 
           g.save
 
@@ -780,9 +788,10 @@ class UploadsController < ApplicationController
 
             typ         = "formular"
 
+            # todo remove this, replaced db access (with Stelle.where)
             #stellen = @bandseitestellen["#{band}_#{seiteStart}"]
             stellen     = Stelle.where(
-                band:       band,
+                band:        band,
                 seite_start: seiteStart
             )
 
@@ -876,9 +885,9 @@ class UploadsController < ApplicationController
               hoehe_original:  recordSzeneBild.hoehe_original
           )
 
-          puts "stellen.size: #{stellen.size}" unless stellen == nil
+
           sz.stellen << stellen unless stellen == nil
-          puts "sz.stellen.size: #{sz.stellen.size}" unless sz.stellen == nil
+
           sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
           #@szene_batch << sz
@@ -893,7 +902,6 @@ class UploadsController < ApplicationController
 
           if @szene_batch.size == max_batch_size
 
-            puts "---> import"
 
             Szene.import @szene_batch if @szene_batch.size > 0
             @szene_batch.clear
