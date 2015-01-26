@@ -126,7 +126,7 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    process_formular
+    #process_formular
     process_ort
     process_gott
     process_wort
@@ -509,12 +509,14 @@ class UploadsController < ApplicationController
               beziehung:                row[4] || '',
               funktion:                 row[5] || '',
               band:                     band,
-              seitezeile:               seitezeile,
+              #seitezeile:               seitezeile,
               anmerkung:                row[8] || '',
 
           )
 
-          manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
+          stelle = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
+          g.bandseite = stelle.bandseite
+          g.bandseitezeile = stelle.bandseitezeile
 
           g.save
 
@@ -752,7 +754,7 @@ class UploadsController < ApplicationController
             stopunsicher = 0
             zerstoerung  = 0
 
-            freigegeben = StellenHelper.getFromBanddicet(band.to_i, 'freigegeben')
+            freigegeben = StellenHelper.getFromBanddict(band.to_i, 'freigegeben')
 
 
             # stelle = Stelle.fetch(

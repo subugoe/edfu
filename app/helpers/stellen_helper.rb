@@ -1,9 +1,9 @@
 module StellenHelper
 
 
-  def self.getFromBanddicet(bandId, element)
+  def self.getFromBanddict(bandId, element)
 
-    bandDict    = {
+    bandDict = {
         1 => {'uid'        => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
               'tempel_uid' => 0},
         2 => {'uid'        => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
@@ -22,7 +22,15 @@ module StellenHelper
               'tempel_uid' => 0}
     }
 
-    return bandDict[bandId][element]
+
+    begin
+      el = bandDict[bandId][element]
+    rescue NoMethodError
+      puts "NoMethodError: bandId=#{bandId}, element=#{element}"
+    end
+
+    return el
+
   end
 
 end

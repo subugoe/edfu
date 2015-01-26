@@ -12,12 +12,12 @@ class CreateWorte < ActiveRecord::Migration
       t.string :anmerkung
       #t.references :wbberlin, index: true
 
-      t.string :band        # bestandteil von stelle
-      t.string :bandseite
-      t.string :bandseitezeile
+      #t.string :band             # bestandteil von stelle
+      #t.string :bandseite        # bestandteil von stelle
+      #t.string :bandseitezeile   # bestandteil von stelle
 
       #t.timestamps
     end
-    add_index :worte, :bandseitezeile # , :unique => true
+    #add_index :worte, :bandseitezeile # , :unique => true
   end
 end

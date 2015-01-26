@@ -57,13 +57,8 @@ ActiveRecord::Schema.define(version: 20150113191310) do
     t.string "eponym"
     t.string "beziehung"
     t.string "funktion"
-    t.string "band"
-    t.string "bandseite"
-    t.string "bandseitezeile"
     t.string "anmerkung"
   end
-
-  add_index "goetter", ["bandseitezeile"], name: "index_goetter_on_bandseitezeile", using: :btree
 
   create_table "literaturen", force: :cascade do |t|
     t.string "beschreibung"
@@ -78,12 +73,7 @@ ActiveRecord::Schema.define(version: 20150113191310) do
     t.string "ort"
     t.string "lokalisation"
     t.string "anmerkung"
-    t.string "band"
-    t.string "bandseite"
-    t.string "bandseitezeile"
   end
-
-  add_index "orte", ["bandseitezeile"], name: "index_orte_on_bandseitezeile", using: :btree
 
   create_table "photos", force: :cascade do |t|
     t.string "name"
@@ -97,6 +87,8 @@ ActiveRecord::Schema.define(version: 20150113191310) do
   create_table "stellen", force: :cascade do |t|
     t.string  "tempel"
     t.string  "band"
+    t.string  "bandseite"
+    t.string  "bandseitezeile"
     t.string  "seite_start"
     t.string  "seite_stop"
     t.string  "zeile_start"
@@ -204,11 +196,6 @@ ActiveRecord::Schema.define(version: 20150113191310) do
     t.string "belegstellenEdfu"
     t.string "belegstellenWb"
     t.string "anmerkung"
-    t.string "band"
-    t.string "bandseite"
-    t.string "bandseitezeile"
   end
-
-  add_index "worte", ["bandseitezeile"], name: "index_worte_on_bandseitezeile", using: :btree
 
 end

@@ -133,7 +133,7 @@ module VerifyFormularHelper
     # todo entfernen? Gehört zur Normalisierung
     band_uid    = band #bandDict[(self[:band]).to_i]['nummer']
     # freigegeben = bandDict[band.to_i]['freigegeben']
-    freigegeben = StellenHelper.getFromBanddicet((band).to_i, 'freigegeben')
+    freigegeben = StellenHelper.getFromBanddict((band).to_i, 'freigegeben')
 
     ## Sonderfälle
     szOriginal  = seitezeile

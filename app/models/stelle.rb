@@ -8,7 +8,7 @@ require 'celluloid/autostart'
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper
 
-  attr_accessor :bandseite, :bandseitezeile
+  # attr_accessor :bandseite, :bandseitezeile
 
   belongs_to :zugehoerigZu, polymorphic: true
   has_and_belongs_to_many :szenen, :dependent => :delete_all
@@ -29,8 +29,10 @@ class Stelle < ActiveRecord::Base
         :sql_uid          => self[:id], # ---
 
         :tempel           => self.tempel, # ---
-        :band             => self.band, # ---
 
+        :band             => self.band, # ---
+        :bandseite        => self.bandseite, # ---
+        :bandseitezeile   => self.bandseitezeile, # ---
         :seite_start      => self.seite_start, # ---
         :seite_stop       => self.seite_stop, # ---
         :zeile_start      => self.zeile_start, # ---
@@ -53,8 +55,8 @@ class Stelle < ActiveRecord::Base
   end
 
   def self.fetch(
-    typ,
-      tempel,
+      typ,
+          tempel,
           band,
           bandseite,
           bandseitezeile,

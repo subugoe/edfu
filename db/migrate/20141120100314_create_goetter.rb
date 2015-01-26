@@ -9,9 +9,9 @@ class CreateGoetter < ActiveRecord::Migration
       t.string :beziehung
       t.string :funktion
 
-      t.string :band        # bestandteil von stelle
-      t.string :bandseite
-      t.string :bandseitezeile
+      #t.string :band             # bestandteil von stelle
+      #t.string :bandseite        # bestandteil von stelle
+      #t.string :bandseitezeile   # bestandteil von stelle
 
       #t.string :seitezeile
 
@@ -19,6 +19,6 @@ class CreateGoetter < ActiveRecord::Migration
 
       #t.timestamps
     end
-    add_index :goetter, :bandseitezeile # , :unique => true
+    # add_index :goetter, :bandseitezeile # , :unique => true
   end
 end
