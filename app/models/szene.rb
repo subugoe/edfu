@@ -4,7 +4,6 @@ class Szene < ActiveRecord::Base
   extend EdfuModelHelper
 
   has_and_belongs_to_many :stellen, :dependent => :delete_all
-  # has_many :szenebilder
 
   #after_commit :add_to_solr
   #before_validation :check_data
