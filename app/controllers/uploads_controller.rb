@@ -156,7 +156,6 @@ class UploadsController < ApplicationController
     Szene.delete_all
 
 
-
   end
 
   def cleanupSolr
@@ -583,33 +582,21 @@ class UploadsController < ApplicationController
       else
 
 
-        # name -> label
-        # dateiname -> image
-        # imagemap -> imagemap
-        # breite -> new_size_x
-        # hoehe -> new_size_y
-        # breite_original -> orig_size_x
-        # hoehe_original -> orig_size_y
-        # offset_x -> offset_x
-        # offset_y -> offset_y
-
-        recordSzeneBild = Szenebild.new(
-            dateiname:       bildRow[bilderColumnDict['image']],
-            name:            bildRow[bilderColumnDict['label']],
-            imagemap:        bildRow[bilderColumnDict['imagemap']],
-            breite:          bildRow[bilderColumnDict['new_size_x']],
-            hoehe:           bildRow[bilderColumnDict['new_size_y']],
-            breite_original: bildRow[bilderColumnDict['orig_size_x']],
-            hoehe_original:  bildRow[bilderColumnDict['orig_size_y']],
-            offset_x:        bildRow[bilderColumnDict['offset_x']],
-            offset_y:        bildRow[bilderColumnDict['offset_y']]
-        )
+        dateiname       = bildRow[bilderColumnDict['image']]
+        name            = bildRow[bilderColumnDict['label']]
+        imagemap        = bildRow[bilderColumnDict['imagemap']]
+        breite          = bildRow[bilderColumnDict['new_size_x']]
+        hoehe           = bildRow[bilderColumnDict['new_size_y']]
+        breite_original = bildRow[bilderColumnDict['orig_size_x']]
+        hoehe_original  = bildRow[bilderColumnDict['orig_size_y']]
+        offset_x        = bildRow[bilderColumnDict['offset_x']]
+        offset_y        = bildRow[bilderColumnDict['offset_y']]
 
 
       end
 
 
-      filePath = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
+      filePath = 'Daten/szenen/' + dateiname.gsub('.gif', '.csv')
 
 
       columnDict = {}
@@ -708,15 +695,15 @@ class UploadsController < ApplicationController
               grau:            grau,
               polygon:         polygon,
               # aus szenebild
-              name:            recordSzeneBild.name,
-              dateiname:       recordSzeneBild.dateiname,
-              imagemap:        recordSzeneBild.imagemap,
-              bild_breite:     recordSzeneBild.breite,
-              bild_hoehe:      recordSzeneBild.hoehe,
-              offset_x:        recordSzeneBild.offset_x,
-              offset_y:        recordSzeneBild.offset_y,
-              breite_original: recordSzeneBild.breite_original,
-              hoehe_original:  recordSzeneBild.hoehe_original
+              name:            name,
+              dateiname:       dateiname,
+              imagemap:        imagemap,
+              bild_breite:     breite,
+              bild_hoehe:      hoehe,
+              offset_x:        offset_x,
+              offset_y:        offset_y,
+              breite_original: breite_original,
+              hoehe_original:  hoehe_original
           )
 
 
