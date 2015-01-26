@@ -9,13 +9,10 @@ class Gott < ActiveRecord::Base
   include EdfuNumericsConversionHelper
   extend EdfuModelHelper
 
-  # todo has_many or has_one?
+
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
   attr_accessor :transliteration_nosuffix
-
-  #after_commit :add_to_solr
-  #before_validation :check_data
 
 
   def to_solr_string
@@ -37,7 +34,7 @@ class Gott < ActiveRecord::Base
         :band => roemisch_nach_dezimal(band.to_s.strip).to_i,
 
         :anmerkung => self[:anmerkung], # ---
-        :sort => "Act--#{stelle}", # --- todo
+        :sort => "Act--#{stelle}", # ---
 
         :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :zerstoerung => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---

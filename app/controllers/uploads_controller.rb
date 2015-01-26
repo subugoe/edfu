@@ -258,7 +258,6 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      # todo: remove this
       # break if i==10
 
       # if uid doesn't exist
@@ -439,7 +438,7 @@ class UploadsController < ApplicationController
         next
       end
 
-      # todo replace this
+
       # break if i==15
 
 

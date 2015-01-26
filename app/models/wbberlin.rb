@@ -9,8 +9,6 @@ class Wbberlin < ActiveRecord::Base
 
   belongs_to :wort
 
-  #after_commit :add_to_solr
-
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%02i' % self[:zeile_start]}"
@@ -57,10 +55,10 @@ class Wbberlin < ActiveRecord::Base
 
   def add_to_solr
 
-    # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
     solr.add (to_solr_string)
     solr.commit
+
   end
 
 

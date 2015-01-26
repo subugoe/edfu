@@ -10,11 +10,6 @@ class Wort < ActiveRecord::Base
   has_one :wbberlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  #belongs_to :wbberlin
-
-
-  #after_commit :add_to_solr
-  #before_validation :check_data
 
   def to_solr_string
 
@@ -48,7 +43,7 @@ class Wort < ActiveRecord::Base
         :freigegeben => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
 
-        :sort => "Ddt--#{stelle}", # ---  todo
+        :sort => "Ddt--#{stelle}", # ---
         :berlin_display => self.wbberlin.berlin_display, # ---
         :berlin_band => self.wbberlin.band.to_i, # ---
         :berlin_seite_start => self.wbberlin.seite_start.to_i, # ---
@@ -69,10 +64,10 @@ class Wort < ActiveRecord::Base
 
   def add_to_solr
 
-    # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
     solr.add (to_solr_string)
     solr.commit
+
   end
 
 end

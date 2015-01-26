@@ -49,7 +49,8 @@ module VerifyFormularHelper
 
 
   private
-# todo in module auslagern
+
+
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
 
@@ -96,43 +97,8 @@ module VerifyFormularHelper
 
   def create_stellen(seitezeile, band, uid, formular)
 
-    # # todo extract to module
-    # # Einträge für die 8 Chassinat Bände.
-    # bandDict    = {
-    #     1 => {'uid'        => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
-    #           'tempel_uid' => 0},
-    #     2 => {'uid'        => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
-    #           'tempel_uid' => 0},
-    #     3 => {'uid'        => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
-    #           'tempel_uid' => 0},
-    #     4 => {'uid'        => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
-    #           'tempel_uid' => 0},
-    #     5 => {'uid'        => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
-    #           'tempel_uid' => 0},
-    #     6 => {'uid'        => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
-    #           'tempel_uid' => 0},
-    #     7 => {'uid'        => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
-    #           'tempel_uid' => 0},
-    #     8 => {'uid'        => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
-    #           'tempel_uid' => 0}
-    # }
-
-    #band = []
-    #stelle = []
-
     anmerkung   = ''
 
-    # Felder
-    #@myFormular['texttyp'] = self[:texttyp]
-
-    # Textposition
-
-    # todo Konversion absichern Integer("1")
-
-    myStelle    = {}
-    # todo entfernen? Gehört zur Normalisierung
-    band_uid    = band #bandDict[(self[:band]).to_i]['nummer']
-    # freigegeben = bandDict[band.to_i]['freigegeben']
     freigegeben = StellenHelper.getFromBanddict((band).to_i, 'freigegeben')
 
     ## Sonderfälle
@@ -256,21 +222,13 @@ module VerifyFormularHelper
       logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler, zeile_stop > 30,  #{seitezeile}"
     end
 
-
     stop_unsicher = false
     zerstoerung   = false
-
-    # # todo Teil der Normalisierung ?
-    # uid = stelle.length
-    # @myFormular['stelle_uid'] = stelle.length
-
-    # stelle << [myStelle]
-    # @formularDict[@myFormular['uid']] = @myFormular
 
     stelle        = Stelle.fetch(
         "formular",
         'Edfu',
-        band_uid,
+        band,
         bandseite,
         bandseitezeile,
         seite_start,
@@ -280,15 +238,8 @@ module VerifyFormularHelper
         anmerkung,
         stop_unsicher,
         zerstoerung,
-        freigegeben #,
-        # formular
+        freigegeben
     )
-
-    #formular.bandseite = bandseite
-    #formular.bandseitezeile = bandseitezeile
-
-    #formular.stellen << stelle
-
 
     return stelle
 
@@ -371,7 +322,6 @@ module VerifyFormularHelper
 
 
     # 4772-4795
-    # todo check why is here a float in photo?
     photo = photo.to_s.gsub(/D05_1061:/, 'D05_1061,')
     # 4817-4823
     photo = photo.gsub(/D05-0933/, 'D05_0933')
@@ -382,7 +332,6 @@ module VerifyFormularHelper
 
     #elif Photo == '103, 105, 111, 112, 2372, 2387, 2560 ( 103 - 105, 2387 - 2390, E XIV, pl. DCLXXIV )*':
 
-    # todo prüfen ob uid korrekt ist?
     # 10021
     if uid == 10021
       photo = '103, 105, 111, 112, 2372, 2387, 2560 ( 103, 104, 105, 2387, 2388, 2389, 2390, E. XIV, pl. DCLXXIV )*'
@@ -488,7 +437,6 @@ module VerifyFormularHelper
 
       if  re6.match(bildString)
 
-        # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
 
         # Klammern auf, ggf mit einem Stern hinter der schließenden Klammer
         klammern = true
@@ -637,7 +585,6 @@ module VerifyFormularHelper
           kommentar = photo_kommentar
         end
 
-        # todo ggf. in array sammeln und als batch speichern
         p = Photo.fetch(
             pfad,
             name,
@@ -658,10 +605,6 @@ module VerifyFormularHelper
       bildString = bildString.strip.sub(',', '').strip # m[2]
 
     end
-
-
-    # todo: finishCollection(PRIMARY) nicht impl., wirklich benötigt? scheinbar nur für Normalisierung
-    # finishCollection(PRIMARY)
 
     return photos
 

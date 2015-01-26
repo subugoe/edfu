@@ -10,34 +10,8 @@ module VerifyGottHelper
   private
   def manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, gott)
 
-    # # todo extract to module
-    # # Einträge für die 8 Chassinat Bände.
-    # bandDict = {
-    #     1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
-    #           'tempel_uid' => 0},
-    #     2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
-    #           'tempel_uid' => 0},
-    #     3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
-    #           'tempel_uid' => 0},
-    #     4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
-    #           'tempel_uid' => 0},
-    #     5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
-    #           'tempel_uid' => 0},
-    #     6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
-    #           'tempel_uid' => 0},
-    #     7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
-    #           'tempel_uid' => 0},
-    #     8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
-    #           'tempel_uid' => 0}
-    # }
-
 
     stellen = Array.new
-
-    #gott = []
-    #gott_has_stelle = []
-
-    # Tabelle GL
 
     re3     = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
@@ -122,9 +96,6 @@ module VerifyGottHelper
       band = 'VII' # 'VIi'
     end
 
-
-    # gelegentlich ist der Inhalt doppelt vorhanden
-
     logger.debug "\t[Debug]  [GL] uid: #{uid}, seitezeile: #{seitezeile}"
 
     if seitezeile.class == Float
@@ -170,7 +141,8 @@ module VerifyGottHelper
     teile.each { |sz|
 
 
-      # todo check this
+      # todo check the following
+
       # if match = seitezeile.match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
 
 
@@ -231,7 +203,7 @@ module VerifyGottHelper
             stopZeile = startZeile
           end
         end
-      end #8818
+      end
 
 
       startZeile ||= 1
@@ -242,7 +214,7 @@ module VerifyGottHelper
 
       if startSeite > 0 and dezimal_band > 0
 
-        # todo extract to module
+
         stelle                  = Stelle.new
         stelle.tempel           = 'Edfu'
         stelle.band             = dezimal_band
@@ -256,17 +228,8 @@ module VerifyGottHelper
         stelle.stelle_unsicher  = stopUnsicher
         stelle.zerstoerung      = false
         stelle.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
-        # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
-
-        #stelle.zugehoerigZu     = gott
-        #gott.stellen << stelle
 
         stellen << stelle
-
-        #gott.bandseite = stelle.bandseite
-        #gott.bandseitezeile = stelle.bandseitezeile
-
-        #self.stellen << stelle unless self.stellen.include? stelle
 
 
         if startZeile > 30
@@ -277,18 +240,9 @@ module VerifyGottHelper
           logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: '#{sz}'"
         end
 
-
-        # myGott['stelle_uid'] = myStelle['uid']
-
       else
         logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: '#{sz}'"
       end
-
-      #else
-      #  logger.error "\t[ERROR]  [GL] uid: #{uid} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{seitezeile}"
-      #end
-      #end
-      #end
 
     }
 

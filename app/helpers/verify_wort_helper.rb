@@ -15,35 +15,6 @@ module VerifyWortHelper
 
     stellen       = Array.new
 
-
-    # # todo extract to module
-    # # Einträge für die 8 Chassinat Bände.
-    # bandDict = {
-    #     1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
-    #           'tempel_uid' => 0},
-    #     2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
-    #           'tempel_uid' => 0},
-    #     3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
-    #           'tempel_uid' => 0},
-    #     4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
-    #           'tempel_uid' => 0},
-    #     5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
-    #           'tempel_uid' => 0},
-    #     6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
-    #           'tempel_uid' => 0},
-    #     7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
-    #           'tempel_uid' => 0},
-    #     8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
-    #           'tempel_uid' => 0}
-    # }
-
-    #wort = []
-
-    # wird unter der Tabelle WORT_HAS_STELLE (WORT_STELLE_MM) hinzugefügt
-    # wort_has_stelle = []
-
-    # Wörterbuch Berlin mit Datensatz für 'nicht belegt'
-
     # wird unter der Tabelle BERLIN (WB_BERLIN) hinzugefügt
     berlin        = [
         {
@@ -56,8 +27,6 @@ module VerifyWortHelper
             'notiz'       => nil
         }
     ]
-
-    # Tabelle WL
 
 
     re20          = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
@@ -142,7 +111,7 @@ module VerifyWortHelper
     end
 
 
-    #bEdfu = bEdfu.strip('EPON; ')
+
     if match = bEdfu.match(/(^EPON; )(.*)(EPON; $)/)
       bEdfu = match[2]
     end
@@ -216,7 +185,7 @@ module VerifyWortHelper
     end
 
 
-    # band = roemisch[roemischBand]
+
     wbBand = roemisch_nach_dezimal(wbBand_roemisch)
 
     wb = wb.gsub(' -', '-').gsub('- ', '-')
@@ -229,8 +198,6 @@ module VerifyWortHelper
         wbSeiteStart = (wbSeiteZeile[0].strip()).to_i
         wbSeiteStop  = wbSeiteStart
 
-
-        #logger.debug "\t[DEBUG]  [WL] uid: #{uid} wb: #{wb}, seitezeile: #{wbSeiteZeile}, start: #{wbSeiteStart}, stop: #{wbSeiteStop}"
 
         begin
           if wbSeiteZeile[1] != nil and wbSeiteZeile[1].strip() != ''
@@ -253,9 +220,6 @@ module VerifyWortHelper
           wbZeileStop = (wbTeile[1].strip()).to_i
         end
 
-        # todo geändert
-        # von: stop = [seiteStart, zeileStop]
-        # nach: stop = [seiteStop, zeileStop]
         wbStart = [wbSeiteStart, wbZeileStart]
         wbStop  = [wbSeiteStop, wbZeileStop]
 
@@ -264,44 +228,17 @@ module VerifyWortHelper
       end
 
     else
+
       # Nur eine Stelle
       begin
         wbStart = szSplit(wb)
       rescue ArgumentError
         logger.error "\t[ERROR]  [WL] uid: #{uid} Stelle  #{wb} konnte nicht gesplittet werden"
       end
+
       wbStop = wbStart
     end
 
-
-    # bereitsVorhanden = false
-    #
-    # # hat 1:1 relation;  todo wird das noch gebraucht?
-    # if (self.wb_berlin != nil and
-    #     self.wb_berlin.seite_start == wbSeiteStart and
-    #     self.wb_berlin.band == wbBand and
-    #     self.wb_berlin.seite_stop == wbSeiteStop and
-    #     self.wb_berlin.zeile_start == wbZeileStart and
-    #     self.wb_berlin.zeile_stop == wbZeileStop)
-    #
-    #   self.wb_berlin.notiz = wbAnmerkung if self.wb_berlin.notiz != wbAnmerkung
-    #
-    #   bereitsVorhanden = true
-    # end
-    #
-    #
-    # unless bereitsVorhanden
-
-
-    # dbWB = Wbberlin.create(
-    #     :band => wbBand || 'unbekannt',
-    #     :seite_start => wbStart[0] || '',
-    #     :seite_stop => wbStop[0] || '',
-    #     :zeile_start => wbStart[1] || '',
-    #     :zeile_stop => wbStop[1] || '',
-    #     :notiz => wbAnmerkung || '',
-    #     :wort => wort
-    # )
 
 
     dbWB             = Wbberlin.new
@@ -312,11 +249,6 @@ module VerifyWortHelper
     dbWB.zeile_stop  = wbStop[1] || ''
     dbWB.notiz       = wbAnmerkung || ''
     dbWB.wort        = wort
-
-
-    #wort.wbberlin = dbWB
-
-    #end
 
 
     #--- edfu
@@ -359,7 +291,7 @@ module VerifyWortHelper
         if b.index(',') == nil
           if edfuSeiteStart != 0
             b = edfuSeiteStart.to_s + ', ' + b
-            #					print "\t".join(["WL", str(uid), "INFO", u"Seitenzahl hinzugefügt", b])
+
           else
             logger.error "\t[ERROR]  [WL] uid: #{uid} keine Seitenzahl #{b} :: #{bEdfu}"
           end
@@ -412,23 +344,6 @@ module VerifyWortHelper
             logger.error "\t[ERROR]  [WL] uid: #{uid} m20[5] zu lang #{b}"
           end
 
-          # todo nicht korrekt
-          # stelle = Stelle.create(
-          #     :tempel => 'Edfu',
-          #     :band => edfuBandNr,
-          #     :bandseite => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
-          #     :bandseitezeile => "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
-          #     :seite_start => edfuSeiteStart,
-          #     :seite_stop => edfuSeiteStop,
-          #     :zeile_start => edfuZeileStart,
-          #     :zeile_stop => edfuZeileStop,
-          #     :stelle_anmerkung => edfuAnmerkung,
-          #     :stelle_unsicher => false,
-          #     :zerstoerung => false,
-          #     :freigegeben => bandDict[(edfuBandNr).to_i]['freigegeben'],
-          #     :zugehoerigZu => wort
-          # )
-
 
           stelle                  = Stelle.new
           stelle.tempel           = 'Edfu'
@@ -442,18 +357,10 @@ module VerifyWortHelper
           stelle.stelle_anmerkung = edfuAnmerkung
           stelle.stelle_unsicher  = false
           stelle.zerstoerung      = false
-          #stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
           stelle.freigegeben      = StellenHelper.getFromBanddict((edfuBandNr).to_i, 'freigegeben')
 
           stellen << stelle
 
-          #wort.bandseite = stelle.bandseite
-          #wort.bandseitezeile = stelle.bandseitezeile
-
-          #stelle.zugehoerigZu = wort
-          #wort.stellen << stelle
-
-          #stellen << stelle
 
           if edfuZeileStart == nil
             logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_start == nil; #{b}"

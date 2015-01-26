@@ -12,29 +12,6 @@ module VerifyOrtHelper
 
   def manipulate_stelle_string_and_create(stelle, uid, ort)
 
-
-    # # todo extract to module
-    # # Einträge für die 8 Chassinat Bände.
-    # bandDict = {
-    #     1 => {'uid' => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
-    #           'tempel_uid' => 0},
-    #     2 => {'uid' => 2, 'nummer' => 2, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou II, 1897.',
-    #           'tempel_uid' => 0},
-    #     3 => {'uid' => 3, 'nummer' => 3, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou III, 1928.',
-    #           'tempel_uid' => 0},
-    #     4 => {'uid' => 4, 'nummer' => 4, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou IV, 1929.',
-    #           'tempel_uid' => 0},
-    #     5 => {'uid' => 5, 'nummer' => 5, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou V, 1930.',
-    #           'tempel_uid' => 0},
-    #     6 => {'uid' => 6, 'nummer' => 6, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VI, 1931.',
-    #           'tempel_uid' => 0},
-    #     7 => {'uid' => 7, 'nummer' => 7, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VII, 1932.',
-    #           'tempel_uid' => 0},
-    #     8 => {'uid' => 8, 'nummer' => 8, 'freigegeben' => true, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou VIII, 1933.',
-    #           'tempel_uid' => 0}
-    # }
-
-
     re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
     originalStelle = stelle
@@ -105,8 +82,6 @@ module VerifyOrtHelper
     else
       ort.anmerkung = anm || ''
     end
-
-    # ort << [myOrt]
 
     # match als strip(char)-Ersatz
     teile = stelle.strip.split(';') #.match(/(^\s*;\s*)(.*)(\s*;\s*$)/))[2].split(';')
@@ -180,18 +155,8 @@ module VerifyOrtHelper
           stelle.freigegeben = StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
 
 
-          # stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
-          #stelle.zugehoerigZu = ort
-
-          #ort.bandseite = stelle.bandseite
-          #ort.bandseitezeile = stelle.bandseitezeile
-
           stelle.zugehoerigZu = ort
           ort.stellen << stelle
-
-
-
-          #self.stellen << stelle unless self.stellen.include? stelle
 
           if zeileStart > 30
             logger.info "\t[Error]  [OL] uid: #{uid} zeile_start > 30, zeile_start: #{zeileStart}, teil: #{teil}"
@@ -201,8 +166,6 @@ module VerifyOrtHelper
             logger.info "\t[Error]  [OL] uid: #{uid} zeile_stop > 30, zeile_stop: #{zeileStop}, teil: #{teil}"
           end
 
-          # für Normalisierung
-          # ort_has_stelle += [{'uid_local' => uid, 'uid_foreign' => myStelle['uid']}]
 
         end
       end

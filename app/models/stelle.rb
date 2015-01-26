@@ -13,8 +13,6 @@ class Stelle < ActiveRecord::Base
   belongs_to :zugehoerigZu, polymorphic: true
   has_and_belongs_to_many :szenen, :dependent => :delete_all
 
-  #after_commit :add_to_solr
-
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%03i' % self[:zeile_start]}"
@@ -42,12 +40,9 @@ class Stelle < ActiveRecord::Base
 
         :freigegeben      => self.freigegeben, # ---
         :zerstoerung      => self.zerstoerung, # ---
-        # todo: check if to_s meet the requirements
+
         :stelle_anmerkung => self.stelle_anmerkung.to_s, # ---
         :stelle_unsicher  => self.stelle_unsicher, # ---
-
-        # todo: uncomment this
-        # :besitzer => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu.uid}", # ---
 
         :typ              => 'stelle', # ---
         :id               => "stelle-#{self[:id]}" # ---
@@ -67,8 +62,7 @@ class Stelle < ActiveRecord::Base
           stelle_anmerkung,
           stelle_unsicher,
           zerstoerung,
-          freigegeben# ,
-   # zugehoerigZU
+          freigegeben
   )
 
 
@@ -91,8 +85,6 @@ class Stelle < ActiveRecord::Base
       )
 
 
-
-      # s.zugehoerigZu = zugehoerigZU
       s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
       Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
@@ -117,10 +109,10 @@ class Stelle < ActiveRecord::Base
 
   def add_to_solr
 
-    # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
     solr.add (to_solr_string)
     solr.commit
+
   end
 
 end
