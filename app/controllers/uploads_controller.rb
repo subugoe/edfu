@@ -54,10 +54,8 @@ class UploadsController < ApplicationController
 
 
     n = 50000
-    #Benchmark.bm(7) do |x|
-    #x.report("File handling:") {
 
-    # todo check tables (all columns?)
+    # todo valdate tables (all columns?)
 
     File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
       file.write(uploaded_formular.read)
@@ -75,8 +73,7 @@ class UploadsController < ApplicationController
       file.write(uploaded_wort.read)
     end
 
-    #}
-    # end
+
     processed = false
 
     Benchmark.bm(7) do |x|
@@ -85,14 +82,14 @@ class UploadsController < ApplicationController
       }
     end
 
-
     respond_to do |format|
-      #if @upload.save
+
       if processed
         format.html { redirect_to uploads_path, notice: "Upload was successfully created." }
       else
         format.html { redirect_to uploads_path, alert: "Upload not created!" }
       end
+
     end
 
   end
@@ -126,12 +123,12 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    #process_formular
-    #process_ort
+    process_formular
+    process_ort
     process_gott
-    #process_wort
+    process_wort
 
-    #process_szene
+    process_szene
 
     cleanupSolr
     updateSolr
@@ -140,29 +137,25 @@ class UploadsController < ApplicationController
   end
 
   def deleteDB
-    Benchmark.bm(7) do |x|
 
-      x.report("delete data from db:") {
+      # User.delete_all
 
-        #User.delete_all
+      Rails.cache.clear
 
-        Rails.cache.clear
+      Formular.delete_all
+      FormulareLiteraturen.delete_all
+      FormularePhotos.delete_all
+      Gott.delete_all
+      Literatur.delete_all
+      Ort.delete_all
+      Photo.delete_all
+      Stelle.delete_all
+      Wort.delete_all
+      Wbberlin.delete_all
+      Szene.delete_all
+      Szenebild.delete_all
 
-        Formular.delete_all
-        FormulareLiteraturen.delete_all
-        FormularePhotos.delete_all
-        Gott.delete_all
-        Literatur.delete_all
-        Ort.delete_all
-        Photo.delete_all
-        Stelle.delete_all
-        Wort.delete_all
-        Wbberlin.delete_all
-        Szene.delete_all
-        Szenebild.delete_all
 
-      }
-    end
   end
 
   def cleanupSolr
@@ -177,48 +170,40 @@ class UploadsController < ApplicationController
   end
 
   def updateSolr
-    Benchmark.bm(7) do |x|
 
-      x.report("add words to solr:") {
-        if (@word_solr_batch != nil && @word_solr_batch.size > 0)
-          add_to_solr(@word_solr_batch)
-        end
-      }
-      x.report("add gods to solr:") {
-        if @gott_solr_batch != nil && @gott_solr_batch.size > 0
-          add_to_solr(@gott_solr_batch)
-        end
-      }
-      x.report("add topos to solr:") {
-        if @ort_solr_batch != nil && @ort_solr_batch.size > 0
-          add_to_solr(@ort_solr_batch)
-        end
-      }
-      x.report("add formulars to solr:") {
-        if @formular_solr_batch != nil && @formular_solr_batch.size > 0
-          add_to_solr(@formular_solr_batch)
-        end
-      }
-      x.report("add scenes to solr:") {
-        if @szene_solr_batch != nil && @szene_solr_batch.size > 0
-          add_to_solr(@szene_solr_batch)
-        end
-      }
-
-      # todo: was ist schneller? einzeln, oder zusammen?
-      # x.report("add to solr:") {
-      #     add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
-      #}
-
+    if (@word_solr_batch != nil && @word_solr_batch.size > 0)
+      add_to_solr(@word_solr_batch)
     end
+
+    if @gott_solr_batch != nil && @gott_solr_batch.size > 0
+      add_to_solr(@gott_solr_batch)
+    end
+
+    if @ort_solr_batch != nil && @ort_solr_batch.size > 0
+      add_to_solr(@ort_solr_batch)
+    end
+
+    if @formular_solr_batch != nil && @formular_solr_batch.size > 0
+      add_to_solr(@formular_solr_batch)
+    end
+
+    if @szene_solr_batch != nil && @szene_solr_batch.size > 0
+      add_to_solr(@szene_solr_batch)
+    end
+
+    # todo: was ist schneller? einzeln, oder zusammen?
+    # add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
+
+
   end
+
 
   def add_to_solr(solr_string_array)
 
-    # todo extract
     solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
     solr.add (solr_string_array)
     solr.commit
+
   end
 
   # todo move to Formular/Helper (Formular.xls)
@@ -253,161 +238,146 @@ class UploadsController < ApplicationController
     @formular_literatur_batch = Array.new
 
 
-    Benchmark.bm(7) do |x|
+    logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
 
-      logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
-
-      # file = Rails.root.join('public', 'uploads', 'Formular.xls')
-      # excel = nil
+    # file = Rails.root.join('public', 'uploads', 'Formular.xls')
+    # excel = nil
 
 
-      #excel = Roo::Excel.new(file.to_s)
-      excel               = Roo::Excel.new("public/uploads/Formular.xls")
-      excel.default_sheet = excel.sheets.first
+    #excel = Roo::Excel.new(file.to_s)
+    excel               = Roo::Excel.new("public/uploads/Formular.xls")
+    excel.default_sheet = excel.sheets.first
 
-      x.report("create all formulars:") {
-        excel.each do |row|
+    excel.each do |row|
 
-          # not process the header
-          if i==1
-            i += 1
-            next
-          end
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
 
-          # if SzeneID doesn't exist
-          if row[7] != nil and row[7] != ''
-            szID = Integer(row[7])
-          else
-            szID = ''
-          end
+      # if SzeneID doesn't exist
+      if row[7] != nil and row[7] != ''
+        szID = Integer(row[7])
+      else
+        szID = ''
+      end
 
-          # todo: remove this
-          # break if i==10
+      # todo: remove this
+      # break if i==10
 
-          # if uid doesn't exist
-          # todo use string
-          if row[9] != nil and row[9] != ''
-            uID = Integer(row[9])
-          else
-            uID = SecureRandom.random_number(100000000)
-            # todo logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
-          end
-
-
-          uebersetzung = row[4] || ''
-          photo        = row[6].to_s || ''
-          literatur    = row[8] || ''
-          seitezeile   = row[2] || ''
-          band         = Integer(row[1]) || -1
-
-          # in batch und dann bulk ingest, nebenläufig ausführen
-          f            = Formular.new
+      # if uid doesn't exist
+      # todo use string
+      if row[9] != nil and row[9] != ''
+        uID = Integer(row[9])
+      else
+        uID = SecureRandom.random_number(100000000)
+        # todo logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
+      end
 
 
-          f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
+      uebersetzung = row[4] || ''
+      photo        = row[6].to_s || ''
+      literatur    = row[8] || ''
+      seitezeile   = row[2] || ''
+      band         = Integer(row[1]) || -1
 
-          f.uid                      = uID
-          f.transliteration          = row[0] || ''
-          f.band                     = band
-          #f.seitezeile               = seitezeile
-          f.transliteration_nosuffix = row[3] || ''
-          f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
-          f.texttyp                  = row[5] || ''
-          f.szeneID                  = szID
-
-          # --- Stellen
-
-          s                          = create_stellen(seitezeile, band, uID) # , f)
-          if s.class == Array
-            s = s[0]
-            @stelle_batch << s
-            # todo for other types
-            addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
-          end
-          #s.zugehoerigZu = f
-          #f.stellen << s
-
-          f.bandseite      = s.bandseite
-          f.bandseitezeile = s.bandseitezeile
-
-          # --- Photos
-
-          @photo_batch     += manipulate_photo_string_and_create(photo, uID, f)
-
-          f.photos.each { |p|
-            fp          = FormularePhotos.new
-            fp.formular = f
-            fp.photo    = p
-            @formular_photo_batch << fp
-          }
-
-          # --- Literaturen
-
-          f.literaturen.each { |lit|
-            fl           = FormulareLiteraturen.new
-            fl.formular  = f
-            fl.literatur = lit
-            @formular_literatur_batch << fl
-          }
-          @literatur_batch += create_literaturen(uID, f)
+      # in batch und dann bulk ingest, nebenläufig ausführen
+      f            = Formular.new
 
 
-          @formular_batch << f
+      f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
 
-          @formular_solr_batch << f.to_solr_string
-          @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
+      f.uid                      = uID
+      f.transliteration          = row[0] || ''
+      f.band                     = band
+      #f.seitezeile               = seitezeile
+      f.transliteration_nosuffix = row[3] || ''
+      f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
+      f.texttyp                  = row[5] || ''
+      f.szeneID                  = szID
 
-          # --- check batch size and write to db if max_size reached
+      # --- Stellen
 
-          if @formular_batch.size == max_batch_size
-            Formular.import @formular_batch
-            @formular_batch.clear
-          end
+      s                          = create_stellen(seitezeile, band, uID, f)
+      if s.class == Array
+        s = s[0]
+        @stelle_batch << s
+        # todo for other types
+        addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
+      end
 
-          if @formular_photo_batch.size == max_batch_size
-            FormularePhotos.import @formular_photo_batch
-            @formular_photo_batch.clear
-          end
+      s.zugehoerigZu   = f
+      f.bandseite      = s.bandseite
+      f.bandseitezeile = s.bandseitezeile
 
+      f.stellen << s
 
-          if @formular_literatur_batch.size == max_batch_size
-            FormulareLiteraturen.import @formular_literatur_batch
-            @formular_literatur_batch.clear
-          end
+      # --- Photos
 
-          if @stelle_batch.size == max_batch_size
-            Stelle.import @stelle_batch
-            @stelle_batch.clear
-          end
+      @photo_batch += manipulate_photo_string_and_create(photo, uID, f)
 
-          if @photo_batch.size == max_batch_size
-            Photo.import @photo_batch
-            @photo_batch.clear
-          end
-
-          if @literatur_batch.size == max_batch_size
-            Literatur.import @literatur_batch
-            @literatur_batch.clear
-          end
-
-          i += 1
-        end
+      f.photos.each { |p|
+        fp          = FormularePhotos.new
+        fp.formular = f
+        fp.photo    = p
+        @formular_photo_batch << fp
       }
 
+      # --- Literaturen
 
-      # --- write batches to db
+      f.literaturen.each { |lit|
+        fl           = FormulareLiteraturen.new
+        fl.formular  = f
+        fl.literatur = lit
+        @formular_literatur_batch << fl
+      }
+      @literatur_batch += create_literaturen(uID, f)
 
-      Stelle.import @stelle_batch if @stelle_batch.size > 0
-      Photo.import @photo_batch if @photo_batch.size > 0
-      Literatur.import @literatur_batch if @literatur_batch.size > 0
-      FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
-      FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
-      Formular.import @formular_batch if @photo_batch.size > 0
 
+      @formular_batch << f
+
+      @formular_solr_batch << f.to_solr_string
+      @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
+
+      # --- check batch size and write to db if max_size reached
+
+      if @formular_batch.size == max_batch_size
+
+        Formular.import @formular_batch
+        @formular_batch.clear
+
+        FormularePhotos.import @formular_photo_batch
+        @formular_photo_batch.clear
+
+        FormulareLiteraturen.import @formular_literatur_batch
+        @formular_literatur_batch.clear
+
+        Stelle.import @stelle_batch
+        @stelle_batch.clear
+
+        Photo.import @photo_batch
+        @photo_batch.clear
+
+        Literatur.import @literatur_batch
+        @literatur_batch.clear
+      end
+
+      i += 1
     end
 
-  end
 
+    # --- write batches to db
+
+    Stelle.import @stelle_batch if @stelle_batch.size > 0
+    Photo.import @photo_batch if @photo_batch.size > 0
+    Literatur.import @literatur_batch if @literatur_batch.size > 0
+    FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
+    FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
+    Formular.import @formular_batch if @photo_batch.size > 0
+
+
+  end
 
 
   def addToBandseitestellen(i, stelle)
@@ -418,7 +388,6 @@ class UploadsController < ApplicationController
       @bandseitestellen[i] = [stelle]
     end
   end
-
 
 
   # todo move to Ort-Model/Helper (Topo.xls)
@@ -433,54 +402,49 @@ class UploadsController < ApplicationController
 
     @ort_solr_batch = Array.new
 
-    Benchmark.bm(7) do |x|
-      x.report("create all topos:") {
-        excel.each do |row|
+    excel.each do |row|
 
-          # not process the header
-          if i==1
-            i += 1
-            next
-          end
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
 
-          iStelle = row[0] ||= ''
+      iStelle = row[0] ||= ''
 
-          uid = Integer(row[5]) || ''
+      uid = Integer(row[5]) || ''
 
-          o = Ort.new(
+      o = Ort.new(
 
-              # changed to string from integer
-              uid:             uid,
-              #iStelle: row[0] || '',
-              transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
-              #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
-              ort:             row[2] || '',
-              lokalisation:    row[3] || '',
-              anmerkung:       row[4] || ''
+          # changed to string from integer
+          uid:             uid,
+          #iStelle: row[0] || '',
+          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
+          #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          ort:             row[2] || '',
+          lokalisation:    row[3] || '',
+          anmerkung:       row[4] || ''
 
-          )
+      )
 
 
-
-          if (iStelle == '')
-            logger.error "\t[Error]  [OL] uid: #{uid} Fehler mit STELLE, '#{iStelle }'"
-          else
-            manipulate_stelle_string_and_create(iStelle, uid, o)
-          end
-
-
-          o.save
-
-          @ort_solr_batch << o.to_solr_string
-          @ort_solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
+      if (iStelle == '')
+        logger.error "\t[Error]  [OL] uid: #{uid} Fehler mit STELLE, '#{iStelle }'"
+      else
+        manipulate_stelle_string_and_create(iStelle, uid, o)
+      end
 
 
-          i += 1
-        end
-      }
+      o.save
+
+      @ort_solr_batch << o.to_solr_string
+      @ort_solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
+
+
+      i += 1
     end
-  end
 
+  end
 
 
   # todo move to Gott-Model/Helper (Gods.xls)
@@ -495,54 +459,57 @@ class UploadsController < ApplicationController
     @gott_solr_batch = Array.new
 
 
-    Benchmark.bm(7) do |x|
-      x.report("create all gods:") {
-        excel.each do |row|
+    excel.each do |row|
 
-          # not process the header
-          if i==1
-            i += 1
-            next
-          end
+      # not process the header
+      if i==1
+        i += 1
+        next
+      end
 
-          # todo replace this
-          break if i==150
+      # todo replace this
+      # break if i==15
 
 
-          uid        = Integer(row[9]) || ''
-          seitezeile = row[7] || ''
-          band       = row[6] || ''
+      uid        = Integer(row[9]) || ''
+      seitezeile = row[7] || ''
+      band       = row[6] || ''
 
-          g = Gott.new(
+      g = Gott.new(
 
-              uid:                      uid,
-              transliteration:          row[1] || '', # todo transliteration_highlight hinzufügen
-              transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
-              ort:                      row[2] || '',
-              eponym:                   row[3] || '',
-              beziehung:                row[4] || '',
-              funktion:                 row[5] || '',
-              band:                     band,
-              #seitezeile:               seitezeile,
-              anmerkung:                row[8] || '',
+          uid:                      uid,
+          transliteration:          row[1] || '', # todo transliteration_highlight hinzufügen
+          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          ort:                      row[2] || '',
+          eponym:                   row[3] || '',
+          beziehung:                row[4] || '',
+          funktion:                 row[5] || '',
+          band:                     band,
+          #seitezeile:               seitezeile,
+          anmerkung:                row[8] || '',
 
-          )
+      )
 
-          stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
-          #g.stellen << stellen
+      stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
 
-          #g.bandseite = stelle.bandseite
-          #g.bandseitezeile = stelle.bandseitezeile
-
-          g.save
-
-          @gott_solr_batch << g.to_solr_string
-          @gott_solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
-
-          i += 1
-        end
+      stellen.each { |stelle|
+        stelle.zugehoerigZu = g
+        g.stellen << stelle
       }
+
+      #g.stellen << stellen
+
+      #g.bandseite = stelle.bandseite
+      #g.bandseitezeile = stelle.bandseitezeile
+
+      g.save
+
+      @gott_solr_batch << g.to_solr_string
+      @gott_solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
+
+      i += 1
     end
+
   end
 
   # todo move to Wort-Model/Helper (WL.xls)
@@ -557,66 +524,68 @@ class UploadsController < ApplicationController
 
     @word_solr_batch = Array.new
 
-    Benchmark.bm(7) do |x|
-      x.report("create all words:") {
-        excel.each do |row|
+    excel.each do |row|
 
-          # ignore the header
-          if i==1
-            if row[7] != nil && row[7].casecmp('UniqueId') == 0
-              uniqueId = true
-            else
-              logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
-            end
-
-            i += 1
-            next
-
-          end
-
-          if row[2] != nil and row[2] != ''
-            begin
-              hierogl = Integer(row[2])
-            rescue ArgumentError
-              hierogl = row[2].to_s
-            end
-          else
-            hierogl = ''
-          end
-
-          if uniqueId
-            uid = Integer(row[7]) || ''
-          else
-            uid = i-1
-          end
-
-          belegstellenEdfu = row[4] || ''
-          belegstellenWb   = row[5] || ''
-
-          w                          = Wort.new
-          w.uid                      = uid
-          w.transliteration          = row[0] || '' # todo transliteration_highlight hinzufügen
-          w.transliteration_nosuffix = row[0] || '' # todo identisch mit transliteration ?
-          w.uebersetzung             = row[1] || ''
-          # hieroglyph changed to string from integer
-          w.hieroglyph               = hierogl || ''
-          w.weiteres                 = row[3] || ''
-          w.belegstellenEdfu         = belegstellenEdfu # todo in was indexiert? stelle_id?
-          w.belegstellenWb           = belegstellenWb # todo in was indexiert? stelle_berlin_id?
-          w.anmerkung                = row[6] || ''
-
-          manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
-
-          w.save
-
-          @word_solr_batch << w.to_solr_string
-          @word_solr_batch << w.wbberlin.to_solr_string
-          @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
-
-          i += 1
+      # ignore the header
+      if i==1
+        if row[7] != nil && row[7].casecmp('UniqueId') == 0
+          uniqueId = true
+        else
+          logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
         end
+
+        i += 1
+        next
+
+      end
+
+      if row[2] != nil and row[2] != ''
+        begin
+          hierogl = Integer(row[2])
+        rescue ArgumentError
+          hierogl = row[2].to_s
+        end
+      else
+        hierogl = ''
+      end
+
+      if uniqueId
+        uid = Integer(row[7]) || ''
+      else
+        uid = i-1
+      end
+
+      belegstellenEdfu = row[4] || ''
+      belegstellenWb   = row[5] || ''
+
+      w                          = Wort.new
+      w.uid                      = uid
+      w.transliteration          = row[0] || '' # todo transliteration_highlight hinzufügen
+      w.transliteration_nosuffix = row[0] || '' # todo identisch mit transliteration ?
+      w.uebersetzung             = row[1] || ''
+      # hieroglyph changed to string from integer
+      w.hieroglyph               = hierogl || ''
+      w.weiteres                 = row[3] || ''
+      w.belegstellenEdfu         = belegstellenEdfu # todo in was indexiert? stelle_id?
+      w.belegstellenWb           = belegstellenWb # todo in was indexiert? stelle_berlin_id?
+      w.anmerkung                = row[6] || ''
+
+      stellen = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
+
+      stellen.each { |stelle|
+        stelle.zugehoerigZu = w
+        w.stellen << stelle
       }
+
+      w.save
+
+      @word_solr_batch << w.to_solr_string
+      @word_solr_batch << w.wbberlin.to_solr_string
+      @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
+
+      i += 1
     end
+
   end
 
 

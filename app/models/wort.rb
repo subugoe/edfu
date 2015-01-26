@@ -22,6 +22,7 @@ class Wort < ActiveRecord::Base
       stelle = self.stellen.first.start
     rescue NoMethodError
       puts "problem mit solr-sort: für uid: #{self.uid} (wort)"
+      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: #{self.uid}, sort: 'Ddt--' statt 'Ddt--<stelle>' (wort)"
       stelle = ''
     end
 

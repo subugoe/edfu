@@ -67,7 +67,8 @@ class Stelle < ActiveRecord::Base
           stelle_anmerkung,
           stelle_unsicher,
           zerstoerung,
-          freigegeben
+          freigegeben# ,
+   # zugehoerigZU
   )
 
 
@@ -90,6 +91,8 @@ class Stelle < ActiveRecord::Base
       )
 
 
+
+      # s.zugehoerigZu = zugehoerigZU
       s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
       Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)

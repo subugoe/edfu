@@ -165,10 +165,10 @@ module VerifyGottHelper
     end
 
 
-
     teile = seitezeile.split(";")
 
     teile.each { |sz|
+
 
       # todo check this
       # if match = seitezeile.match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
@@ -181,35 +181,37 @@ module VerifyGottHelper
 
       stopUnsicher = false
       #if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
-        #sz          = match[2]
-        komponenten = sz.split(',')
-        if komponenten.length == 1
-          # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
-          match = sz.match(/([0-9]*)(.*)/)
+      #sz          = match[2]
+      komponenten  = sz.split(',')
+      if komponenten.length == 1
+        # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
+        match = sz.match(/([0-9]*)(.*)/)
 
-          sz          = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
-          komponenten = sz.split(',')
+        sz          = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
+        komponenten = sz.split(',')
+      end
+
+      if komponenten.length > 2
+        sz = sz.gsub(' ', '')
+        sz = sz.gsub('/', '-')
+        sy = sz.split('-')
+        if sy.length == 2
+          start      = szSplit(sy[0])
+          stop       = szSplit(sy[1])
+          startSeite = start[0]
+          startZeile = start[1]
+          stopSeite  = stop[0]
+          stopZeile  = stop[1]
+        else
+          logger.error "\t[ERROR]  [GL] uid: #{uid} SEITEZEILE, falsche Komponentenzahl: '#{sz}'"
         end
 
-        if komponenten.length > 2
-          sz = sz.gsub(' ', '')
-          sz = sz.gsub('/', '-')
-          sy = sz.split('-')
-          if sy.length == 2
-            start      = szSplit(sy[0])
-            stop       = szSplit(sy[1])
-            startSeite = start[0]
-            startZeile = start[1]
-            stopSeite  = stop[0]
-            stopZeile  = stop[1]
-          else
-            logger.error "\t[ERROR]  [GL] uid: #{uid} SEITEZEILE, falsche Komponentenzahl: #{sz}"
-          end
+      else
+        startSeite = (komponenten[0]).to_i
+        stopSeite  = startSeite
 
-        else
-          startSeite = (komponenten[0]).to_i
-          stopSeite  = startSeite
-          zeilen     = komponenten[1].strip()
+        if komponenten.size == 2
+          zeilen = komponenten[1].strip()
           if zeilen.match(/f/)
 
             stopUnsicher = true
@@ -229,53 +231,58 @@ module VerifyGottHelper
             stopZeile = startZeile
           end
         end
+      end #8818
 
 
-        dezimal_band = roemisch_nach_dezimal(band.to_s.strip).to_i
+      startZeile ||= 1
+      stopZeile ||= 30
+
+      dezimal_band = roemisch_nach_dezimal(band.to_s.strip).to_i
 
 
-        if startSeite > 0 and dezimal_band > 0
+      if startSeite > 0 and dezimal_band > 0
 
-          # todo extract to module
-          stelle                  = Stelle.new
-          stelle.tempel           = 'Edfu'
-          stelle.band             = dezimal_band
-          stelle.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
-          stelle.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
-          stelle.seite_start      = startSeite
-          stelle.seite_stop       = stopSeite
-          stelle.zeile_start      = startZeile
-          stelle.zeile_stop       = stopZeile
-          stelle.stelle_anmerkung = stelleAnmerkung
-          stelle.stelle_unsicher  = stopUnsicher
-          stelle.zerstoerung      = false
-          stelle.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
-          # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
+        # todo extract to module
+        stelle                  = Stelle.new
+        stelle.tempel           = 'Edfu'
+        stelle.band             = dezimal_band
+        stelle.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
+        stelle.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
+        stelle.seite_start      = startSeite
+        stelle.seite_stop       = stopSeite
+        stelle.zeile_start      = startZeile
+        stelle.zeile_stop       = stopZeile
+        stelle.stelle_anmerkung = stelleAnmerkung
+        stelle.stelle_unsicher  = stopUnsicher
+        stelle.zerstoerung      = false
+        stelle.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+        # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
 
-          stelle.zugehoerigZu     = gott
-          gott.stellen << stelle
+        #stelle.zugehoerigZu     = gott
+        #gott.stellen << stelle
 
+        stellen << stelle
 
-          #gott.bandseite = stelle.bandseite
-          #gott.bandseitezeile = stelle.bandseitezeile
+        #gott.bandseite = stelle.bandseite
+        #gott.bandseitezeile = stelle.bandseitezeile
 
-          #self.stellen << stelle unless self.stellen.include? stelle
-
-
-          if startZeile > 30
-            logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_start > 30: #{sz}"
-          end
-
-          if stopZeile > 30
-            logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: #{sz}"
-          end
+        #self.stellen << stelle unless self.stellen.include? stelle
 
 
-          # myGott['stelle_uid'] = myStelle['uid']
-
-        else
-          logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: #{sz}"
+        if startZeile > 30
+          logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_start > 30: '#{sz}'"
         end
+
+        if stopZeile > 30
+          logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: '#{sz}'"
+        end
+
+
+        # myGott['stelle_uid'] = myStelle['uid']
+
+      else
+        logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: '#{sz}'"
+      end
 
       #else
       #  logger.error "\t[ERROR]  [GL] uid: #{uid} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{seitezeile}"
@@ -285,7 +292,7 @@ module VerifyGottHelper
 
     }
 
-    #return stellen
+    return stellen
 
   end
 

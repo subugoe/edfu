@@ -29,7 +29,7 @@ class Ort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      puts "problem mit solr-sort: für uid: #{self.uid} (gott)"
+      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: #{self.uid}, sort: '<transliteration>--' statt '<transliteration>--<stelle>' (ort)"
       stelle = ''
     end
 

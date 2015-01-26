@@ -25,7 +25,7 @@ class Formular < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      puts "problem mit solr-sort: für uid: #{self.uid} (formular)"
+      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: #{self.uid}, sort: '' statt '<stelle>' (formular)"
       stelle = ''
     end
 

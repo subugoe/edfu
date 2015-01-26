@@ -27,7 +27,6 @@ class Scrape
     #
     #   scanline = im.export_pixels(0, 0, im.columns, im.rows, "RGB");
     #
-    #   puts scanline.size
 
 
 
@@ -154,8 +153,6 @@ class Scrape
             # (.*) - Edfou (\d*), p. (\d*), \(pl. (\d*)\)
             #
 
-            # todo: remove this
-            # puts area
 
             # description = ''
             # volume      = ''
@@ -185,8 +182,6 @@ class Scrape
                 end
               end
 
-              # todo: remove this
-              # puts "0: #{match[0]}, 1: #{match[1]}, 2: #{match[2]}, 3: #{match[3]}"
 
               if match[1] != nil
                 description = match[1].strip
@@ -647,9 +642,6 @@ class Scrape
       pixels.push(pixel)
     end
 
-    # todo: remove this
-    # puts pixels.min
-    # puts pixels.max
 
     # set starting coordinate default
     startx = 0

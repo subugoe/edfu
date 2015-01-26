@@ -444,12 +444,14 @@ module VerifyWortHelper
           stelle.zerstoerung      = false
           #stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
           stelle.freigegeben      = StellenHelper.getFromBanddict((edfuBandNr).to_i, 'freigegeben')
-          #stelle.zugehoerigZu = wort
+
+          stellen << stelle
 
           #wort.bandseite = stelle.bandseite
           #wort.bandseitezeile = stelle.bandseitezeile
 
-          wort.stellen << stelle
+          #stelle.zugehoerigZu = wort
+          #wort.stellen << stelle
 
           #stellen << stelle
 
@@ -473,7 +475,7 @@ module VerifyWortHelper
     end
 
 
-    # return stellen
+    return stellen
   end
 
   def szSplit(s)

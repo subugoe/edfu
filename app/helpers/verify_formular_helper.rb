@@ -94,7 +94,7 @@ module VerifyFormularHelper
   end
 
 
-  def create_stellen(seitezeile, band, uid) # , formular)
+  def create_stellen(seitezeile, band, uid, formular)
 
     # # todo extract to module
     # # Einträge für die 8 Chassinat Bände.
@@ -280,13 +280,17 @@ module VerifyFormularHelper
         anmerkung,
         stop_unsicher,
         zerstoerung,
-        freigegeben
+        freigegeben #,
+        # formular
     )
 
-    formular.stellen << stelle
-    stelle.zugehoerigZu = formular
+    #formular.bandseite = bandseite
+    #formular.bandseitezeile = bandseitezeile
 
-    # return stelle
+    #formular.stellen << stelle
+
+
+    return stelle
 
   end
 
