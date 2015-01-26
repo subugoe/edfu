@@ -20,7 +20,7 @@ class UploadsController < ApplicationController
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
 
-  # todo add multifile upload
+
   # todo add email for notification
   # todo add worker queue/thread for async processing
 
@@ -33,14 +33,7 @@ class UploadsController < ApplicationController
   # POST /uploads
   # POST /uploads.json
   def create
-    @upload           = Upload.new(upload_params)
-
-
-    # todo: remove the next 4 lines
-    # Scrape.new
-    # respond_to do |format|
-    #   format.html { redirect_to uploads_path, notice: "Upload was successfully created." }
-    # end
+    @upload = Upload.new(upload_params)
 
 
     uploaded_formular = params[:upload][:formular]
@@ -76,11 +69,7 @@ class UploadsController < ApplicationController
 
     processed = false
 
-    Benchmark.bm(7) do |x|
-      x.report("process all:") {
-        processed = process_files
-      }
-    end
+    processed = process_files
 
     respond_to do |format|
 
@@ -119,54 +108,63 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    @bandseitestellen = Hash.new
+    Benchmark.bm(7) do |x|
 
-    deleteDB
+      deleteDB
 
-    process_formular
-    process_ort
-    process_gott
-    process_wort
+      x.report("formular  processing:") {
+        process_formular
+      }
+      x.report("topo  processing:") {
+        process_ort
+      }
+      x.report("gods  processing:") {
+        process_gott
+      }
+      x.report("word processing:") {
+        process_wort
+      }
 
-    process_szene
+      x.report("scenes processing:") {
+        process_szene
+      }
 
-    cleanupSolr
-    updateSolr
+      x.report("solr processing:") {
+        cleanupSolr
+        updateSolr
+      }
 
-
+    end
   end
 
   def deleteDB
 
-      # User.delete_all
+    # User.delete_all
 
-      Rails.cache.clear
+    Rails.cache.clear
 
-      Formular.delete_all
-      FormulareLiteraturen.delete_all
-      FormularePhotos.delete_all
-      Gott.delete_all
-      Literatur.delete_all
-      Ort.delete_all
-      Photo.delete_all
-      Stelle.delete_all
-      Wort.delete_all
-      Wbberlin.delete_all
-      Szene.delete_all
-      Szenebild.delete_all
+    Formular.delete_all
+    FormulareLiteraturen.delete_all
+    FormularePhotos.delete_all
+    Gott.delete_all
+    Literatur.delete_all
+    Ort.delete_all
+    Photo.delete_all
+    Stelle.delete_all
+    Wort.delete_all
+    Wbberlin.delete_all
+    Szene.delete_all
+
 
 
   end
 
   def cleanupSolr
 
-    Benchmark.bm(7) do |x|
-      x.report("delete solr docs:") {
-        solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-        solr.update :data => '<delete><query>*:*</query></delete>'
-        solr.update :data => '<commit/>'
-      }
-    end
+    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr.update :data => '<delete><query>*:*</query></delete>'
+    solr.update :data => '<commit/>'
+
   end
 
   def updateSolr
@@ -191,9 +189,6 @@ class UploadsController < ApplicationController
       add_to_solr(@szene_solr_batch)
     end
 
-    # todo: was ist schneller? einzeln, oder zusammen?
-    # add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
-
 
   end
 
@@ -206,7 +201,7 @@ class UploadsController < ApplicationController
 
   end
 
-  # todo move to Formular/Helper (Formular.xls)
+
   def process_formular
 
     logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
@@ -238,13 +233,6 @@ class UploadsController < ApplicationController
     @formular_literatur_batch = Array.new
 
 
-    logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
-
-    # file = Rails.root.join('public', 'uploads', 'Formular.xls')
-    # excel = nil
-
-
-    #excel = Roo::Excel.new(file.to_s)
     excel               = Roo::Excel.new("public/uploads/Formular.xls")
     excel.default_sheet = excel.sheets.first
 
@@ -255,6 +243,13 @@ class UploadsController < ApplicationController
         i += 1
         next
       end
+
+      uebersetzung = row[4] || ''
+      photo        = row[6].to_s || ''
+      literatur    = row[8] || ''
+      seitezeile   = row[2] || ''
+      band         = Integer(row[1]) || -1
+
 
       # if SzeneID doesn't exist
       if row[7] != nil and row[7] != ''
@@ -267,31 +262,23 @@ class UploadsController < ApplicationController
       # break if i==10
 
       # if uid doesn't exist
-      # todo use string
       if row[9] != nil and row[9] != ''
         uID = Integer(row[9])
       else
         uID = SecureRandom.random_number(100000000)
-        # todo logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
+        logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Formular Tabelle vorhanden - uebersetzung: #{uebersetzung}, seitezeile: #{seitezeile}"
       end
 
 
-      uebersetzung = row[4] || ''
-      photo        = row[6].to_s || ''
-      literatur    = row[8] || ''
-      seitezeile   = row[2] || ''
-      band         = Integer(row[1]) || -1
-
-      # in batch und dann bulk ingest, nebenläufig ausführen
-      f            = Formular.new
+      f = Formular.new
 
 
       f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
 
-      f.uid                      = uID
-      f.transliteration          = row[0] || ''
-      f.band                     = band
-      #f.seitezeile               = seitezeile
+      f.uid             = uID
+      f.transliteration = row[0] || ''
+      f.band            = band
+
       f.transliteration_nosuffix = row[3] || ''
       f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
       f.texttyp                  = row[5] || ''
@@ -303,8 +290,6 @@ class UploadsController < ApplicationController
       if s.class == Array
         s = s[0]
         @stelle_batch << s
-        # todo for other types
-        addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
       end
 
       s.zugehoerigZu   = f
@@ -380,22 +365,12 @@ class UploadsController < ApplicationController
   end
 
 
-  def addToBandseitestellen(i, stelle)
-
-    if @bandseitestellen[i] != nil
-      @bandseitestellen[i] << stelle
-    else
-      @bandseitestellen[i] = [stelle]
-    end
-  end
-
-
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
 
     logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
 
-    # todo replace this with uploaded file
+
     excel               = Roo::Excel.new("public/uploads/Topo.xls")
     excel.default_sheet = excel.sheets.first
     i                   = 1
@@ -416,11 +391,8 @@ class UploadsController < ApplicationController
 
       o = Ort.new(
 
-          # changed to string from integer
           uid:             uid,
-          #iStelle: row[0] || '',
-          transliteration: row[1] || '', # todo transliteration_highlight hinzufügen
-          #transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          transliteration: row[1] || '',
           ort:             row[2] || '',
           lokalisation:    row[3] || '',
           anmerkung:       row[4] || ''
@@ -478,14 +450,13 @@ class UploadsController < ApplicationController
       g = Gott.new(
 
           uid:                      uid,
-          transliteration:          row[1] || '', # todo transliteration_highlight hinzufügen
-          transliteration_nosuffix: row[1] || '', # todo identisch mit transliteration ?
+          transliteration:          row[1] || '',
+          transliteration_nosuffix: row[1] || '',
           ort:                      row[2] || '',
           eponym:                   row[3] || '',
           beziehung:                row[4] || '',
           funktion:                 row[5] || '',
           band:                     band,
-          #seitezeile:               seitezeile,
           anmerkung:                row[8] || '',
 
       )
@@ -496,11 +467,6 @@ class UploadsController < ApplicationController
         stelle.zugehoerigZu = g
         g.stellen << stelle
       }
-
-      #g.stellen << stellen
-
-      #g.bandseite = stelle.bandseite
-      #g.bandseitezeile = stelle.bandseitezeile
 
       g.save
 
@@ -560,14 +526,13 @@ class UploadsController < ApplicationController
 
       w                          = Wort.new
       w.uid                      = uid
-      w.transliteration          = row[0] || '' # todo transliteration_highlight hinzufügen
-      w.transliteration_nosuffix = row[0] || '' # todo identisch mit transliteration ?
+      w.transliteration          = row[0] || ''
+      w.transliteration_nosuffix = row[0] || ''
       w.uebersetzung             = row[1] || ''
-      # hieroglyph changed to string from integer
       w.hieroglyph               = hierogl || ''
       w.weiteres                 = row[3] || ''
-      w.belegstellenEdfu         = belegstellenEdfu # todo in was indexiert? stelle_id?
-      w.belegstellenWb           = belegstellenWb # todo in was indexiert? stelle_berlin_id?
+      w.belegstellenEdfu         = belegstellenEdfu
+      w.belegstellenWb           = belegstellenWb
       w.anmerkung                = row[6] || ''
 
       stellen = manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, w)
@@ -604,11 +569,6 @@ class UploadsController < ApplicationController
 
 
     CSV.foreach("Daten/tempelplan.csv", :col_sep => ';') do |bildRow|
-      # with open('Daten/tempelplan.csv', 'rb') as bilderListeCSV:
-      #                                                bilderListeReader = UnicodeReader(bilderListeCSV, delimiter=';')
-
-
-      # for bildRow in bilderListeReader :
 
       if bildRow[0] == 'image'
 
@@ -649,13 +609,8 @@ class UploadsController < ApplicationController
 
       end
 
-      # todo is the dateiname unique?
-      # szene_bildDict[recordSzeneBild.dateiname] = recordSzeneBild
-      # szene_bild_ID                                = recordSzeneBild.id
 
-      filePath   = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
-      # with open(filePath, 'r') as csvFile:
-      #                                  print u 'INFO CSV Datei »' + filePath + u '«'
+      filePath = 'Daten/szenen/' + recordSzeneBild.dateiname.gsub('.gif', '.csv')
 
 
       columnDict = {}
@@ -681,25 +636,11 @@ class UploadsController < ApplicationController
           # --- stellen
 
 
-          band           = ''
-          bandseite      = ''
-          bandseitezeile = ''
-          seiteStart     = ''
-          seiteStop      = ''
-          zeileStart     = ''
-          zeileStop      = ''
-          anmerkung      = ''
-          stopunsicher   = ''
-          zerstoerung    = ''
-          freigegeben    = ''
-
           stellen = nil
 
           if row[columnDict['volume']] != nil && row[columnDict['volume']] != ''
 
-
             band = row[columnDict['volume']]
-
 
             if band.to_i > 8
 
@@ -708,74 +649,16 @@ class UploadsController < ApplicationController
               next
             end
 
-            band_roemisch = dezimal_nach_roemisch(band)
-
-
             unless seiteStart = row[columnDict['page']]
               seiteStart = 0
             end
 
-            if row.size >= 15
-              seiteStop  = row[columnDict['page-to']]
-              zeileStart = row[columnDict['line']]
-              zeileStop  = row[columnDict['line-to']]
-
-              bandseitezeile = "#{band_roemisch}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)} - #{'%03i' % (seiteStop)}, #{'%02i' % (zeileStop)}"
-
-
-            else
-              seiteStop  = seiteStart
-              zeileStart = 0
-              zeileStop  = 30
-
-              bandseitezeile = "#{band_roemisch}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
-
-
-            end
-
-            bandseite = "#{band_roemisch}, #{'%03i' % (seiteStart)}"
-
-            anmerkung    = ''
-            stopunsicher = 0
-            zerstoerung  = 0
-
-            freigegeben = StellenHelper.getFromBanddict(band.to_i, 'freigegeben')
-
-
-            # stelle = Stelle.fetch(
-            #     'Edfu',
-            #     band,
-            #     bandseite,
-            #     bandseitezeile,
-            #     seiteStart,
-            #     seiteStop,
-            #     zeileStart,
-            #     zeileStop,
-            #     anmerkung,
-            #     stopunsicher,
-            #     zerstoerung,
-            #     freigegeben
-            # )
-            #
-            # if stelle.class == Array
-            #   # szeneBild is new
-            #   stelle = stelle[0]
-            #   @stelle_batch << stelle
-            # end
-
-            typ         = "formular"
-
-            # todo remove this, replaced db access (with Stelle.where)
-            #stellen = @bandseitestellen["#{band}_#{seiteStart}"]
-            stellen     = Stelle.where(
+            stellen = Stelle.where(
                 band:        band,
                 seite_start: seiteStart
             )
 
-            # todo also for other types
-
           end
-
 
           # -- szenen
 
@@ -812,31 +695,6 @@ class UploadsController < ApplicationController
             polygon = ''
           end
 
-          # todo is plate unique? NO, e.g. there are 17 Szenes with szene_nummer = 113
-          # rSzene = Szene.new(
-          #     filePath,
-          #     nummer,
-          #     beschreibung,
-          #     rect,
-          #     row[columnDict['coord-x']],
-          #     row[columnDict['coord-y']],
-          #     row[columnDict['angleOfView']],
-          #     row[columnDict['extent-width']],
-          #     row[columnDict['height-percent']],
-          #     row[columnDict['extent-height-percent']].to_f,
-          #     grau,
-          #     polygon,
-          #     recordSzeneBild
-          # )
-          #
-          # if rSzene.class == Array
-          #   # szeneBild is new
-          #   rSzene = rSzene[0]
-          #   rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
-          #   @szene_batch << rSzene unless @szene_batch.include? rSzene
-          # else
-          #   put "not new: #{rSzene.id}, #{beschreibung}"
-          # end
 
           sz = Szene.new(
               nummer:          nummer,
@@ -867,12 +725,7 @@ class UploadsController < ApplicationController
 
           sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
-          #@szene_batch << sz
           sz.save
-
-          #rSzene.stellen << stelle unless (stelle == nil || rSzene.stellen.include?(stelle))
-          # rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
-
 
           @szene_solr_batch << sz.to_solr_string
 
@@ -883,8 +736,6 @@ class UploadsController < ApplicationController
             Szene.import @szene_batch if @szene_batch.size > 0
             @szene_batch.clear
 
-            #Stelle.import @stelle_batch if @stelle_batch.size > 0
-            #@stelle_batch.clear
 
           end
 
@@ -894,13 +745,8 @@ class UploadsController < ApplicationController
       end
 
       Szene.import @szene_batch if @szene_batch.size > 0
-      # Stelle.import @stelle_batch if @stelle_batch.size > 0
 
     end
-
-
-    # wird unter der Tabelle SZENE_BILD hinzugefügt
-    #szene_bild = szene_bildDict.values()
 
   end
 
