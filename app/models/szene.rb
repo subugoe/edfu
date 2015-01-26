@@ -4,7 +4,7 @@ class Szene < ActiveRecord::Base
   extend EdfuModelHelper
 
   has_and_belongs_to_many :stellen, :dependent => :delete_all
-  has_many :szenebilder
+  # has_many :szenebilder
 
   #after_commit :add_to_solr
   #before_validation :check_data
@@ -43,8 +43,8 @@ class Szene < ActiveRecord::Base
           name:            recordSzeneBild.name,
           dateiname:       recordSzeneBild.dateiname,
           imagemap:        recordSzeneBild.imagemap,
-          breite:          recordSzeneBild.breite,
-          hoehe:           recordSzeneBild.hoehe,
+          bild_breite:          recordSzeneBild.breite,
+          bild_hoehe:           recordSzeneBild.hoehe,
           offset_x:        recordSzeneBild.offset_x,
           offset_y:        recordSzeneBild.offset_y,
           breite_original: recordSzeneBild.breite_original,
@@ -64,17 +64,24 @@ class Szene < ActiveRecord::Base
 
 
   def to_solr_string
+
+
     return {
 
+        #:sql_uid                  => self[:id],
         # from szenebild
-        :szene_bild_name      => self.szenebilder[0].name, # --
-        :szene_bild_dateiname => self.szenebilder[0].dateiname, # --
+        :szene_bild_name      => self.name, # --
+        :szene_bild_dateiname => self.dateiname, # --
 
-        :szene_bild_breite    => self.szenebilder[0].breite, #  # --
-        :szene_bild_hoehe     => self.szenebilder[0].hoehe, #  # --
+        :szene_bild_breite    => self.bild_breite, #  # --
+        :szene_bild_hoehe     => self.bild_hoehe, #  # --
 
-        :szene_bild_offset_x  => self.szenebilder[0].offset_x, # --
-        :szene_bild_offset_y  => self.szenebilder[0].offset_y, # --
+        :szene_bild_offset_x  => self.offset_x, # --
+        :szene_bild_offset_y  => self.offset_y, # --
+
+        #:imagemap             => self.imagemap,
+        #:breite_original      => self.breite_original,
+        #:hoehe_original       => self.hoehe_original,
 
         # from szene
 
@@ -89,8 +96,8 @@ class Szene < ActiveRecord::Base
 
         :szene_blickwinkel    => self[:blickwinkel], # --
         :szene_prozent_z      => self[:prozent_z], # --
-        :szene_hoehe          => self[:hoehe], # --
-        :szene_breite         => self[:breite], # --
+        :szene_hoehe          => self.hoehe, # --
+        :szene_breite         => self.breite, # --
         :szene_koordinate_x   => self[:koordinate_x], # --
         :szene_koordinate_y   => self[:koordinate_y], # --
 

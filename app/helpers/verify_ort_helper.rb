@@ -172,7 +172,8 @@ module VerifyOrtHelper
           stelle.stelle_anmerkung = kommentar
           stelle.stelle_unsicher = false
           stelle.zerstoerung = false
-          stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
+          stelle.freigegeben = StellenHelper.getFromBanddicet((bandNr).to_i, 'freigegeben')
+          # stelle.freigegeben = bandDict[(bandNr).to_i]['freigegeben']
           #stelle.zugehoerigZu = ort
           ort.stellen << stelle
           ort.bandseite = stelle.bandseite

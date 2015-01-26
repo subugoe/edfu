@@ -236,7 +236,8 @@ module VerifyGottHelper
             stelle.stelle_anmerkung = stelleAnmerkung
             stelle.stelle_unsicher = stopUnsicher
             stelle.zerstoerung = false
-            stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
+            stelle.freigegeben = StellenHelper.getFromBanddicet((dezimal_band).to_i, 'freigegeben')
+            # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
             #stelle.zugehoerigZu = gott
             gott.stellen << stelle
             gott.bandseite = stelle.bandseite

@@ -53,6 +53,7 @@ class Stelle < ActiveRecord::Base
   end
 
   def self.fetch(
+    typ,
       tempel,
           band,
           bandseite,
@@ -68,7 +69,7 @@ class Stelle < ActiveRecord::Base
   )
 
 
-    Rails.cache.fetch("stelle_#{bandseite}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
+    Rails.cache.fetch("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
 
 
       s = Stelle.new(
@@ -89,7 +90,8 @@ class Stelle < ActiveRecord::Base
 
       s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
-      Rails.cache.write("stelle_#{bandseite}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
+      Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
+
       return [s]
     }
 

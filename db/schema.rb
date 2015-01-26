@@ -149,6 +149,15 @@ ActiveRecord::Schema.define(version: 20150113191310) do
     t.string "prozent_z"
     t.string "hoehe"
     t.string "grau"
+    t.string "name"
+    t.string "dateiname"
+    t.string "imagemap"
+    t.string "bild_breite"
+    t.string "bild_hoehe"
+    t.string "offset_x"
+    t.string "offset_y"
+    t.string "breite_original"
+    t.string "hoehe_original"
   end
 
   create_table "uploads", force: :cascade do |t|

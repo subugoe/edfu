@@ -93,7 +93,7 @@ module VerifyFormularHelper
   end
 
 
-  def create_stellen(seitezeile, band, uid)# , formular)
+  def create_stellen(seitezeile, band, uid) # , formular)
 
     # todo extract to module
     # Einträge für die 8 Chassinat Bände.
@@ -131,7 +131,8 @@ module VerifyFormularHelper
     myStelle    = {}
     # todo entfernen? Gehört zur Normalisierung
     band_uid    = band #bandDict[(self[:band]).to_i]['nummer']
-    freigegeben = bandDict[band.to_i]['freigegeben']
+    # freigegeben = bandDict[band.to_i]['freigegeben']
+    freigegeben = StellenHelper.getFromBanddicet((band).to_i, 'freigegeben')
 
     ## Sonderfälle
     szOriginal  = seitezeile
@@ -266,6 +267,7 @@ module VerifyFormularHelper
     # @formularDict[@myFormular['uid']] = @myFormular
 
     stelle        = Stelle.fetch(
+        "formular",
         'Edfu',
         band_uid,
         bandseite,

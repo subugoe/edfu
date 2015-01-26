@@ -122,12 +122,14 @@ class UploadsController < ApplicationController
 
   def process_files
 
+    @bandseitestellen = Hash.new
+
     deleteDB
 
-    #process_formular
-    # process_ort
-    # process_gott
-    # process_wort
+    process_formular
+    process_ort
+    process_gott
+    process_wort
     #
     process_szene
     #
@@ -203,7 +205,7 @@ class UploadsController < ApplicationController
         end
       }
 
-      # todo: was ist schneller? zuvor, oder so?
+      # todo: was ist schneller? einzeln, oder zusammen?
       # x.report("add to solr:") {
       #     add_to_solr(@word_solr_batch + @gott_solr_batch + @ort_solr_batch + @formular_solr_batch)
       #}
@@ -250,6 +252,7 @@ class UploadsController < ApplicationController
     @formular_photo_batch     = Array.new
     @formular_literatur_batch = Array.new
 
+
     Benchmark.bm(7) do |x|
 
       logger.debug "\t[DEBUG]  [UploadController] #{Rails.root.join('public', 'uploads', 'Formular.xls')}"
@@ -279,7 +282,7 @@ class UploadsController < ApplicationController
           end
 
           # todo: remove this
-          break if i==10
+          # break if i==10
 
           # if uid doesn't exist
           # todo use string
@@ -306,7 +309,7 @@ class UploadsController < ApplicationController
           f.uid                      = uID
           f.transliteration          = row[0] || ''
           f.band                     = band
-          f.seitezeile               = seitezeile
+          #f.seitezeile               = seitezeile
           f.transliteration_nosuffix = row[3] || ''
           f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
           f.texttyp                  = row[5] || ''
@@ -318,6 +321,8 @@ class UploadsController < ApplicationController
           if s.class == Array
             s = s[0]
             @stelle_batch << s
+            # todo for other types
+            addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
           end
           s.zugehoerigZu = f
 
@@ -400,6 +405,15 @@ class UploadsController < ApplicationController
 
     end
 
+  end
+
+  def addToBandseitestellen(i, stelle)
+
+    if @bandseitestellen[i] != nil
+      @bandseitestellen[i] << stelle
+    else
+      @bandseitestellen[i] = [stelle]
+    end
   end
 
   # todo move to Ort-Model/Helper (Topo.xls)
@@ -634,15 +648,15 @@ class UploadsController < ApplicationController
         # offset_y -> offset_y
 
         recordSzeneBild = Szenebild.new(
-            dateiname: bildRow[bilderColumnDict['image']],
-            name: bildRow[bilderColumnDict['label']],
-            imagemap: bildRow[bilderColumnDict['imagemap']],
-            breite: bildRow[bilderColumnDict['new_size_x']],
-            hoehe: bildRow[bilderColumnDict['new_size_y']],
+            dateiname:       bildRow[bilderColumnDict['image']],
+            name:            bildRow[bilderColumnDict['label']],
+            imagemap:        bildRow[bilderColumnDict['imagemap']],
+            breite:          bildRow[bilderColumnDict['new_size_x']],
+            hoehe:           bildRow[bilderColumnDict['new_size_y']],
             breite_original: bildRow[bilderColumnDict['orig_size_x']],
-            hoehe_original: bildRow[bilderColumnDict['orig_size_y']],
-            offset_x: bildRow[bilderColumnDict['offset_x']],
-            offset_y: bildRow[bilderColumnDict['offset_y']]
+            hoehe_original:  bildRow[bilderColumnDict['orig_size_y']],
+            offset_x:        bildRow[bilderColumnDict['offset_x']],
+            offset_y:        bildRow[bilderColumnDict['offset_y']]
         )
 
 
@@ -692,7 +706,7 @@ class UploadsController < ApplicationController
           zerstoerung    = ''
           freigegeben    = ''
 
-          stelle = nil
+          stellen = nil
 
           if row[columnDict['volume']] != nil && row[columnDict['volume']] != ''
 
@@ -762,6 +776,16 @@ class UploadsController < ApplicationController
             #   @stelle_batch << stelle
             # end
 
+            typ         = "formular"
+
+            #stellen = @bandseitestellen["#{band}_#{seiteStart}"]
+            stellen     = Stelle.where(
+                band:       band,
+                seite_start: seiteStart
+            )
+
+            # todo also for other types
+
           end
 
 
@@ -801,34 +825,68 @@ class UploadsController < ApplicationController
           end
 
           # todo is plate unique? NO, e.g. there are 17 Szenes with szene_nummer = 113
-          rSzene = Szene.fetch(
-              filePath,
-              nummer,
-              beschreibung,
-              rect,
-              row[columnDict['coord-x']],
-              row[columnDict['coord-y']],
-              row[columnDict['angleOfView']],
-              row[columnDict['extent-width']],
-              row[columnDict['height-percent']],
-              row[columnDict['extent-height-percent']].to_f,
-              grau,
-              polygon,
-              recordSzeneBild
+          # rSzene = Szene.new(
+          #     filePath,
+          #     nummer,
+          #     beschreibung,
+          #     rect,
+          #     row[columnDict['coord-x']],
+          #     row[columnDict['coord-y']],
+          #     row[columnDict['angleOfView']],
+          #     row[columnDict['extent-width']],
+          #     row[columnDict['height-percent']],
+          #     row[columnDict['extent-height-percent']].to_f,
+          #     grau,
+          #     polygon,
+          #     recordSzeneBild
+          # )
+          #
+          # if rSzene.class == Array
+          #   # szeneBild is new
+          #   rSzene = rSzene[0]
+          #   rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
+          #   @szene_batch << rSzene unless @szene_batch.include? rSzene
+          # else
+          #   put "not new: #{rSzene.id}, #{beschreibung}"
+          # end
+
+          sz = Szene.new(
+              nummer:          nummer,
+              beschreibung:    beschreibung,
+              rect:            rect,
+              koordinate_x:    row[columnDict['coord-x']],
+              koordinate_y:    row[columnDict['coord-y']],
+              blickwinkel:     row[columnDict['angleOfView']],
+              breite:          row[columnDict['extent-width']],
+              prozent_z:       row[columnDict['height-percent']],
+              hoehe:           row[columnDict['extent-height-percent']].to_f,
+              grau:            grau,
+              polygon:         polygon,
+              # aus szenebild
+              name:            recordSzeneBild.name,
+              dateiname:       recordSzeneBild.dateiname,
+              imagemap:        recordSzeneBild.imagemap,
+              bild_breite:     recordSzeneBild.breite,
+              bild_hoehe:      recordSzeneBild.hoehe,
+              offset_x:        recordSzeneBild.offset_x,
+              offset_y:        recordSzeneBild.offset_y,
+              breite_original: recordSzeneBild.breite_original,
+              hoehe_original:  recordSzeneBild.hoehe_original
           )
 
-          if rSzene.class == Array
-            # szeneBild is new
-            rSzene = rSzene[0]
-            rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
-            @szene_batch << rSzene unless @szene_batch.include? rSzene
-          end
+          puts "stellen.size: #{stellen.size}" unless stellen == nil
+          sz.stellen << stellen unless stellen == nil
+          puts "sz.stellen.size: #{sz.stellen.size}" unless sz.stellen == nil
+          sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
+
+          #@szene_batch << sz
+          sz.save
 
           #rSzene.stellen << stelle unless (stelle == nil || rSzene.stellen.include?(stelle))
           # rSzene.szenebilder << recordSzeneBild unless rSzene.szenebilder.include? recordSzeneBild
 
 
-          @szene_solr_batch << rSzene.to_solr_string
+          @szene_solr_batch << sz.to_solr_string
 
 
           if @szene_batch.size == max_batch_size

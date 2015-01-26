@@ -18,8 +18,8 @@ class CreateSzenen < ActiveRecord::Migration
       t.string :name
       t.string :dateiname
       t.string :imagemap
-      t.string :breite
-      t.string :hoehe
+      t.string :bild_breite
+      t.string :bild_hoehe
       t.string :offset_x
       t.string :offset_y
       t.string :breite_original

@@ -441,7 +441,8 @@ module VerifyWortHelper
           stelle.stelle_anmerkung = edfuAnmerkung
           stelle.stelle_unsicher = false
           stelle.zerstoerung = false
-          stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
+          #stelle.freigegeben = bandDict[(edfuBandNr).to_i]['freigegeben']
+          stelle.freigegeben = StellenHelper.getFromBanddicet((edfuBandNr).to_i, 'freigegeben')
           #stelle.zugehoerigZu = wort
           wort.stellen << stelle
           wort.bandseite = stelle.bandseite
