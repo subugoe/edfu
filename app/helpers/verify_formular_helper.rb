@@ -283,9 +283,10 @@ module VerifyFormularHelper
         freigegeben
     )
 
-    #formular.stellen << stelle
+    formular.stellen << stelle
+    stelle.zugehoerigZu = formular
 
-    return stelle
+    # return stelle
 
   end
 

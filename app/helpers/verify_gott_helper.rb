@@ -32,16 +32,18 @@ module VerifyGottHelper
     # }
 
 
+    stellen = Array.new
+
     #gott = []
     #gott_has_stelle = []
 
     # Tabelle GL
 
-    re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
+    re3     = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
 
     originalSEITEZEILE = seitezeile
-    stelleAnmerkung = ''
+    stelleAnmerkung    = ''
 
     if seitezeile == '066, 011ff,;'
       # 84
@@ -51,7 +53,7 @@ module VerifyGottHelper
       seitezeile = '264, 0 - 269, 30;'
     elsif seitezeile == '2,7?'
       # 1178
-      seitezeile = '2, 7'
+      seitezeile      = '2, 7'
       stelleAnmerkung = '2,7?'
     elsif seitezeile == '052, 006 und 008;'
       # 2376
@@ -67,14 +69,14 @@ module VerifyGottHelper
       seitezeile = '149, 3'
     elsif seitezeile == '90, 3 (25);'
       # 4093
-      seitezeile = '90, 3;'
+      seitezeile      = '90, 3;'
       stelleAnmerkung = '(25)'
     elsif seitezeile == '39, 11/f.'
       # 5487
       seitezeile = '39, 11f.'
     elsif seitezeile == '90,3 (36)'
       # 5758
-      seitezeile = '90,3'
+      seitezeile      = '90,3'
       stelleAnmerkung = '(36)'
     elsif seitezeile == '33,14 33,14'
       # 5791
@@ -129,8 +131,8 @@ module VerifyGottHelper
       seitezeile = seitezeile.to_s
     end
 
-    szsz = seitezeile.gsub(' ', '')
-    halbeLaenge = (szsz.length / 2).to_i
+    szsz         = seitezeile.gsub(' ', '')
+    halbeLaenge  = (szsz.length / 2).to_i
     halberString = szsz[halbeLaenge..-1]
     if (halberString + halberString) == szsz
       seitezeile = halberString
@@ -162,113 +164,128 @@ module VerifyGottHelper
       logger.info "\t[INFO]  [GL] uid: #{uid} Änderung SEITEZEILE, original: #{originalSEITEZEILE} new: #{seitezeile}"
     end
 
-    # todo check this
-    if match = seitezeile.match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
-      szs = match[2].split(';')
-      if szs.length == 1 and szs[0].length > 1
-        sz = szs[0]
-        stopUnsicher = false
-        if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
-          sz = match[2]
+
+
+    teile = seitezeile.split(";")
+
+    teile.each { |sz|
+
+      # todo check this
+      # if match = seitezeile.match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
+
+
+      #szs = match[2].split(';')
+      #if szs.length == 1 and szs[0].length > 1
+      #sz = szs[0]
+
+
+      stopUnsicher = false
+      #if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
+        #sz          = match[2]
+        komponenten = sz.split(',')
+        if komponenten.length == 1
+          # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
+          match = sz.match(/([0-9]*)(.*)/)
+
+          sz          = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
           komponenten = sz.split(',')
-          if komponenten.length == 1
-            # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
-            match = sz.match(/([0-9]*)(.*)/)
+        end
 
-            sz = sz.gsub('([0-9]*)(.*)', "#{match[1]},0#{match[2]}")
-            komponenten = sz.split(',')
-          end
-
-          if komponenten.length > 2
-            sz = sz.gsub(' ', '')
-            sz = sz.gsub('/', '-')
-            sy = sz.split('-')
-            if sy.length == 2
-              start = szSplit(sy[0])
-              stop = szSplit(sy[1])
-              startSeite = start[0]
-              startZeile = start[1]
-              stopSeite = stop[0]
-              stopZeile = stop[1]
-            else
-              logger.error "\t[ERROR]  [GL] uid: #{uid} SEITEZEILE, falsche Komponentenzahl: #{sz}"
-            end
-
+        if komponenten.length > 2
+          sz = sz.gsub(' ', '')
+          sz = sz.gsub('/', '-')
+          sy = sz.split('-')
+          if sy.length == 2
+            start      = szSplit(sy[0])
+            stop       = szSplit(sy[1])
+            startSeite = start[0]
+            startZeile = start[1]
+            stopSeite  = stop[0]
+            stopZeile  = stop[1]
           else
-            startSeite = (komponenten[0]).to_i
-            stopSeite = startSeite
-            zeilen = komponenten[1].strip()
-            if zeilen.match(/f/)
-
-              stopUnsicher = true
-              # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-              zeilen = zeilen.gsub(/\s*f+\.*/, '')
-            end
-
-            # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-            zeilen = zeilen.gsub(/[ \/-]+/, '-')
-            zs = zeilen.split('-')
-
-            startZeile = (zs[0]).to_i
-            if zs.length > 1
-
-              stopZeile = (zs[1]).to_i
-            else
-              stopZeile = startZeile
-            end
-          end
-
-
-          dezimal_band = roemisch_nach_dezimal(band.to_s.strip).to_i
-
-
-          if startSeite > 0 and dezimal_band > 0
-
-            # todo extract to module
-            stelle = Stelle.new
-            stelle.tempel = 'Edfu'
-            stelle.band = dezimal_band
-            stelle.bandseite = "#{band}, #{'%03i' % (startSeite)}"
-            stelle.bandseitezeile = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
-            stelle.seite_start = startSeite
-            stelle.seite_stop = stopSeite
-            stelle.zeile_start = startZeile
-            stelle.zeile_stop = stopZeile
-            stelle.stelle_anmerkung = stelleAnmerkung
-            stelle.stelle_unsicher = stopUnsicher
-            stelle.zerstoerung = false
-            stelle.freigegeben = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
-            # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
-            #stelle.zugehoerigZu = gott
-            gott.stellen << stelle
-            #gott.bandseite = stelle.bandseite
-            #gott.bandseitezeile = stelle.bandseitezeile
-
-            #self.stellen << stelle unless self.stellen.include? stelle
-
-
-            if startZeile > 30
-              logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_start > 30: #{sz}"
-            end
-
-            if stopZeile > 30
-              logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: #{sz}"
-            end
-
-
-            # myGott['stelle_uid'] = myStelle['uid']
-
-          else
-            logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: #{sz}"
+            logger.error "\t[ERROR]  [GL] uid: #{uid} SEITEZEILE, falsche Komponentenzahl: #{sz}"
           end
 
         else
-          logger.error "\t[ERROR]  [GL] uid: #{uid} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{seitezeile}"
-        end
-      end
-    end
+          startSeite = (komponenten[0]).to_i
+          stopSeite  = startSeite
+          zeilen     = komponenten[1].strip()
+          if zeilen.match(/f/)
 
-    return stelle
+            stopUnsicher = true
+            # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
+            zeilen       = zeilen.gsub(/\s*f+\.*/, '')
+          end
+
+          # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
+          zeilen = zeilen.gsub(/[ \/-]+/, '-')
+          zs     = zeilen.split('-')
+
+          startZeile = (zs[0]).to_i
+          if zs.length > 1
+
+            stopZeile = (zs[1]).to_i
+          else
+            stopZeile = startZeile
+          end
+        end
+
+
+        dezimal_band = roemisch_nach_dezimal(band.to_s.strip).to_i
+
+
+        if startSeite > 0 and dezimal_band > 0
+
+          # todo extract to module
+          stelle                  = Stelle.new
+          stelle.tempel           = 'Edfu'
+          stelle.band             = dezimal_band
+          stelle.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
+          stelle.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
+          stelle.seite_start      = startSeite
+          stelle.seite_stop       = stopSeite
+          stelle.zeile_start      = startZeile
+          stelle.zeile_stop       = stopZeile
+          stelle.stelle_anmerkung = stelleAnmerkung
+          stelle.stelle_unsicher  = stopUnsicher
+          stelle.zerstoerung      = false
+          stelle.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+          # stelle.freigegeben = bandDict[dezimal_band]['freigegeben']
+
+          stelle.zugehoerigZu     = gott
+          gott.stellen << stelle
+
+
+          #gott.bandseite = stelle.bandseite
+          #gott.bandseitezeile = stelle.bandseitezeile
+
+          #self.stellen << stelle unless self.stellen.include? stelle
+
+
+          if startZeile > 30
+            logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_start > 30: #{sz}"
+          end
+
+          if stopZeile > 30
+            logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: #{sz}"
+          end
+
+
+          # myGott['stelle_uid'] = myStelle['uid']
+
+        else
+          logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: #{sz}"
+        end
+
+      #else
+      #  logger.error "\t[ERROR]  [GL] uid: #{uid} nicht genau eine Stelle in SEITEZEILE: Datensatz verwerfen: #{seitezeile}"
+      #end
+      #end
+      #end
+
+    }
+
+    #return stellen
 
   end
 

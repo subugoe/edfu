@@ -126,12 +126,12 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    process_formular
-    process_ort
+    #process_formular
+    #process_ort
     process_gott
-    process_wort
+    #process_wort
 
-    process_szene
+    #process_szene
 
     cleanupSolr
     updateSolr
@@ -324,8 +324,8 @@ class UploadsController < ApplicationController
             # todo for other types
             addToBandseitestellen("#{s.band}_#{s.seite_start}", s)
           end
-          s.zugehoerigZu = f
-          f.stellen << s
+          #s.zugehoerigZu = f
+          #f.stellen << s
 
           f.bandseite      = s.bandseite
           f.bandseitezeile = s.bandseitezeile
@@ -408,6 +408,8 @@ class UploadsController < ApplicationController
 
   end
 
+
+
   def addToBandseitestellen(i, stelle)
 
     if @bandseitestellen[i] != nil
@@ -416,6 +418,8 @@ class UploadsController < ApplicationController
       @bandseitestellen[i] = [stelle]
     end
   end
+
+
 
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
@@ -477,6 +481,8 @@ class UploadsController < ApplicationController
     end
   end
 
+
+
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
@@ -500,7 +506,7 @@ class UploadsController < ApplicationController
           end
 
           # todo replace this
-          #break if i==15
+          break if i==150
 
 
           uid        = Integer(row[9]) || ''
@@ -522,7 +528,9 @@ class UploadsController < ApplicationController
 
           )
 
-          stelle = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
+          stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
+          #g.stellen << stellen
+
           #g.bandseite = stelle.bandseite
           #g.bandseitezeile = stelle.bandseitezeile
 

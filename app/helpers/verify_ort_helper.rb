@@ -12,6 +12,7 @@ module VerifyOrtHelper
 
   def manipulate_stelle_string_and_create(stelle, uid, ort)
 
+
     # # todo extract to module
     # # Einträge für die 8 Chassinat Bände.
     # bandDict = {
@@ -185,7 +186,10 @@ module VerifyOrtHelper
           #ort.bandseite = stelle.bandseite
           #ort.bandseitezeile = stelle.bandseitezeile
 
+          stelle.zugehoerigZu = ort
           ort.stellen << stelle
+
+
 
           #self.stellen << stelle unless self.stellen.include? stelle
 
