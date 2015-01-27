@@ -7,7 +7,7 @@
 		* boot2docker start
 		* $(boot2docker shellinit) 
 	* fig build
-	* fig run edfuweb rake db:drop db:create db:migrate create_default_user	* fig up
+	* fig run edfuweb rake db:drop db:create db:migrate create_default_user
 	    * please find the container names in th e fig.yml config file (here: edfuweb)
 	* fig up
 * connect to a running container
