@@ -22,6 +22,7 @@ edfuweb:
    links:
      - edfudb:edfudb
      - edfuredis:edfuredis
+
 #solr:  # https://github.com/ckan/ckan-docker
 #  build: docker/solr
 #  hostname: solr

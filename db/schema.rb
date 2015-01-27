@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113191310) do
+ActiveRecord::Schema.define(version: 20150113183814) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -114,21 +114,6 @@ ActiveRecord::Schema.define(version: 20150113191310) do
   add_index "stellen_szenen", ["stelle_id"], name: "index_stellen_szenen_on_stelle_id", using: :btree
   add_index "stellen_szenen", ["szene_id", "stelle_id"], name: "index_stellen_szenen_on_szene_id_and_stelle_id", unique: true, using: :btree
   add_index "stellen_szenen", ["szene_id"], name: "index_stellen_szenen_on_szene_id", using: :btree
-
-  create_table "szenebilder", force: :cascade do |t|
-    t.string  "name"
-    t.string  "dateiname"
-    t.string  "imagemap"
-    t.string  "breite"
-    t.string  "hoehe"
-    t.string  "offset_x"
-    t.string  "offset_y"
-    t.string  "breite_original"
-    t.string  "hoehe_original"
-    t.integer "szene_id"
-  end
-
-  add_index "szenebilder", ["szene_id"], name: "index_szenebilder_on_szene_id", using: :btree
 
   create_table "szenen", force: :cascade do |t|
     t.string "nummer"

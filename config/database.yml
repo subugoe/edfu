@@ -28,8 +28,8 @@ default: &default
   pool: 5
   username: postgres
   password: postgres
-  host: localhost
-  # host: edfudb
+  #host: localhost
+  host: edfudb
   port: 5432
 
 development:
