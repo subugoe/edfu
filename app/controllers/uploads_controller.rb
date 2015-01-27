@@ -110,30 +110,31 @@ class UploadsController < ApplicationController
 
     Benchmark.bm(7) do |x|
 
-      deleteDB
+      x.report("process all") {
+        deleteDB
 
-      x.report("formular  processing:") {
-        process_formular
-      }
-      x.report("topo  processing:") {
-        process_ort
-      }
-      x.report("gods  processing:") {
-        process_gott
-      }
-      x.report("word processing:") {
-        process_wort
-      }
+        x.report("formular  processing:") {
+          process_formular
+        }
+        x.report("topo  processing:") {
+          process_ort
+        }
+        x.report("gods  processing:") {
+          process_gott
+        }
+        x.report("word processing:") {
+          process_wort
+        }
 
-      x.report("scenes processing:") {
-        process_szene
-      }
+        x.report("scenes processing:") {
+          process_szene
+        }
 
-      x.report("solr processing:") {
-        cleanupSolr
-        updateSolr
+        x.report("solr processing:") {
+          cleanupSolr
+          updateSolr
+        }
       }
-
     end
   end
 
@@ -204,19 +205,6 @@ class UploadsController < ApplicationController
   def process_formular
 
     logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
-    #
-    # formulare_batch = Array.new()
-    #
-    # literaturen = Array.new
-    # literatur_batch = Array.new()
-    # literatur_hash = Hash.new()
-    #
-    #
-    # photos = Array.new
-    # photo_batch = Array.new()
-    #
-    # stellen = Array.new
-    # stellen_batch = Array.new
 
     max_batch_size = 1500
     n              = 50000
