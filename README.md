@@ -9,11 +9,11 @@
 	* fig build
 	* fig run edfuweb rake db:drop db:create db:migrate create_default_user	* fig up
 	    * please find the container names in th e fig.yml config file (here: edfuweb)
+	* fig up
 * connect to a running container
     * docker exec -it [container-id] /bin/bash
-    * you can find out the id with "docker ps"
+        * you can find out the id with "docker ps"
 * Get the IP-Address
 	* boot2docker ip
-
 * Request the site
 	* http://...ip...:3000
