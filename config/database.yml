@@ -29,7 +29,7 @@ default: &default
   username: postgres
   password: postgres
   #host: localhost
-  host: edfudb
+  host: db
   port: 5432
 
 development:
