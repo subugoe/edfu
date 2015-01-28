@@ -24,6 +24,9 @@ class UploadsController < ApplicationController
   # todo add email for notification
   # todo add worker queue/thread for async processing
 
+  SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
+  SOLR_PORT = ENV['SOLR_PORT_8983_TCP_PORT']
+
   # GET /uploads/new
   def new
     @upload = Upload.new
@@ -161,7 +164,7 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -195,7 +198,7 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
@@ -245,7 +248,7 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      # break if i==10
+      #break if i==100
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
@@ -371,6 +374,8 @@ class UploadsController < ApplicationController
         next
       end
 
+      #break if i==100
+
       iStelle = row[0] ||= ''
 
       uid = Integer(row[5]) || ''
@@ -426,7 +431,7 @@ class UploadsController < ApplicationController
       end
 
 
-      # break if i==15
+      #break if i==100
 
 
       uid        = Integer(row[9]) || ''
@@ -485,11 +490,11 @@ class UploadsController < ApplicationController
         else
           logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
         end
-
         i += 1
         next
-
       end
+
+      #break if i==100
 
       if row[2] != nil and row[2] != ''
         begin
