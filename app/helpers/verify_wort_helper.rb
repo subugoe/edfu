@@ -122,7 +122,7 @@ module VerifyWortHelper
 
     if bEdfu != belegstellenEdfu
       edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
-      logger.info "\t[INFO]  [GL] uid: #{uid} Änderung BelegstellenEdfu, original: #{belegstellenEdfu} new: #{bEdfu}"
+      logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung BelegstellenEdfu, original: '#{belegstellenEdfu}' neu: '#{bEdfu}'"
     end
 
 
@@ -164,7 +164,7 @@ module VerifyWortHelper
 
       if wb != belegstellenWb
         wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-        logger.info "\t[INFO]  [GL] uid: #{uid} Änderung BelegstellenWb, original: #{belegstellenWb} new: #{wb}"
+        logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung BelegstellenWb, original: '#{belegstellenWb}' neu: '#{wb}'"
       end
 
 
@@ -204,10 +204,10 @@ module VerifyWortHelper
             wbZeileStart = (wbSeiteZeile[1].strip()).to_i # if wbSeiteZeile[1] != nil
           else
             wbZeileStart = 1
-            logger.error "\t[ERROR]  [WL] uid: #{uid} Datensatz mit BelegstellenWb #{wb} überprüfen -> ZeileStart auf 1 gesetzt"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' Datensatz mit BelegstellenWb '#{wb}' überprüfen -> ZeileStart auf 1 gesetzt"
           end
         rescue ArgumentError
-          logger.error "\t[ERROR]  [WL] uid: #{uid} Datensatz mit BelegstellenWb #{wbSeiteZeile[0]} überprüfen"
+          logger.error "\t[ERROR]  [WL] uid: '#{uid}' Datensatz mit BelegstellenWb '#{wbSeiteZeile[0]}' überprüfen"
         end
 
         if wbTeile[1].index(',') != nil
@@ -224,7 +224,7 @@ module VerifyWortHelper
         wbStop  = [wbSeiteStop, wbZeileStop]
 
       else
-        logger.error "\t[ERROR]  [WL] uid: #{uid} BelegstellenWb Formatfehler #{wb}"
+        logger.error "\t[ERROR]  [WL] uid: '#{uid}' BelegstellenWb Formatfehler '#{wb}'"
       end
 
     else
@@ -233,7 +233,7 @@ module VerifyWortHelper
       begin
         wbStart = szSplit(wb)
       rescue ArgumentError
-        logger.error "\t[ERROR]  [WL] uid: #{uid} Stelle  #{wb} konnte nicht gesplittet werden"
+        logger.error "\t[ERROR]  [WL] uid: '#{uid}' Stelle '#{wb}' konnte nicht gesplittet werden"
       end
 
       wbStop = wbStart
@@ -293,7 +293,7 @@ module VerifyWortHelper
             b = edfuSeiteStart.to_s + ', ' + b
 
           else
-            logger.error "\t[ERROR]  [WL] uid: #{uid} keine Seitenzahl #{b} :: #{bEdfu}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' keine Seitenzahl #{b} :: #{bEdfu}"
           end
 
         end
@@ -307,7 +307,7 @@ module VerifyWortHelper
             bandDezimal  = roemisch_nach_dezimal bandRoemisch
             edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
           elsif edfuBandNr == 0
-            logger.error "\t[ERROR]  [WL] uid: #{uid} FEHLER", "fehlende Bandangabe #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' FEHLER, fehlende Bandangabe '#{b}'"
           end
 
           edfuSeiteStart = m20[3].to_i
@@ -330,7 +330,7 @@ module VerifyWortHelper
               edfuZeileStart = (zeilen[0]).to_i
               edfuZeileStop  = (zeilen[1]).to_i
             else
-              logger.error "\t[ERROR]  [WL] uid: #{uid} zu viele Komponenten in Zeilenangabe: #{b}"
+              logger.error "\t[ERROR]  [WL] uid: '#{uid}' zu viele Komponenten in Zeilenangabe: '#{b}'"
             end
 
             edfuAnmerkung = m20[6].strip()
@@ -341,7 +341,7 @@ module VerifyWortHelper
           elsif m20[5] == '>*'
             stern = true
           elsif (m20[5]).length > 2
-            logger.error "\t[ERROR]  [WL] uid: #{uid} m20[5] zu lang #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' Bandangabe zu lang '#{b}'"
           end
 
 
@@ -363,20 +363,20 @@ module VerifyWortHelper
 
 
           if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_start == nil; #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_start == nil; '#{b}'"
           elsif edfuZeileStart > 30
-            logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_start > 30; #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_start > 30; '#{b}'"
           end
 
           if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_stop  == nil; #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_stop  == nil; '#{b}'"
           elsif edfuZeileStop > 30
-            logger.error "\t[ERROR]  [WL] uid: #{uid} zeile_stop > 30;  #{b}"
+            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_stop > 30;  '#{b}'"
           end
 
 
         else
-          logger.error "\t[ERROR]  [WL] uid: #{uid} keine erkennbare Seitenzahl #{b}"
+          logger.error "\t[ERROR]  [WL] uid: '#{uid}' keine erkennbare Seitenzahl '#{b}'"
         end
       }
     end
@@ -391,7 +391,7 @@ module VerifyWortHelper
     begin
       parts = [(parts[0]).to_i, (parts[1]).to_i]
     rescue ArgumentError
-      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
+      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: '#{s}' aufgelöst nach: '#{parts}'"
     end
 
     return parts

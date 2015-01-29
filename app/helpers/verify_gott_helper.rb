@@ -8,7 +8,7 @@ module VerifyGottHelper
 
 
   private
-  def manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, gott)
+  def manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band)
 
 
     stellen = Array.new
@@ -96,7 +96,6 @@ module VerifyGottHelper
       band = 'VII' # 'VIi'
     end
 
-    logger.debug "\t[Debug]  [GL] uid: #{uid}, seitezeile: #{seitezeile}"
 
     if seitezeile.class == Float
       seitezeile = seitezeile.to_s
@@ -132,7 +131,7 @@ module VerifyGottHelper
     seitezeile = seitezeile.gsub(/und/, ';')
 
     if originalSEITEZEILE != seitezeile
-      logger.info "\t[INFO]  [GL] uid: #{uid} Änderung SEITEZEILE, original: #{originalSEITEZEILE} new: #{seitezeile}"
+      logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung SEITEZEILE, original: '#{originalSEITEZEILE}' neu: '#{seitezeile}'"
     end
 
 
@@ -175,7 +174,7 @@ module VerifyGottHelper
           stopSeite  = stop[0]
           stopZeile  = stop[1]
         else
-          logger.error "\t[ERROR]  [GL] uid: #{uid} SEITEZEILE, falsche Komponentenzahl: '#{sz}'"
+          logger.error "\t[ERROR]  [GL] uid: '#{uid}' SEITEZEILE, falsche Komponentenzahl: '#{sz}'"
         end
 
       else
@@ -233,15 +232,15 @@ module VerifyGottHelper
 
 
         if startZeile > 30
-          logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_start > 30: '#{sz}'"
+          logger.error "\t[ERROR]  [GL] uid: '#{uid}' zeile_start > 30: '#{sz}'"
         end
 
         if stopZeile > 30
-          logger.error "\t[ERROR]  [GL] uid: #{uid} zeile_stop > 30: '#{sz}'"
+          logger.error "\t[ERROR]  [GL] uid: '#{uid}' zeile_stop > 30: '#{sz}'"
         end
 
       else
-        logger.error "\t[ERROR]  [GL] uid: #{uid} startSeite oder Band nicht ermittelbar: Datensatz verwerfen: '#{sz}'"
+        logger.error "\t[ERROR]  [GL] uid: '#{uid}' startSeite oder Band nicht ermittelbar: Datensatz verwerfen: '#{sz}'"
       end
 
     }

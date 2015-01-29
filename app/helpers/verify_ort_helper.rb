@@ -72,7 +72,7 @@ module VerifyOrtHelper
     end
 
     if stelle != originalStelle
-      logger.info "\t[INFO]  [OL] uid: #{uid} Änderung STELLE, origialstelle: #{anm} new: #{stelle}"
+      logger.error "\t[ERROR]  [OL] uid: '#{uid}' Änderung STELLE, origialstelle: '#{originalStelle}' neu: '#{stelle}'"
     end
 
     if ort.anmerkung != nil and ort.anmerkung != ''
@@ -99,7 +99,7 @@ module VerifyOrtHelper
         m3 = re3.match(teil)
 
         if not m3
-          logger.info "\t[Error]  [OL] uid: #{uid} Fehler mit STELLE, teil: #{teil}"
+          logger.error "\t[ERROR]  [OL] uid: '#{uid}' Fehler mit STELLE, teil: '#{teil}'"
         else
 
           myBand = m3[1].strip() unless m3[1].empty?
@@ -121,7 +121,7 @@ module VerifyOrtHelper
             begin
               zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
             rescue NoMethodError
-              logger.debug "\t[DEBUG]  [OL] uid: #{uid}, Stelle: #{stelle}]}, Teil: #{teil}"
+              logger.debug "\t[DEBUG]  [OL] uid: '#{uid}', Stelle: '#{stelle}', Teil: '#{teil}'"
             end
 
             kommentar = ''
@@ -159,11 +159,11 @@ module VerifyOrtHelper
           ort.stellen << stelle
 
           if zeileStart > 30
-            logger.info "\t[Error]  [OL] uid: #{uid} zeile_start > 30, zeile_start: #{zeileStart}, teil: #{teil}"
+            logger.info "\t[Error]  [OL] uid: '#{uid}' zeile_start > 30, zeile_start: '#{zeileStart}', teil: '#{teil}'"
           end
 
           if zeileStop > 30
-            logger.info "\t[Error]  [OL] uid: #{uid} zeile_stop > 30, zeile_stop: #{zeileStop}, teil: #{teil}"
+            logger.info "\t[Error]  [OL] uid: '#{uid}' zeile_stop > 30, zeile_stop: '#{zeileStop}', teil: '#{teil}'"
           end
 
 
