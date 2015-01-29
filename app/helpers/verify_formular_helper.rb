@@ -603,7 +603,7 @@ module VerifyFormularHelper
       end
 
 
-      bildString = bildString.strip.sub(/^(, )/, '').strip # m[2]
+      bildString = bildString.strip.sub(/^(,\s*)/, '').strip # m[2]
 
     end
 

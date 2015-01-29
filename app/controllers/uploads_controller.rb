@@ -25,7 +25,7 @@ class UploadsController < ApplicationController
   # todo add worker queue/thread for async processing
 
   SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
-  SOLR_PORT = ENV['SOLR_PORT_8983_TCP_PORT']
+  SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT']
 
   # GET /uploads/new
   def new
@@ -114,29 +114,29 @@ class UploadsController < ApplicationController
     Benchmark.bm(7) do |x|
 
 
-        deleteDB
+      deleteDB
 
-        x.report("formular  processing:") {
-          process_formular
-        }
-        x.report("topo  processing:") {
-          process_ort
-        }
-        x.report("gods  processing:") {
-          process_gott
-        }
-        x.report("word processing:") {
-          process_wort
-        }
+      x.report("formular  processing:") {
+        process_formular
+      }
+      x.report("topo  processing:") {
+        process_ort
+      }
+      x.report("gods  processing:") {
+        process_gott
+      }
+      x.report("word processing:") {
+        process_wort
+      }
 
-        x.report("scenes processing:") {
-          process_szene
-        }
+      x.report("scenes processing:") {
+        process_szene
+      }
 
-        x.report("solr processing:") {
-          cleanupSolr
-          updateSolr
-        }
+      x.report("solr processing:") {
+        cleanupSolr
+        updateSolr
+      }
 
 
     end
@@ -237,7 +237,7 @@ class UploadsController < ApplicationController
 
 
       uebersetzung = row[4] || ''
-      photo        = row[6].to_s || ''
+      photo        = row[6] || ''
       literatur    = row[8] || ''
       seitezeile   = row[2] || ''
       band         = Integer(row[1]) || -1
@@ -250,7 +250,7 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      #break if i==3
+      #break if i==1500
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
@@ -266,8 +266,8 @@ class UploadsController < ApplicationController
 
       f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
 
-      f.uid             = uID
-      f.transliteration = row[0] || ''
+      f.uid                      = uID
+      f.transliteration          = row[0] || ''
       #f.band            = band
 
       f.transliteration_nosuffix = row[3] || ''
@@ -283,13 +283,17 @@ class UploadsController < ApplicationController
         @stelle_batch << s
       end
 
-      s.zugehoerigZu   = f
+      s.zugehoerigZu = f
       #f.bandseite      = s.bandseite
       #f.bandseitezeile = s.bandseitezeile
 
       f.stellen << s
 
       # --- Photos
+
+      if photo.class == Float
+        photo = (photo.to_i).to_s
+      end
 
       @photo_batch += manipulate_photo_string_and_create(photo, uID, f)
 
