@@ -22,7 +22,7 @@ class Ort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: #{self.uid}, sort: '<transliteration>--' statt '<transliteration>--<stelle>' (ort)"
+      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: '#{self.uid}', sort: '<transliteration>--' statt '<transliteration>--<stelle>' (ort)"
       stelle = ''
     end
 
@@ -38,6 +38,7 @@ class Ort < ActiveRecord::Base
         :anmerkung                => self[:anmerkung], # ---
 
         :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
+
         :band                     => self.stellen.collect { |stelle| stelle.band }, # ---
         :bandseite                => self.stellen.collect { |stelle| stelle.bandseite }, # ---
         :bandseitezeile           => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
@@ -51,7 +52,6 @@ class Ort < ActiveRecord::Base
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
         :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
-
 
         :typ                      => 'ort', # ---
         :id                       => "ort-#{self[:uid]}" # ---

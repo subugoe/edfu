@@ -44,6 +44,8 @@ class Stelle < ActiveRecord::Base
         :stelle_anmerkung => self.stelle_anmerkung.to_s, # ---
         :stelle_unsicher  => self.stelle_unsicher, # ---
 
+        :besitzer         => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu_id}",
+
         :typ              => 'stelle', # ---
         :id               => "stelle-#{self[:id]}" # ---
     }
