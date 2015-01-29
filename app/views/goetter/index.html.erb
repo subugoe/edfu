@@ -5,14 +5,12 @@
     <tr>
       <th>Uid</th>
       <th>Transliteration</th>
-      <th>Transliteration nosuffix</th>
       <th>Ort</th>
       <th>Eponym</th>
       <th>Beziehung</th>
       <th>Funktion</th>
-      <th>Band</th>
-      <th>Seitezeile</th>
       <th>Anmerkung</th>
+      <th>Bandseitezeile</th>
       <th></th>
     </tr>
   </thead>
@@ -22,14 +20,12 @@
       <tr>
         <td><%= gott.uid %></td>
         <td><%= gott.transliteration %></td>
-        <td><%= gott.transliteration_nosuffix %></td>
         <td><%= gott.ort %></td>
         <td><%= gott.eponym %></td>
         <td><%= gott.beziehung %></td>
         <td><%= gott.funktion %></td>
-        <td><%= gott.band %></td>
-        <td><%= gott.seitezeile %></td>
         <td><%= gott.anmerkung %></td>
+          <td><%= gott.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td>
         <td><%= link_to 'Einzelsicht', gott %></td>
       </tr>
     <% end %>

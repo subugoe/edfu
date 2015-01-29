@@ -53,16 +53,6 @@
 </p>
 
 <p>
-  <strong>Band:</strong>
-  <%= @formular.band %>
-</p>
-
-<p>
-  <strong>Seitezeile:</strong>
-  <%= @formular.seitezeile %>
-</p>
-
-<p>
     <strong>Stelle:</strong>
     <%= raw @formular.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
 </p>

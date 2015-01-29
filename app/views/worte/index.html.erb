@@ -14,6 +14,7 @@
         <th>Belegstellenwb</th>
         <th>WB_Berlin</th>
         <th>Anmerkung</th>
+        <th>Bandseitezeile</th>
         <th></th>
     </tr>
     </thead>
@@ -33,6 +34,7 @@
             <td><%= wort.wbberlin.id %></td>
             <!-- todo link -->
             <td><%= wort.anmerkung %></td>
+            <td><%= wort.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td>
             <td><%= link_to 'Einzelsicht', wort %></td>
         </tr>
     <% end %>

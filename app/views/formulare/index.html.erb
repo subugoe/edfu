@@ -11,10 +11,8 @@
         <th>Photo</th>
         <th>Photo pfad</th>
         <th>Photo kommentar</th>
-        <th>Szeneid</th>
         <th>Literatur</th>
-        <th>Band</th>
-        <th>Seitezeile</th>
+        <th>Bandseitezeile</th>
         <th></th>
     </tr>
     </thead>
@@ -30,10 +28,8 @@
             <td><%= formular.photos.collect { |photo| photo.name } %></td>
             <td><%= formular.photos.collect { |photo| photo.pfad } %></td>
             <td><%= formular.photos.collect { |photo| photo.kommentar } %></td>
-            <td><%= formular.szeneID %></td>
             <td><%= formular.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" } %></td>
-            <td><%= formular.band %></td>
-            <td><%= formular.seitezeile %></td>
+            <td><%= formular.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td>
             <td><%= link_to 'Einzelsicht', formular %></td>
         </tr>
     <% end %>
