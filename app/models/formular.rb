@@ -22,18 +22,18 @@ class Formular < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: #{self.uid}, sort: '' statt '<stelle>' (formular)"
+      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: '#{self.uid}', sort: '' statt '<stelle>' (formular)"
       stelle = ''
     end
 
     return {
         :sql_uid                  => self[:uid], # ---
 
-        :sort => stelle, # ---
+        :sort                     => stelle, # ---
 
         :transliteration          => self[:transliteration], # ---
 
-        :transliteration_nosuffix => self[:transliteration], #
+        :transliteration_nosuffix => self[:transliteration_nosuffix], #
         :uebersetzung             => self[:uebersetzung], # ---
         :texttyp                  => self[:texttyp], # ---
         :szene_nummer             => self[:szeneID], #
@@ -44,7 +44,6 @@ class Formular < ActiveRecord::Base
 
         :literatur                => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
 
-        :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
         :band                     => self.stellen.collect { |stelle| stelle.band }, # ---
         :bandseite                => self.stellen.collect { |stelle| stelle.bandseite }, # ---
         :bandseitezeile           => self.stellen.collect { |stelle| stelle.bandseitezeile }, # ---
@@ -54,10 +53,13 @@ class Formular < ActiveRecord::Base
         :seite_stop               => self.stellen.collect { |stelle| stelle.seite_stop }, # ---
         :zeile_start              => self.stellen.collect { |stelle| stelle.zeile_start }, # ---
         :zeile_stop               => self.stellen.collect { |stelle| stelle.zeile_stop }, # ---
+
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
         :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+
+        :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
 
         :typ                      => 'formular', # ---
         :id                       => "formular-#{self[:uid]}" # ---
