@@ -57,7 +57,7 @@ module VerifyFormularHelper
     begin
       parts = [(parts[0]).to_i, (parts[1]).to_i]
     rescue ArgumentError
-      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: #{s} aufgelöst nach: #{parts}"
+      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: '#{s}' aufgelöst nach: '#{parts}'"
     end
 
     return parts
@@ -88,6 +88,7 @@ module VerifyFormularHelper
 
         #literaturen << lit # unless self.literaturen.include? lit
         formular.literaturen << lit unless formular.literaturen.include? lit
+
       }
     end
 
@@ -95,7 +96,7 @@ module VerifyFormularHelper
   end
 
 
-  def create_stellen(seitezeile, band, uid, formular)
+  def create_stellen(seitezeile, band, uid)
 
     anmerkung   = ''
 
@@ -146,13 +147,13 @@ module VerifyFormularHelper
     end
 
     if szOriginal != seitezeile
-      logger.info "\t[INFO]  [FL] uid: #{uid} Aenderung SEITEZEILE, Original: #{szOriginal} neu: #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Aenderung SEITEZEILE, Original: '#{szOriginal}' neu: '#{seitezeile}'"
     end
     if (kommentar.length) > 0
-      logger.info "\t[INFO]  [FL] uid: #{uid} SEITEZEILE + Kommentar: #{kommentar}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' SEITEZEILE + Kommentar: '#{kommentar}'"
     end
     if (seitezeile.scan(/[^0-9, -]/)).length > 0
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler mit SEITEZEILE,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler mit SEITEZEILE,  '#{seitezeile}'"
     end
 
     if anmerkung != nil and anmerkung != ''
@@ -183,7 +184,7 @@ module VerifyFormularHelper
       end
     else
       result = [[0, 0], [0, 0]]
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler mit SEITEZEILE,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler mit SEITEZEILE,  '#{seitezeile}'"
     end
 
     # eine seite  (drei ziffern: 007 oder 012)
@@ -202,11 +203,11 @@ module VerifyFormularHelper
     bandseite = "#{band_roemisch}, #{'%03i' % (result[0][0])}"
 
     if result[0][0] > result[1][0]
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler , SEITEN absteigend,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler , SEITEN absteigend,  '#{seitezeile}'"
     end
 
     if result[0][0] == result[1][0] and result[0][1] > result[1][1]
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler, ZEILEN absteigend,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, ZEILEN absteigend,  '#{seitezeile}'"
     end
 
     seite_start = result[0][0]
@@ -215,11 +216,11 @@ module VerifyFormularHelper
     zeile_stop  = result[1][1]
 
     if zeile_start > 30
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler, zeile_start > 30,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, zeile_start > 30,  '#{seitezeile}'"
     end
 
     if zeile_stop > 30
-      logger.error "\t[ERROR]  [FL] uid: #{uid} Fehler, zeile_stop > 30,  #{seitezeile}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, zeile_stop > 30,  '#{seitezeile}'"
     end
 
     stop_unsicher = false
@@ -373,9 +374,8 @@ module VerifyFormularHelper
     photo = photo.gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if origPhoto != photo
-      logger.info "\t[INFO]  [FL] #{uid} Photo String veraendert, orginal: #{origPhoto} neu: #{photo}"
+      logger.error "\t[Error]  [FL] '#{uid}' Photo String veraendert, orginal: '#{origPhoto}' neu: '#{photo}'"
     end
-
 
     # Sonderfälle
 
@@ -397,21 +397,21 @@ module VerifyFormularHelper
         'E. XIV'                => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
     }
 
-    re1  = Regexp.new('[0-9]+a*')
-    re2  = Regexp.new('D03_[0-9]+')
-    re3  = Regexp.new('D05_[0-9]+a*')
-    re4  = Regexp.new('e[0-9]+')
-    re5  = Regexp.new('(E. [XVI]+), (pl. [DCLXVI0-9]+)')
-    re6  = Regexp.new('\([^)]*\)(\s*\**)')
-    re7  = Regexp.new('[DCLXVI]+')
-    re8  = Regexp.new('\)\s*\**')
-    re9  = Regexp.new('(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
-    re10 = Regexp.new('e-onr-[0-9]+')
-    re11 = Regexp.new(';*\s*Labrique, Stylistique, (pl. [0-9.]*)')
-    re12 = Regexp.new('\s*\*') # beginnt mit beliebiege whitesp. und '*'
-    re13 = Regexp.new('\s*\(teilweise\)')
-    re14 = Regexp.new('([^)]*)\s*(\(E. [IVX]+, [0-9]+, [-0-9]+\))(.*)')
-    re15 = Regexp.new('[^(]*\((E.[^)]*)')
+    re1  = Regexp.new('^[0-9]+a*')
+    re2  = Regexp.new('^D03_[0-9]+')
+    re3  = Regexp.new('^D05_[0-9]+a*')
+    re4  = Regexp.new('^e[0-9]+')
+    re5  = Regexp.new('^(E. [XVI]+), (pl. [DCLXVI0-9]+)')
+    re6  = Regexp.new('^\([^)]*\)(\s*\**)')
+    re7  = Regexp.new('^[DCLXVI]+')
+    re8  = Regexp.new('^\)\s*\**')
+    re9  = Regexp.new('^(G[0-9]+)\s*([f.]*)') # Z.B. G30 oder G32 ff.
+    re10 = Regexp.new('^e-onr-[0-9]+')
+    re11 = Regexp.new('^;*\s*Labrique, Stylistique, (pl. [0-9.]*)')
+    re12 = Regexp.new('^\s*\*') # beginnt mit beliebiege whitesp. und '*'
+    re13 = Regexp.new('^\s*\(teilweise\)')
+    re14 = Regexp.new('^([^)]*)\s*(\(E. [IVX]+, [0-9]+, [-0-9]+\))(.*)')
+    re15 = Regexp.new('^[^(]*\((E.[^)]*)')
 
 
     bildString = photo
@@ -419,7 +419,6 @@ module VerifyFormularHelper
     stern      = false
 
     while bildString.size > 0
-
 
       name      = ''
       typ       = '---'
@@ -457,7 +456,7 @@ module VerifyFormularHelper
         if m14 and uid < 9000
           # 6344-6356
           bildString = m14[1] + m14[3]
-          kommentar  = m14[2]
+          kommentar  = m14[2]             # todo check this
 
         elsif uid == 9834
           bildString = '3911 )*'
@@ -501,6 +500,7 @@ module VerifyFormularHelper
 
       elsif re4.match(bildString)
         # Fall 4: Dateiname der Form eXXX
+
         name       = re4.match(bildString)[0]
         typ        = 'e'
         bildString = bildString[(name.length)..-1]
@@ -542,6 +542,7 @@ module VerifyFormularHelper
         # rest = m.group(3)
 
         # kombi aus strip & führendes/endende Komma abschneiden
+        #
         bildString = bildString[((m[0]).length)..-1].strip.sub(',', '').strip #match(/(^\s*,\s*)(.*)(\s*,\s*$)/)[2]
 
         if re7.match(bildString)
@@ -549,7 +550,7 @@ module VerifyFormularHelper
           bildString = typ + ', pl. ' + bildString
         end
       else
-        logger.warn "\t[WARN]  [FL] uid: #{uid} unklarer String:  #{:bildString}"
+        logger.error "\t[ERROR]  [FL] uid: '#{uid}' keine Abbildungsregel für Photo String: '#{bildString}'"
         bildString = ''
       end
 
@@ -571,11 +572,8 @@ module VerifyFormularHelper
           kommentar  = 'E. VIII, 118, 7'
           bildString = ''
         end
-
-
-        pfad = "#{typ}/#{name}"
-
-        if photo_kommentar
+        # todo is empty?
+        if photo_kommentar.size > 0
           if kommentar
             kommentar = "#{photo_kommentar}; #{kommentar}"
           else
@@ -584,6 +582,9 @@ module VerifyFormularHelper
         else
           kommentar = photo_kommentar
         end
+
+        typ = photoTypDict[typ]['name']
+        pfad = "#{typ}/#{name}"
 
         p = Photo.fetch(
             pfad,
@@ -602,7 +603,7 @@ module VerifyFormularHelper
       end
 
 
-      bildString = bildString.strip.sub(',', '').strip # m[2]
+      bildString = bildString.strip.sub(/^(, )/, '').strip # m[2]
 
     end
 
@@ -628,7 +629,7 @@ module VerifyFormularHelper
                        .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  uebersetzung != origUebers
-      logger.info "\t[INFO]  [FL] uid: #{uid} String der Übersetzung verändert, von: #{origUebers} auf: #{uebersetzung}"
+      logger.error "\t[Error]  [FL] uid: '#{uid}' String der Übersetzung verändert, von: '#{origUebers}' auf: '#{uebersetzung}'"
     end
 
     # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
@@ -639,7 +640,7 @@ module VerifyFormularHelper
     #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
     # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
     if uebersetzung.match re101 or uebersetzung.match re102
-      logger.warn "\t[WARN]  [FL] uid: #{uid} Vermutlich kaputte Akzente, übersetzung: #{uebersetzung}"
+      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Vermutlich kaputte Akzente, übersetzung: '#{uebersetzung}'"
     end
 
     return uebersetzung
