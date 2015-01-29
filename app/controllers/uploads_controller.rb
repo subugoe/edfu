@@ -7,7 +7,7 @@ require 'verify_formular_helper'
 require 'verify_ort_helper'
 require 'verify_gott_helper'
 require 'verify_wort_helper'
-require 'scrape'
+# require 'scrape'
 require 'stellen_helper'
 
 
@@ -113,7 +113,7 @@ class UploadsController < ApplicationController
 
     Benchmark.bm(7) do |x|
 
-      x.report("process all") {
+
         deleteDB
 
         x.report("formular  processing:") {
@@ -137,7 +137,8 @@ class UploadsController < ApplicationController
           cleanupSolr
           updateSolr
         }
-      }
+
+
     end
   end
 
@@ -234,6 +235,7 @@ class UploadsController < ApplicationController
         next
       end
 
+
       uebersetzung = row[4] || ''
       photo        = row[6].to_s || ''
       literatur    = row[8] || ''
@@ -248,14 +250,14 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      #break if i==100
+      #break if i==3
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
         uID = Integer(row[9])
       else
         uID = SecureRandom.random_number(100000000)
-        logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Formular Tabelle vorhanden - uebersetzung: #{uebersetzung}, seitezeile: #{seitezeile}"
+        logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Formular Tabelle vorhanden - uebersetzung: '#{uebersetzung}', seitezeile: '#{seitezeile}'"
       end
 
 
@@ -266,7 +268,7 @@ class UploadsController < ApplicationController
 
       f.uid             = uID
       f.transliteration = row[0] || ''
-      f.band            = band
+      #f.band            = band
 
       f.transliteration_nosuffix = row[3] || ''
       f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
@@ -275,15 +277,15 @@ class UploadsController < ApplicationController
 
       # --- Stellen
 
-      s                          = create_stellen(seitezeile, band, uID, f)
+      s                          = create_stellen(seitezeile, band, uID)
       if s.class == Array
         s = s[0]
         @stelle_batch << s
       end
 
       s.zugehoerigZu   = f
-      f.bandseite      = s.bandseite
-      f.bandseitezeile = s.bandseitezeile
+      #f.bandseite      = s.bandseite
+      #f.bandseitezeile = s.bandseitezeile
 
       f.stellen << s
 
@@ -300,13 +302,14 @@ class UploadsController < ApplicationController
 
       # --- Literaturen
 
+      @literatur_batch += create_literaturen(uID, f)
+
       f.literaturen.each { |lit|
         fl           = FormulareLiteraturen.new
         fl.formular  = f
         fl.literatur = lit
         @formular_literatur_batch << fl
       }
-      @literatur_batch += create_literaturen(uID, f)
 
 
       @formular_batch << f
@@ -392,7 +395,7 @@ class UploadsController < ApplicationController
 
 
       if (iStelle == '')
-        logger.error "\t[Error]  [OL] uid: #{uid} Fehler mit STELLE, '#{iStelle }'"
+        logger.error "\t[Error]  [OL] uid: '#{uid}' Fehler mit STELLE, '#{iStelle }'"
       else
         manipulate_stelle_string_and_create(iStelle, uid, o)
       end
@@ -447,12 +450,12 @@ class UploadsController < ApplicationController
           eponym:                   row[3] || '',
           beziehung:                row[4] || '',
           funktion:                 row[5] || '',
-          band:                     band,
+          #band:                     band,
           anmerkung:                row[8] || '',
 
       )
 
-      stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band, g)
+      stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band)
 
       stellen.each { |stelle|
         stelle.zugehoerigZu = g
@@ -596,7 +599,7 @@ class UploadsController < ApplicationController
 
 
       CSV.foreach(filePath, :col_sep => ';') do |row|
-        logger.info "\t[INFO]  [UploadController] CSV Datei: #{filePath}"
+        logger.info "\t[INFO]  [UploadController] CSV Datei: '#{filePath}'"
 
         if row[0] == 'description'
 
@@ -623,7 +626,7 @@ class UploadsController < ApplicationController
 
             if band.to_i > 8
 
-              logger.error "\t[Error]  [UploadController] Fehlerhafter Band: #{row} (in #{filePath})."
+              logger.error "\t[Error]  [UploadController] Fehlerhafter Band: '#{row}' (in '#{filePath}')."
 
               next
             end
@@ -648,7 +651,7 @@ class UploadsController < ApplicationController
 
           if nummer.to_s.match(/[,\/\s]+/)
             temp = nummer.to_i
-            logger.error "\t[Error]  [UploadController] Szenennummer (Plate) '#{nummer}' enthält Komma ',', slash '/' oder Leerzeichen #{row} (in #{filePath}). Verwendet wird #{temp}"
+            logger.error "\t[Error]  [UploadController] Szenennummer (Plate) '#{nummer}' enthält Komma ',', slash '/' oder Leerzeichen '#{row}' (in '#{filePath}'). Verwendet wird '#{temp}'"
             nummer = temp
           end
 
@@ -719,7 +722,7 @@ class UploadsController < ApplicationController
           end
 
         else
-          logger.error "\t[Error]  [UploadController] weniger als 12 Spalten in Zeile: #{row} (in #{filePath})"
+          logger.error "\t[Error]  [UploadController] weniger als 12 Spalten in Zeile: '#{row}' (in '#{filePath}')"
         end
       end
 
