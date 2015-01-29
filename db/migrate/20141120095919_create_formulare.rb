@@ -11,13 +11,13 @@ class CreateFormulare < ActiveRecord::Migration
       #t.string :photo_kommentar
       t.string :szeneID
       #t.string :literatur    # über literatur tabelle und per assoziation referenziert
-      t.string :band        # bestandteil von stelle
-      t.string :bandseite
-      t.string :bandseitezeile
+      #t.string :band        # bestandteil von stelle
+      #t.string :bandseite
+      #t.string :bandseitezeile
       #t.string :seitezeile  # bestandteil von stelle
 
       #t.timestamps
     end
-    add_index :formulare, :bandseitezeile # , :unique => true
+    #add_index :formulare, :bandseitezeile # , :unique => true
   end
 end

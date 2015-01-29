@@ -23,12 +23,7 @@ ActiveRecord::Schema.define(version: 20150113183814) do
     t.text   "uebersetzung"
     t.string "texttyp"
     t.string "szeneID"
-    t.string "band"
-    t.string "bandseite"
-    t.string "bandseitezeile"
   end
-
-  add_index "formulare", ["bandseitezeile"], name: "index_formulare_on_bandseitezeile", using: :btree
 
   create_table "formulare_literaturen", id: false, force: :cascade do |t|
     t.integer "formular_id"
@@ -57,7 +52,6 @@ ActiveRecord::Schema.define(version: 20150113183814) do
     t.string "eponym"
     t.string "beziehung"
     t.string "funktion"
-    t.string "band"
     t.string "anmerkung"
   end
 

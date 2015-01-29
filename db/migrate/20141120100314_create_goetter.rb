@@ -9,7 +9,7 @@ class CreateGoetter < ActiveRecord::Migration
       t.string :beziehung
       t.string :funktion
 
-      t.string :band
+      #t.string :band
       #t.string :bandseite        # bestandteil von stelle
       #t.string :bandseitezeile   # bestandteil von stelle
 
