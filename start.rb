@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-`cd .`
+#`cd .`
 `fig build`
 `fig up -d`
 `fig run web rake db:drop db:create db:migrate`
