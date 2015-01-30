@@ -7,6 +7,7 @@ require 'verify_formular_helper'
 require 'verify_ort_helper'
 require 'verify_gott_helper'
 require 'verify_wort_helper'
+require 'csv'
 # require 'scrape'
 require 'stellen_helper'
 
@@ -166,6 +167,7 @@ class UploadsController < ApplicationController
   def cleanupSolr
 
     solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    # solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -726,7 +728,7 @@ class UploadsController < ApplicationController
           end
 
         else
-          logger.error "\t[Error]  [UploadController] weniger als 12 Spalten in Zeile: '#{row}' (in '#{filePath}')"
+          logger.error "\t[Error]  [UploadController - Szenenerzeugung] weniger als 12 Spalten in Zeile: '#{row}' (in '#{filePath}')"
         end
       end
 
