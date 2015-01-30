@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 #`cd .`
-`fig build`
-`fig up -d`
-`fig run web rake db:drop db:create db:migrate`
+`fig build -f /home/jenkins/edfu/fig.yml`
+`fig up -d -f /home/jenkins/edfu/fig.yml`
+`fig run web  rake db:drop db:create db:migrate  -f /home/jenkins/edfu/fig.yml`
 
 container = `Docker ps`
 container.lines { |container|
