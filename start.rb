@@ -1,21 +1,21 @@
 #!/usr/bin/env ruby
 
 #`cd .`
-puts 'fig build'
-`sudo fig -d -f /home/jenkins/edfu/fig.yml build`
+puts "\nfig build"
+`sudo fig  build`
 
-puts 'fig up -d'
-`sudo fig -d -f /home/jenkins/edfu/fig.yml up`
+puts "\nfig up -d"
+`sudo fig up -d`
 
-puts 'fig run web ...'
-`sudo fig -d -f /home/jenkins/edfu/fig.yml run web  rake db:drop db:create db:migrate`
+puts "\nfig run  web  rake db:drop db:create db:migrate"
+`sudo fig run  web  rake db:drop db:create db:migrate create_default_user`
 
-puts 'docker ps ...'
-container = `sudo docker ps`
-container.lines { |container|
-
-  if container.include? "web"
-    container_id = container.split[0]
-    `docker exec -d #{container_id} rake create_default_user`
-  end
-}
+#puts "\ndocker ps"
+#container = `sudo docker ps`
+#container.lines { |container|
+#
+#  if container.include? "web"
+#    container_id = container.split[0]
+#    `docker exec #{container_id} rake create_default_user`
+#  end
+#}
