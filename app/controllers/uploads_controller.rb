@@ -40,33 +40,33 @@ class UploadsController < ApplicationController
     @upload = Upload.new(upload_params)
 
 
-    uploaded_formular = params[:upload][:formular]
-    uploaded_ort      = params[:upload][:ort]
-    uploaded_gott     = params[:upload][:gott]
-    uploaded_wort     = params[:upload][:wort]
-    email             = params[:upload][:email]
+    $uploaded_formular = params[:upload][:formular]
+    $uploaded_ort      = params[:upload][:ort]
+    $uploaded_gott     = params[:upload][:gott]
+    $uploaded_wort     = params[:upload][:wort]
+    $email             = params[:upload][:email]
 
 
-    logger.debug "\t[DEBUG]  [UploadController] #{uploaded_formular.original_filename} #{uploaded_ort.original_filename} #{uploaded_gott.original_filename} #{uploaded_wort.original_filename} #{email}"
+    logger.debug "\t[DEBUG]  [UploadController] #{$uploaded_formular.original_filename} #{$uploaded_ort.original_filename} #{$uploaded_gott.original_filename} #{$uploaded_wort.original_filename} #{$email}"
 
 
     n = 50000
 
     # todo valdate tables (all columns?)
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_formular.original_filename), 'wb') do |file|
+    File.open(Rails.root.join('public', 'uploads', $uploaded_formular.original_filename), 'wb') do |file|
       file.write(uploaded_formular.read)
     end
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_ort.original_filename), 'wb') do |file|
+    File.open(Rails.root.join('public', 'uploads', $uploaded_ort.original_filename), 'wb') do |file|
       file.write(uploaded_ort.read)
     end
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_gott.original_filename), 'wb') do |file|
+    File.open(Rails.root.join('public', 'uploads', $uploaded_gott.original_filename), 'wb') do |file|
       file.write(uploaded_gott.read)
     end
 
-    File.open(Rails.root.join('public', 'uploads', uploaded_wort.original_filename), 'wb') do |file|
+    File.open(Rails.root.join('public', 'uploads', $uploaded_wort.original_filename), 'wb') do |file|
       file.write(uploaded_wort.read)
     end
 
@@ -226,7 +226,8 @@ class UploadsController < ApplicationController
     @formular_literatur_batch = Array.new
 
 
-    excel               = Roo::Excel.new("public/uploads/Formular.xls")
+    # excel               = Roo::Excel.new("public/uploads/Formular.xls")
+    excel               = Roo::Excel.new("public/uploads/#{$uploaded_formular.original_filename}")
     excel.default_sheet = excel.sheets.first
 
     excel.each do |row|
@@ -369,7 +370,8 @@ class UploadsController < ApplicationController
     logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
 
 
-    excel               = Roo::Excel.new("public/uploads/Topo.xls")
+    # excel               = Roo::Excel.new("public/uploads/Topo.xls")
+    excel               = Roo::Excel.new("public/uploads/#{$uploaded_ort.original_filename}")
     excel.default_sheet = excel.sheets.first
     i                   = 1
 
@@ -424,7 +426,8 @@ class UploadsController < ApplicationController
 
     logger.debug "\t[DEBUG]  [UploadController] Processing gods table"
 
-    excel               = Roo::Excel.new("public/uploads/Gods.xls")
+    # excel               = Roo::Excel.new("public/uploads/Gods.xls")
+    excel               = Roo::Excel.new("public/uploads/#{$uploaded_gott.original_filename}")
     excel.default_sheet = excel.sheets.first
     i                   = 1
 
@@ -483,7 +486,8 @@ class UploadsController < ApplicationController
 
     logger.debug "\t[DEBUG]  [UploadController] Processing word table"
 
-    excel               = Roo::Excel.new("public/uploads/WL.xls")
+    #excel               = Roo::Excel.new("public/uploads/Woerterliste.xls")
+    excel               = Roo::Excel.new("public/uploads/#{$uploaded_wort.original_filename}")
     excel.default_sheet = excel.sheets.first
     i                   = 1
     uniqueId            = false
