@@ -1,13 +1,17 @@
 #!/usr/bin/env ruby
 
 #`cd .`
+
+puts "\ndocker stop $(docker ps -a -q)"
+`sudo docker stop $(docker ps -a -q)`
+
 puts "\nfig build"
 `sudo fig  build`
 
 puts "\nfig up -d"
 `sudo fig up -d`
 
-puts "\nfig run  web  rake db:drop db:create db:migrate"
+puts "\nfig run  web  rake db:drop db:create db:migrate create_default_user"
 `sudo fig run  web  rake db:drop db:create db:migrate create_default_user`
 
 #puts "\ndocker ps"
