@@ -2,8 +2,8 @@
 
 #`cd .`
 
-puts "\ndocker stop $(docker ps -a -q)"
-`sudo docker stop $(docker ps -a -q)`
+puts "\ndocker stop $(sudo docker ps -a -q)"
+`sudo docker stop $(sudo docker ps -a -q)`
 
 puts "\nfig build"
 `sudo fig  build`
