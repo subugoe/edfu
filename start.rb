@@ -1,11 +1,17 @@
 #!/usr/bin/env ruby
 
 #`cd .`
-`fig -f /home/jenkins/edfu/fig.yml build`
-`fig -d -f /home/jenkins/edfu/fig.yml up`
-`fig -f /home/jenkins/edfu/fig.yml run web  rake db:drop db:create db:migrate`
+puts 'fig build'
+`sudo fig -f /home/jenkins/edfu/fig.yml build`
 
-container = `Docker ps`
+puts 'fig up -d'
+`sudo fig -f /home/jenkins/edfu/fig.yml up -d`
+
+puts 'fig run web ...'
+`sudo fig -f /home/jenkins/edfu/fig.yml run web  rake db:drop db:create db:migrate`
+
+puts 'docker ps ...'
+container = `sudo docker ps`
 container.lines { |container|
 
   if container.include? "web"
