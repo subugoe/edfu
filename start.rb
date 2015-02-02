@@ -14,8 +14,8 @@ if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
-puts "\nfig build"
-`fig  build`
+puts "\nfig build web"
+`fig  build web`
 
 puts "\nfig up -d"
 `fig up -d`
