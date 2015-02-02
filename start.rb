@@ -4,12 +4,15 @@
 
 Dir.chdir("/home/jenkins/edfu/")
 
-if File.exist?("temp/pids/server.pid")
-  `rm tmp/pids/server.pid`
-end
+puts "\nfig stop"
+`fig  stop`
 
 puts "\ndocker stop $(docker ps -a -q)"
 `docker stop $(docker ps -a -q)`
+
+if File.exist?("temp/pids/server.pid")
+  `rm tmp/pids/server.pid`
+end
 
 puts "\nfig build"
 `fig  build`
