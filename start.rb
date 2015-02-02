@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+
+
+Dir.chdir("/home/jenkins/edfu/")
+
 if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
