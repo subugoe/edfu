@@ -118,25 +118,25 @@ class UploadsController < ApplicationController
       deleteDB
 
       x.report("formular  processing:") {
-        process_formular
+        #process_formular
       }
       x.report("topo  processing:") {
-        process_ort
+        #process_ort
       }
       x.report("gods  processing:") {
-        process_gott
+        #process_gott
       }
       x.report("word processing:") {
         process_wort
       }
 
       x.report("scenes processing:") {
-        process_szene
+        #process_szene
       }
 
       x.report("solr processing:") {
-        cleanupSolr
-        updateSolr
+        #cleanupSolr
+        #updateSolr
       }
 
 
