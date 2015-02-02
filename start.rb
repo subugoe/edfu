@@ -1,21 +1,23 @@
 #!/usr/bin/env ruby
 
-#`cd .`
+if File.exist?("temp/pids/server.pid")
+  `rm tmp/pids/server.pid`
+end
 
-puts "\ndocker stop $(sudo docker ps -a -q)"
-`sudo docker stop $(sudo docker ps -a -q)`
+puts "\ndocker stop $(docker ps -a -q)"
+`docker stop $(docker ps -a -q)`
 
 puts "\nfig build"
-`sudo fig  build`
+`fig  build`
 
 puts "\nfig up -d"
-`sudo fig up -d`
+`fig up -d`
 
 puts "\nfig run  web  rake db:drop db:create db:migrate create_default_user"
-`sudo fig run  web  rake db:drop db:create db:migrate create_default_user`
+`fig run  web  rake db:drop db:create db:migrate create_default_user`
 
 #puts "\ndocker ps"
-#container = `sudo docker ps`
+#container = `docker ps`
 #container.lines { |container|
 #
 #  if container.include? "web"
