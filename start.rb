@@ -1,14 +1,22 @@
 #!/usr/bin/env ruby
 
+
+
+Dir.chdir("/home/jenkins/edfu/")
+
+puts "\nfig stop"
+`fig  stop`
+
+# puts "\ndocker stop $(docker ps -a -q)"
+# `docker stop $(docker ps -a -q)`
+
 if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
-puts "\ndocker stop $(docker ps -a -q)"
-`docker stop $(docker ps -a -q)`
-
 puts "\nfig build"
-`fig  build`
+`fig build`
+# `fig build --no-cache`
 
 puts "\nfig up -d"
 `fig up -d`
