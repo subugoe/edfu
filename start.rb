@@ -7,8 +7,8 @@ Dir.chdir("/home/jenkins/edfu/")
 puts "\nfig stop"
 `fig  stop`
 
-puts "\ndocker stop $(docker ps -a -q)"
-`docker stop $(docker ps -a -q)`
+# puts "\ndocker stop $(docker ps -a -q)"
+# `docker stop $(docker ps -a -q)`
 
 if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
