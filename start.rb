@@ -15,8 +15,8 @@ if File.exist?("temp/pids/server.pid")
 end
 
 puts "\nfig build"
-`fig build`
-#`fig --no-cache build`
+# `fig build`
+`fig build --no-cache`
 
 puts "\nfig up -d"
 `fig up -d`
