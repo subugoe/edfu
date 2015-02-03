@@ -122,7 +122,7 @@ module VerifyWortHelper
 
     if bEdfu != belegstellenEdfu
       edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
-      logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung BelegstellenEdfu, original: '#{belegstellenEdfu}' neu: '#{bEdfu}'"
+      logger.error "\t[ERROR]  [WL] uid: '#{uid}' Änderung BelegstellenEdfu, original: '#{belegstellenEdfu}' neu: '#{bEdfu}'"
     end
 
 
@@ -164,7 +164,7 @@ module VerifyWortHelper
 
       if wb != belegstellenWb
         wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-        logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung BelegstellenWb, original: '#{belegstellenWb}' neu: '#{wb}'"
+        logger.error "\t[ERROR]  [WL] uid: '#{uid}' Änderung BelegstellenWb, original: '#{belegstellenWb}' neu: '#{wb}'"
       end
 
 
