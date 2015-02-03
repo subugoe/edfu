@@ -70,10 +70,33 @@ class UploadsController < ApplicationController
       file.write(@uploaded_wort.read)
     end
 
+    day = Date.today
+    str = "\t[Info]  [UploadController] Begin des Imports (#{day.day}.#{day.month}.#{day.year})"
+    str1 = ""
+    str.size.times do
+      str1 += "="
+    end
+    logger.error "\t" + str1
+    logger.error str
+    logger.error "\t" + str1
+
 
     processed = false
-
     processed = process_files
+
+
+    str = "\t[Info]  [UploadController] Ende des Imports (#{day.day}.#{day.nonth}.#{day.year})"
+    str1 = ""
+    str.size.times do
+      str1 += "="
+    end
+    logger.error "\t" + str1
+    logger.error str
+    logger.error "\t" + str1
+
+
+
+
 
     respond_to do |format|
 
@@ -488,7 +511,10 @@ class UploadsController < ApplicationController
 
     #excel               = Roo::Excel.new("public/uploads/Woerterliste.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_wort.original_filename}")
-    excel.default_sheet = excel.sheets.first
+
+    # todo: nun mal die zweite Tabelle !!!
+    #excel.default_sheet = excel.sheets.first
+    excel.default_sheet = excel.sheets.second
     i                   = 1
     uniqueId            = false
 
