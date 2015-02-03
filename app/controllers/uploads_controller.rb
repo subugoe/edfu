@@ -85,7 +85,7 @@ class UploadsController < ApplicationController
     processed = process_files
 
 
-    str = "\t[Info]  [UploadController] Ende des Imports (#{day.day}.#{day.nonth}.#{day.year})"
+    str = "\t[Info]  [UploadController] Ende des Imports (#{day.day}.#{day.month}.#{day.year})"
     str1 = ""
     str.size.times do
       str1 += "="
