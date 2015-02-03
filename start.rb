@@ -1,11 +1,22 @@
 #!/usr/bin/env ruby
 
 
-
 Dir.chdir("/home/jenkins/edfu/")
 
-puts "\nfig stop"
-`fig  stop`
+
+puts "\nstop web container"
+container = `docker ps`
+container.lines { |container|
+
+  if container.include? "web"
+    container_id = container.split[0]
+    `docker stop #{container_id}`
+  end
+}
+
+
+# puts "\nfig stop"
+# `fig  stop`
 
 # puts "\ndocker stop $(docker ps -a -q)"
 # `docker stop $(docker ps -a -q)`
@@ -24,12 +35,3 @@ puts "\nfig up -d"
 puts "\nfig run  web  rake db:drop db:create db:migrate create_default_user"
 `fig run  web  rake db:drop db:create db:migrate create_default_user`
 
-#puts "\ndocker ps"
-#container = `docker ps`
-#container.lines { |container|
-#
-#  if container.include? "web"
-#    container_id = container.split[0]
-#    `docker exec #{container_id} rake create_default_user`
-#  end
-#}
