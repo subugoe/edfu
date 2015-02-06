@@ -22,7 +22,7 @@ class Formular < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      EdfuLog.new("ERROR", "FL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher '' statt '<stelle>')", "SEITEZEILE", '', '', self.uid)
+      Edfulog.new("ERROR", "FL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher '' statt '<stelle>')", "SEITEZEILE", '', '', self.uid)
       stelle = ''
     end
 

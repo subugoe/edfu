@@ -22,7 +22,7 @@ class Ort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      EdfuLog.new("ERROR", "OL-Model", "Fehlerhafter Start in Stelle (solr sort daher '<transliteration>--' statt '<transliteration>--<stelle>')", "STELLE", '', '', self.uid)
+      Edfulog.new("ERROR", "OL-Model", "Fehlerhafter Start in Stelle (solr sort daher '<transliteration>--' statt '<transliteration>--<stelle>')", "STELLE", '', '', self.uid)
 
       stelle = ''
     end

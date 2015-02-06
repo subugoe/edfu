@@ -19,7 +19,7 @@ class Gott < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      EdfuLog.new("ERROR", "GL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher 'Act--' statt 'Act--<stelle>')", "SEITEZEILE", '', '', self.uid)
+      Edfulog.new("ERROR", "GL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher 'Act--' statt 'Act--<stelle>')", "SEITEZEILE", '', '', self.uid)
       stelle = ''
     end
 

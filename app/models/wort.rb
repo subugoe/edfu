@@ -16,7 +16,7 @@ class Wort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      EdfuLog.new("ERROR", "WL-Model", "Fehlerhafter Start in Belegstelle (solr sort daher 'Dtd--' statt 'Ddt--<stelle>')", "BelegstelleEdfu", '', '', self.uid)
+      Edfulog.new("ERROR", "WL-Model", "Fehlerhafter Start in Belegstelle (solr sort daher 'Dtd--' statt 'Ddt--<stelle>')", "BelegstelleEdfu", '', '', self.uid)
       stelle = ''
     end
 
