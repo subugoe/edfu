@@ -53,12 +53,7 @@ module VerifyFormularHelper
 
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
-
-    begin
-      parts = [(parts[0]).to_i, (parts[1]).to_i]
-    rescue ArgumentError
-      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: '#{s}' aufgelöst nach: '#{parts}'"
-    end
+    parts = [(parts[0]).to_i, (parts[1]).to_i]
 
     return parts
   end
@@ -98,7 +93,7 @@ module VerifyFormularHelper
 
   def create_stellen(seitezeile, band, uid)
 
-    anmerkung   = ''
+    anmerkung = ''
 
     freigegeben = StellenHelper.getFromBanddict((band).to_i, 'freigegeben')
 
@@ -147,13 +142,13 @@ module VerifyFormularHelper
     end
 
     if szOriginal != seitezeile
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Aenderung SEITEZEILE, Original: '#{szOriginal}' neu: '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Änderung der Seitezeile", "SEITEZEILE", szOriginal, seitezeile, uid)
     end
-    if (kommentar.length) > 0
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' SEITEZEILE + Kommentar: '#{kommentar}'"
-    end
+    #if (kommentar.length) > 0
+    #  logger.error "[FL], Kommentar zur Seitezeile, SEITEZEILE, '#{kommentar}', , #{uid}"
+    #end
     if (seitezeile.scan(/[^0-9, -]/)).length > 0
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler mit SEITEZEILE,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
     end
 
     if anmerkung != nil and anmerkung != ''
@@ -170,8 +165,16 @@ module VerifyFormularHelper
 
     if seitezeile.index(' - ') != nil # mit leerzeichen  bsp: 002, 06 - 003, 02
       szParts = seitezeile.split(' - ') # ["002, 06", "003, 02"]
-      result << szSplit(szParts[0]) # ["002, 06"]
-      result << szSplit(szParts[1]) # ["003, 02"]
+
+      begin
+        result << szSplit(szParts[0]) # ["002, 06"]
+        result << szSplit(szParts[1]) # ["003, 02"]
+      rescue ArgumentError
+        Edfulog.new("ERROR", "FL", "Seitezeile konnte nicht gesplittet werden (alles auf 0)", "SEITEZEILE", szOriginal, '', uid)
+        result = [[0, 0], [0, 0]]
+      end
+
+
     elsif seitezeile.index(',') != nil # ohne leerzeichen  bsp: 008, 08-09
       parts = seitezeile.split(',') # ["008", " 08-09"]
       seite = (parts[0]).to_i # 008
@@ -184,7 +187,7 @@ module VerifyFormularHelper
       end
     else
       result = [[0, 0], [0, 0]]
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler mit SEITEZEILE,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
     end
 
     # eine seite  (drei ziffern: 007 oder 012)
@@ -203,11 +206,11 @@ module VerifyFormularHelper
     bandseite = "#{band_roemisch}, #{'%03i' % (result[0][0])}"
 
     if result[0][0] > result[1][0]
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler , SEITEN absteigend,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile (Seiten absteigend)", "SEITEZEILE", szOriginal, '', uid)
     end
 
     if result[0][0] == result[1][0] and result[0][1] > result[1][1]
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, ZEILEN absteigend,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile (Zeilen absteigend)", "SEITEZEILE", szOriginal, '', uid)
     end
 
     seite_start = result[0][0]
@@ -216,17 +219,17 @@ module VerifyFormularHelper
     zeile_stop  = result[1][1]
 
     if zeile_start > 30
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, zeile_start > 30,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile (Start > 30)", "SEITEZEILE", szOriginal, '', uid)
     end
 
     if zeile_stop > 30
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Fehler, zeile_stop > 30,  '#{seitezeile}'"
+      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile (Stop > 30)", "SEITEZEILE", szOriginal, '', uid)
     end
 
     stop_unsicher = false
     zerstoerung   = false
 
-    stelle        = Stelle.fetch(
+    stelle = Stelle.fetch(
         "formular",
         'Edfu',
         band,
@@ -374,7 +377,7 @@ module VerifyFormularHelper
     photo = photo.gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if origPhoto != photo
-      logger.error "\t[Error]  [FL] '#{uid}' Photo String veraendert, orginal: '#{origPhoto}' neu: '#{photo}'"
+      Edfulog.new("ERROR", "FL", "Photostring verändert", "Photo", origPhoto, photo, uid)
     end
 
     # Sonderfälle
@@ -456,7 +459,7 @@ module VerifyFormularHelper
         if m14 and uid < 9000
           # 6344-6356
           bildString = m14[1] + m14[3]
-          kommentar  = m14[2]             # todo check this
+          kommentar  = m14[2] # todo check this
 
         elsif uid == 9834
           bildString = '3911 )*'
@@ -550,8 +553,11 @@ module VerifyFormularHelper
           bildString = typ + ', pl. ' + bildString
         end
       else
-        logger.error "\t[ERROR]  [FL] uid: '#{uid}' keine Abbildungsregel für Photo String: '#{bildString}'"
-        bildString = ''
+        Edfulog.new("ERROR", "FL", "Keine Abbildungsregel für erstes Element im Bildstring (#{bildString})", "Photo", origPhoto, '', uid)
+        pos = bildString.index(",")
+
+        bildString = bildString[pos..-1]
+
       end
 
       if (name.length) > 0
@@ -583,7 +589,7 @@ module VerifyFormularHelper
           kommentar = photo_kommentar
         end
 
-        typ = photoTypDict[typ]['name']
+        typ  = photoTypDict[typ]['name']
         pfad = "#{typ}/#{name}"
 
         p = Photo.fetch(
@@ -603,7 +609,7 @@ module VerifyFormularHelper
       end
 
 
-      bildString = bildString.strip.sub(/^(,\s*)/, '').strip # m[2]
+      bildString = bildString.strip.sub(/^[,.:\s]*/, '').strip # m[2]
 
     end
 
@@ -629,7 +635,7 @@ module VerifyFormularHelper
                        .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  uebersetzung != origUebers
-      logger.error "\t[Error]  [FL] uid: '#{uid}' String der Übersetzung verändert, von: '#{origUebers}' auf: '#{uebersetzung}'"
+      Edfulog.new("ERROR", "FL", "Übersetzung verändert", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
@@ -640,7 +646,7 @@ module VerifyFormularHelper
     #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
     # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
     if uebersetzung.match re101 or uebersetzung.match re102
-      logger.error "\t[ERROR]  [FL] uid: '#{uid}' Vermutlich kaputte Akzente, übersetzung: '#{uebersetzung}'"
+      Edfulog.new("ERROR", "FL", "Vermutlich kaputte Akzente in Übersetzung", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     return uebersetzung

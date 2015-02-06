@@ -13,10 +13,10 @@ module VerifyWortHelper
 
   def manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, wort)
 
-    stellen       = Array.new
+    stellen = Array.new
 
     # wird unter der Tabelle BERLIN (WB_BERLIN) hinzugefügt
-    berlin        = [
+    berlin  = [
         {
             'uid'         => 0,
             'band'        => 0,
@@ -111,7 +111,6 @@ module VerifyWortHelper
     end
 
 
-
     if match = bEdfu.match(/(^EPON; )(.*)(EPON; $)/)
       bEdfu = match[2]
     end
@@ -122,7 +121,7 @@ module VerifyWortHelper
 
     if bEdfu != belegstellenEdfu
       edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
-      logger.error "\t[ERROR]  [WL] uid: '#{uid}' Änderung BelegstellenEdfu, original: '#{belegstellenEdfu}' neu: '#{bEdfu}'"
+      Edfulog.new("ERROR", "WL", "Änderung an Belegstelle, BelegstellenEdfu", "BelegstellenEdfu", belegstellenEdfu, bEdfu, uid)
     end
 
 
@@ -164,7 +163,7 @@ module VerifyWortHelper
 
       if wb != belegstellenWb
         wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-        logger.error "\t[ERROR]  [WL] uid: '#{uid}' Änderung BelegstellenWb, original: '#{belegstellenWb}' neu: '#{wb}'"
+        Edfulog.new("ERROR", "WL", "Änderung an Belegstelle", "BelegstellenWb", belegstellenWb, wb, uid)
       end
 
 
@@ -185,7 +184,6 @@ module VerifyWortHelper
     end
 
 
-
     wbBand = roemisch_nach_dezimal(wbBand_roemisch)
 
     wb = wb.gsub(' -', '-').gsub('- ', '-')
@@ -204,10 +202,12 @@ module VerifyWortHelper
             wbZeileStart = (wbSeiteZeile[1].strip()).to_i # if wbSeiteZeile[1] != nil
           else
             wbZeileStart = 1
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' Datensatz mit BelegstellenWb '#{wb}' überprüfen -> ZeileStart auf 1 gesetzt"
+
+            Edfulog.new("ERROR", "WL", "Zeilenstart auf 1 gesetzt", "BelegstellenWb", wb, '', uid)
           end
         rescue ArgumentError
-          logger.error "\t[ERROR]  [WL] uid: '#{uid}' Datensatz mit BelegstellenWb '#{wbSeiteZeile[0]}' überprüfen"
+
+          Edfulog.new("ERROR", "WL", "Datensatz fehlerhaft", "BelegstellenWb",  wb, '', uid)
         end
 
         if wbTeile[1].index(',') != nil
@@ -224,7 +224,7 @@ module VerifyWortHelper
         wbStop  = [wbSeiteStop, wbZeileStop]
 
       else
-        logger.error "\t[ERROR]  [WL] uid: '#{uid}' BelegstellenWb Formatfehler '#{wb}'"
+        Edfulog.new("ERROR", "WL", "Formatfehler bei Belegtstelle", "BelegstellenWb", wb, '', uid)
       end
 
     else
@@ -233,12 +233,12 @@ module VerifyWortHelper
       begin
         wbStart = szSplit(wb)
       rescue ArgumentError
-        logger.error "\t[ERROR]  [WL] uid: '#{uid}' Stelle '#{wb}' konnte nicht gesplittet werden"
+        Edfulog.new("ERROR", "WL", "Belegstelle konnte nicht gesplittet werden", "BelegstellenWb", wb, '', uid)
+        wbStart = [0, 0]
       end
 
       wbStop = wbStart
     end
-
 
 
     dbWB             = Wbberlin.new
@@ -293,7 +293,7 @@ module VerifyWortHelper
             b = edfuSeiteStart.to_s + ', ' + b
 
           else
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' keine Seitenzahl #{b} :: #{bEdfu}"
+            Edfulog.new("ERROR", "WL", "Keine Seitenzahl vorhanden", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
         end
@@ -307,7 +307,7 @@ module VerifyWortHelper
             bandDezimal  = roemisch_nach_dezimal bandRoemisch
             edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
           elsif edfuBandNr == 0
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' FEHLER, fehlende Bandangabe '#{b}'"
+            Edfulog.new("ERROR", "WL", "Fehlende Bandangabe", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
           edfuSeiteStart = m20[3].to_i
@@ -330,7 +330,7 @@ module VerifyWortHelper
               edfuZeileStart = (zeilen[0]).to_i
               edfuZeileStop  = (zeilen[1]).to_i
             else
-              logger.error "\t[ERROR]  [WL] uid: '#{uid}' zu viele Komponenten in Zeilenangabe: '#{b}'"
+              Edfulog.new("ERROR", "WL", "Zu viele Komponenten", "BelegstellenEdfu", bEdfu, '', uid)
             end
 
             edfuAnmerkung = m20[6].strip()
@@ -341,7 +341,7 @@ module VerifyWortHelper
           elsif m20[5] == '>*'
             stern = true
           elsif (m20[5]).length > 2
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' Bandangabe zu lang '#{b}'"
+            Edfulog.new("ERROR", "WL", "Bandangabe zu lang (#{b})", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
 
@@ -363,20 +363,21 @@ module VerifyWortHelper
 
 
           if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_start == nil; '#{b}'"
+            Edfulog.new("ERROR", "WL", "Startzeile ungültig", "BelegstellenEdfu", bEdfu, '', uid)
           elsif edfuZeileStart > 30
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_start > 30; '#{b}'"
+            Edfulog.new("ERROR", "WL", "Startzeile > 30",  "BelegstellenEdfu", bEdfu, '', uid)
           end
 
-          if edfuZeileStart == nil
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_stop  == nil; '#{b}'"
+          if edfuZeileStop == nil
+            Edfulog.new("ERROR", "WL", "Stopzeile ungültig", "BelegstellenEdfu", bEdfu, '', uid)
           elsif edfuZeileStop > 30
-            logger.error "\t[ERROR]  [WL] uid: '#{uid}' zeile_stop > 30;  '#{b}'"
+            Edfulog.new("ERROR", "WL", "Stopzeile > 30",  "BelegstellenEdfu", bEdfu, '', uid)
           end
 
 
         else
-          logger.error "\t[ERROR]  [WL] uid: '#{uid}' keine erkennbare Seitenzahl '#{b}'"
+
+          Edfulog.new("ERROR", "WL", "Belegstelle (#{b}) verworfen", "BelegstellenEdfu", bEdfu, '', uid)
         end
       }
     end
@@ -387,12 +388,7 @@ module VerifyWortHelper
 
   def szSplit(s)
     parts = s.gsub(' ', '').split(',')
-
-    begin
-      parts = [(parts[0]).to_i, (parts[1]).to_i]
-    rescue ArgumentError
-      logger.error "\t[ERROR]  [FL] Fehler bei der Auftrennung von: '#{s}' aufgelöst nach: '#{parts}'"
-    end
+    parts = [(parts[0]).to_i, (parts[1]).to_i]
 
     return parts
   end

@@ -22,7 +22,8 @@ class Ort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: '#{self.uid}', sort: '<transliteration>--' statt '<transliteration>--<stelle>' (ort)"
+      EdfuLog.new("ERROR", "OL-Model", "Fehlerhafter Start in Stelle (solr sort daher '<transliteration>--' statt '<transliteration>--<stelle>')", "STELLE", '', '', self.uid)
+
       stelle = ''
     end
 

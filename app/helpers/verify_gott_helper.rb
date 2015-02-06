@@ -131,7 +131,7 @@ module VerifyGottHelper
     seitezeile = seitezeile.gsub(/und/, ';')
 
     if originalSEITEZEILE != seitezeile
-      logger.error "\t[ERROR]  [GL] uid: '#{uid}' Änderung SEITEZEILE, original: '#{originalSEITEZEILE}' neu: '#{seitezeile}'"
+      Edfulog.new("ERROR", "GL", "Änderung der Seitezeile", "SEITEZEILE", originalSEITEZEILE, seitezeile, uid)
     end
 
 
@@ -174,7 +174,7 @@ module VerifyGottHelper
           stopSeite  = stop[0]
           stopZeile  = stop[1]
         else
-          logger.error "\t[ERROR]  [GL] uid: '#{uid}' SEITEZEILE, falsche Komponentenzahl: '#{sz}'"
+          Edfulog.new("ERROR", "GL", "Fehlerhafte Komponentenzahl", "SEITEZEILE", sz, '', uid)
         end
 
       else
@@ -214,33 +214,37 @@ module VerifyGottHelper
       if startSeite > 0 and dezimal_band > 0
 
 
-        stelle                  = Stelle.new
-        stelle.tempel           = 'Edfu'
-        stelle.band             = dezimal_band
-        stelle.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
-        stelle.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
-        stelle.seite_start      = startSeite
-        stelle.seite_stop       = stopSeite
-        stelle.zeile_start      = startZeile
-        stelle.zeile_stop       = stopZeile
-        stelle.stelle_anmerkung = stelleAnmerkung
-        stelle.stelle_unsicher  = stopUnsicher
-        stelle.zerstoerung      = false
-        stelle.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+        stelle_obj                  = Stelle.new
+        stelle_obj.tempel           = 'Edfu'
+        stelle_obj.band             = dezimal_band
+        stelle_obj.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
+        stelle_obj.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
+        stelle_obj.seite_start      = startSeite
+        stelle_obj.seite_stop       = stopSeite
+        stelle_obj.zeile_start      = startZeile
+        stelle_obj.zeile_stop       = stopZeile
+        stelle_obj.stelle_anmerkung = stelleAnmerkung
+        stelle_obj.stelle_unsicher  = stopUnsicher
+        stelle_obj.zerstoerung      = false
+        stelle_obj.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
 
-        stellen << stelle
+        stellen << stelle_obj
+
 
 
         if startZeile > 30
-          logger.error "\t[ERROR]  [GL] uid: '#{uid}' zeile_start > 30: '#{sz}'"
+          Edfulog.new("ERROR", "GL",  "Startzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
+
 
         if stopZeile > 30
-          logger.error "\t[ERROR]  [GL] uid: '#{uid}' zeile_stop > 30: '#{sz}'"
+          Edfulog.new("ERROR", "GL",  "Stopzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
 
+
+
       else
-        logger.error "\t[ERROR]  [GL] uid: '#{uid}' startSeite oder Band nicht ermittelbar: Datensatz verwerfen: '#{sz}'"
+        Edfulog.new("ERROR", "GL", "Startseite oder Band nicht ermittelbar", "SEITEZEILE", originalSEITEZEILE, '', uid)
       end
 
     }

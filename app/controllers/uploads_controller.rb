@@ -37,6 +37,7 @@ class UploadsController < ApplicationController
   # POST /uploads
   # POST /uploads.json
   def create
+
     @upload = Upload.new(upload_params)
 
 
@@ -44,13 +45,14 @@ class UploadsController < ApplicationController
     @uploaded_ort      = params[:upload][:ort]
     @uploaded_gott     = params[:upload][:gott]
     @uploaded_wort     = params[:upload][:wort]
-    @email             = params[:upload][:email]
+    # @email             = params[:upload][:email]
 
 
-    logger.debug "\t[DEBUG]  [UploadController] #{@uploaded_formular.original_filename} #{@uploaded_ort.original_filename} #{@uploaded_gott.original_filename} #{@uploaded_wort.original_filename} #{@email}"
+    # logging format
+    # betrifft,   text,       spalte, original, neu,  uid
+    # [FL],       ändere...,  ...,    ...,      ...,  ...
 
-
-    n = 50000
+    n                  = 50000
 
     # todo valdate tables (all columns?)
 
@@ -70,33 +72,14 @@ class UploadsController < ApplicationController
       file.write(@uploaded_wort.read)
     end
 
-    day = Date.today
-    str = "\t[Info]  [UploadController] Begin des Imports (#{day.day}.#{day.month}.#{day.year})"
-    str1 = ""
-    str.size.times do
-      str1 += "="
-    end
-    logger.error "\t" + str1
-    logger.error str
-    logger.error "\t" + str1
-
 
     processed = false
+
+    #Benchmark.bm(7) do |x|
+    #  x.report("processing all:") {
     processed = process_files
-
-
-    str = "\t[Info]  [UploadController] Ende des Imports (#{day.day}.#{day.month}.#{day.year})"
-    str1 = ""
-    str.size.times do
-      str1 += "="
-    end
-    logger.error "\t" + str1
-    logger.error str
-    logger.error "\t" + str1
-
-
-
-
+    #  }
+    #end
 
     respond_to do |format|
 
@@ -135,35 +118,35 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    Benchmark.bm(7) do |x|
+    #Benchmark.bm(7) do |x|
 
 
-      deleteDB
+    deleteDB
 
-      x.report("formular  processing:") {
-        process_formular
-      }
-      x.report("topo  processing:") {
-        process_ort
-      }
-      x.report("gods  processing:") {
-        process_gott
-      }
-      x.report("word processing:") {
-        process_wort
-      }
+    # x.report("formular  processing:") {
+    process_formular
+    # }
+    # x.report("topo  processing:") {
+    process_ort
+    # }
+    # x.report("gods  processing:") {
+    process_gott
+    # }
+    # x.report("word processing:") {
+    process_wort
+    # }
 
-      x.report("scenes processing:") {
-        process_szene
-      }
+    # x.report("scenes processing:") {
+    process_szene
+    # }
 
-      x.report("solr processing:") {
-        cleanupSolr
-        updateSolr
-      }
+    # x.report("solr processing:") {
+    cleanupSolr
+    updateSolr
+    # }
 
 
-    end
+    #end
   end
 
   def deleteDB
@@ -172,6 +155,7 @@ class UploadsController < ApplicationController
 
     Rails.cache.clear
 
+    Edfulog.delete_all
     Formular.delete_all
     FormulareLiteraturen.delete_all
     FormularePhotos.delete_all
@@ -189,8 +173,8 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    # solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -224,7 +208,8 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
@@ -233,11 +218,10 @@ class UploadsController < ApplicationController
 
   def process_formular
 
-    logger.debug "\t[DEBUG]  [UploadController] Processing formular table"
 
     max_batch_size = 1500
     n              = 50000
-    i              = 1
+    i              = 0
 
     @formular_solr_batch = Array.new
 
@@ -250,14 +234,15 @@ class UploadsController < ApplicationController
 
 
     # excel               = Roo::Excel.new("public/uploads/Formular.xls")
-    excel               = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
-    excel.default_sheet = excel.sheets.first
+    excel                     = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
+    excel.default_sheet       = excel.sheets.first
 
     excel.each do |row|
 
+      i += 1
+
       # not process the header
       if i==1
-        i += 1
         next
       end
 
@@ -283,7 +268,9 @@ class UploadsController < ApplicationController
         uID = Integer(row[9])
       else
         uID = SecureRandom.random_number(100000000)
-        logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Formular Tabelle vorhanden - uebersetzung: '#{uebersetzung}', seitezeile: '#{seitezeile}'"
+
+
+        Edfulog.new("ERROR", "UploadController-FL", "Keine UniqueId in Formular Tabelle vorhanden (Zeile #{i})", '', '', '', '')
       end
 
 
@@ -390,8 +377,6 @@ class UploadsController < ApplicationController
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
 
-    logger.debug "\t[DEBUG]  [UploadController] Processing topo table"
-
 
     # excel               = Roo::Excel.new("public/uploads/Topo.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_ort.original_filename}")
@@ -426,7 +411,8 @@ class UploadsController < ApplicationController
 
 
       if (iStelle == '')
-        logger.error "\t[Error]  [OL] uid: '#{uid}' Fehler mit STELLE, '#{iStelle }'"
+
+        Edfulog.new("ERROR", "UploadController-OL", "Leere Stelle", "STELLE", iStelle, '', uid)
       else
         manipulate_stelle_string_and_create(iStelle, uid, o)
       end
@@ -447,7 +433,6 @@ class UploadsController < ApplicationController
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
-    logger.debug "\t[DEBUG]  [UploadController] Processing gods table"
 
     # excel               = Roo::Excel.new("public/uploads/Gods.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_gott.original_filename}")
@@ -507,30 +492,33 @@ class UploadsController < ApplicationController
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
 
-    logger.debug "\t[DEBUG]  [UploadController] Processing word table"
-
     #excel               = Roo::Excel.new("public/uploads/Woerterliste.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_wort.original_filename}")
 
     # todo: nun mal die zweite Tabelle !!!
     #excel.default_sheet = excel.sheets.first
     excel.default_sheet = excel.sheets.second
-    i                   = 1
+    i                   = 0
     uniqueId            = false
 
     @word_solr_batch = Array.new
 
     excel.each do |row|
 
+      i += 1
+
       # ignore the header
       if i==1
+
         if row[7] != nil && row[7].casecmp('UniqueId') == 0
           uniqueId = true
         else
-          logger.error "\t[ERROR]  [UploadController] Keine UniqueId in Wort Tabelle vorhanden"
+
+          Edfulog.new("ERROR", "#{@uploaded_wort.original_filename}", "Keine UniqueId in Wort Tabelle vorhanden", '', '', '', '')
         end
-        i += 1
+
         next
+
       end
 
       #break if i==100
@@ -635,7 +623,7 @@ class UploadsController < ApplicationController
 
 
       CSV.foreach(filePath, :col_sep => ';') do |row|
-        logger.info "\t[INFO]  [UploadController] CSV Datei: '#{filePath}'"
+
 
         if row[0] == 'description'
 
@@ -662,7 +650,8 @@ class UploadsController < ApplicationController
 
             if band.to_i > 8
 
-              logger.error "\t[Error]  [UploadController] Fehlerhafter Band: '#{row}' (in '#{filePath}')."
+
+              Edfulog.new("ERROR", filePath, "Band > 8 (Spalte #{columnDict['volume']})", '', row, '', '')
 
               next
             end
@@ -687,7 +676,8 @@ class UploadsController < ApplicationController
 
           if nummer.to_s.match(/[,\/\s]+/)
             temp = nummer.to_i
-            logger.error "\t[Error]  [UploadController] Szenennummer (Plate) '#{nummer}' enthält Komma ',', slash '/' oder Leerzeichen '#{row}' (in '#{filePath}'). Verwendet wird '#{temp}'"
+
+            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Spalte #{columnDict['plate']})", '', row, '', '')
             nummer = temp
           end
 
@@ -758,7 +748,8 @@ class UploadsController < ApplicationController
           end
 
         else
-          logger.error "\t[Error]  [UploadController - Szenenerzeugung] weniger als 12 Spalten in Zeile: '#{row}' (in '#{filePath}')"
+          # [betrifft],  text,       spalte, original, neu, uid
+          Edfulog.new("ERROR", filePath, "Weniger als 12 Spalten", '', row, '', '')
         end
       end
 

@@ -22,7 +22,7 @@ class Formular < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: '#{self.uid}', sort: '' statt '<stelle>' (formular)"
+      EdfuLog.new("ERROR", "FL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher '' statt '<stelle>')", "SEITEZEILE", '', '', self.uid)
       stelle = ''
     end
 

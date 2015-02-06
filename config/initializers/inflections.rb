@@ -27,4 +27,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'Literatur', 'Literaturen'
   inflect.irregular 'Szene', 'Szenen'
   inflect.irregular 'Szenebild', 'Szenebilder'
+  inflect.irregular 'Edfulog', 'Edfulogs'
 end

@@ -72,7 +72,7 @@ module VerifyOrtHelper
     end
 
     if stelle != originalStelle
-      logger.error "\t[ERROR]  [OL] uid: '#{uid}' Änderung STELLE, origialstelle: '#{originalStelle}' neu: '#{stelle}'"
+      Edfulog.new("ERROR", "OL", "Änderung an Stelle", "STELLE", originalStelle, stelle, uid)
     end
 
     if ort.anmerkung != nil and ort.anmerkung != ''
@@ -99,7 +99,7 @@ module VerifyOrtHelper
         m3 = re3.match(teil)
 
         if not m3
-          logger.error "\t[ERROR]  [OL] uid: '#{uid}' Fehler mit STELLE, teil: '#{teil}'"
+          Edfulog.new("ERROR", "OL",  "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
         else
 
           myBand = m3[1].strip() unless m3[1].empty?
@@ -121,7 +121,7 @@ module VerifyOrtHelper
             begin
               zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
             rescue NoMethodError
-              logger.debug "\t[DEBUG]  [OL] uid: '#{uid}', Stelle: '#{stelle}', Teil: '#{teil}'"
+              Edfulog.new("ERROR", "OL", "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
             end
 
             kommentar = ''
@@ -140,30 +140,31 @@ module VerifyOrtHelper
 
           end
 
-          stelle = Stelle.new
-          stelle.tempel = 'Edfu'
-          stelle.band = bandNr
-          stelle.bandseite = "#{myBand}, #{'%03i' % (seiteStart)}"
-          stelle.bandseitezeile = "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
-          stelle.seite_start = seiteStart
-          stelle.seite_stop = seiteStop
-          stelle.zeile_start = zeileStart
-          stelle.zeile_stop = zeileStop
-          stelle.stelle_anmerkung = kommentar
-          stelle.stelle_unsicher = false
-          stelle.zerstoerung = false
-          stelle.freigegeben = StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
+          stelle_obj = Stelle.new
+          stelle_obj.tempel = 'Edfu'
+          stelle_obj.band = bandNr
+          stelle_obj.bandseite = "#{myBand}, #{'%03i' % (seiteStart)}"
+          stelle_obj.bandseitezeile = "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
+          stelle_obj.seite_start = seiteStart
+          stelle_obj.seite_stop = seiteStop
+          stelle_obj.zeile_start = zeileStart
+          stelle_obj.zeile_stop = zeileStop
+          stelle_obj.stelle_anmerkung = kommentar
+          stelle_obj.stelle_unsicher = false
+          stelle_obj.zerstoerung = false
+          stelle_obj.freigegeben = StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
 
 
-          stelle.zugehoerigZu = ort
-          ort.stellen << stelle
+          stelle_obj.zugehoerigZu = ort
+          ort.stellen << stelle_obj
 
           if zeileStart > 30
-            logger.info "\t[Error]  [OL] uid: '#{uid}' zeile_start > 30, zeile_start: '#{zeileStart}', teil: '#{teil}'"
+            Edfulog.new("ERROR", "OL",  "Startzeile > 30", "STELLE", originalStelle, '', uid)
           end
 
+
           if zeileStop > 30
-            logger.info "\t[Error]  [OL] uid: '#{uid}' zeile_stop > 30, zeile_stop: '#{zeileStop}', teil: '#{teil}'"
+            Edfulog.new("ERROR", "OL",  "Stopzeile > 30", "STELLE", originalStelle, '', uid)
           end
 
 

@@ -16,8 +16,7 @@ class Wort < ActiveRecord::Base
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
-      puts "problem mit solr-sort: für uid: #{self.uid} (wort)"
-      logger.error "[ERROR] Problem mit der Stelle in solr sort Feld für uid: '#{self.uid}', sort: 'Ddt--' statt 'Ddt--<stelle>' (wort)"
+      EdfuLog.new("ERROR", "WL-Model", "Fehlerhafter Start in Belegstelle (solr sort daher 'Dtd--' statt 'Ddt--<stelle>')", "BelegstelleEdfu", '', '', self.uid)
       stelle = ''
     end
 

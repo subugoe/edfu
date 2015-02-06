@@ -1,0 +1,40 @@
+<h1>Edfulog</h1>
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uid:</strong>
+  <%= @edfulog.uid %>
+</p>
+
+<p>
+  <strong>Log-Level:</strong>
+  <%= @edfulog.level %>
+</p>
+
+<p>
+  <strong>Type:</strong>
+  <%= @edfulog.edfutype %>
+</p>
+
+<p>
+  <strong>Hinweis:</strong>
+  <%= @edfulog.text %>
+</p>
+
+<p>
+  <strong>Spalte (in Tabelle):</strong>
+  <%= @edfulog.column %>
+</p>
+
+<p>
+    <strong>Im Original:</strong>
+    <%= @edfulog.old %>
+</p>
+
+<p>
+    <strong>Geändert:</strong>
+    <%= @edfulog.new %>
+</p>
+
+<%= link_to 'Zurück zur Liste', edfulogs_path %>

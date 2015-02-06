@@ -11,10 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113183814) do
+ActiveRecord::Schema.define(version: 20150205110436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "edfulogs", force: :cascade do |t|
+    t.string "level"
+    t.string "edfutype"
+    t.string "text"
+    t.string "column"
+    t.text   "old"
+    t.text   "new"
+    t.string "uid"
+  end
+
+  add_index "edfulogs", ["uid"], name: "index_edfulogs_on_uid", using: :btree
 
   create_table "formulare", force: :cascade do |t|
     t.string "uid"
