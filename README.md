@@ -6,10 +6,11 @@
 		* boot2docker init
 		* boot2docker start
 		* $(boot2docker shellinit) 
-	* fig build
-	* fig run edfuweb rake db:drop db:create db:migrate create_default_user
-	    * please find the container names in th e fig.yml config file (here: edfuweb)
-	* fig up
+	* start for the first time
+		* ruby start.rb	 	
+	* restart
+		* ruby restart.rb 
+	* the scripts build the application, creates the database and start the application
 * connect to a running container
     * docker exec -it [container-id] /bin/bash
         * you can find out the id with "docker ps"
