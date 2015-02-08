@@ -123,21 +123,25 @@ class UploadsController < ApplicationController
 
     deleteDB
 
+    # process scenes first, the info will be used for the other entities
+    # x.report("scenes processing:") {
+    process_szene
+    # }
+
     # x.report("formular  processing:") {
     process_formular
     # }
+
     # x.report("topo  processing:") {
     process_ort
     # }
+
     # x.report("gods  processing:") {
     process_gott
     # }
+
     # x.report("word processing:") {
     process_wort
-    # }
-
-    # x.report("scenes processing:") {
-    process_szene
     # }
 
     # x.report("solr processing:") {
@@ -412,7 +416,7 @@ class UploadsController < ApplicationController
 
       if (iStelle == '')
 
-        Edfulog.new("ERROR", "UploadController-OL", "Leere Stelle", "STELLE", iStelle, '', uid)
+        Edfulog.new("ERROR", "UploadController-OL", "Stellen fehlt", "STELLE", iStelle, '', uid)
       else
         manipulate_stelle_string_and_create(iStelle, uid, o)
       end
@@ -566,7 +570,7 @@ class UploadsController < ApplicationController
       @word_solr_batch << w.wbberlin.to_solr_string
       @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
 
-      i += 1
+
     end
 
   end
@@ -739,12 +743,8 @@ class UploadsController < ApplicationController
 
 
           if @szene_batch.size == max_batch_size
-
-
             Szene.import @szene_batch if @szene_batch.size > 0
             @szene_batch.clear
-
-
           end
 
         else

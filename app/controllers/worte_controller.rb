@@ -6,6 +6,7 @@ class WorteController < ApplicationController
   # GET /worte
   # GET /worte.json
   def index
+    # todo: limit 100?!
     @worte = Wort.all.limit(100)
   end
 
