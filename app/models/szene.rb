@@ -9,9 +9,14 @@ class Szene < ActiveRecord::Base
   #before_validation :check_data
 
 
+  @@szenen = Hash.new(Array.new)
+
+  def self.szenen
+    return @@szenen
+  end
+
   def self.fetch(
-      filepath,
-          nummer,
+      nummer,
           beschreibung,
           rect,
           koordinate_x,
@@ -22,10 +27,20 @@ class Szene < ActiveRecord::Base
           hoehe,
           grau,
           polygon,
-          recordSzeneBild
-  )
+          # aus szenebild
+          name,
+          dateiname,
+          imagemap,
+          bild_breite,
+          bild_hoehe,
+          offset_x,
+          offset_y,
+          breite_original,
+          hoehe_original,
+          band,
+          seiteStart
 
-    Rails.cache.fetch("szene_#{filepath}_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}") {
+  )
 
       sz = Szene.new(
           nummer:          nummer,
@@ -39,25 +54,23 @@ class Szene < ActiveRecord::Base
           hoehe:           hoehe,
           grau:            grau,
           polygon:         polygon,
-          name:            recordSzeneBild.name,
-          dateiname:       recordSzeneBild.dateiname,
-          imagemap:        recordSzeneBild.imagemap,
-          bild_breite:          recordSzeneBild.breite,
-          bild_hoehe:           recordSzeneBild.hoehe,
-          offset_x:        recordSzeneBild.offset_x,
-          offset_y:        recordSzeneBild.offset_y,
-          breite_original: recordSzeneBild.breite_original,
-          hoehe_original:  recordSzeneBild.hoehe_original
+          # aus szenebild
+          name:            name,
+          dateiname:       dateiname,
+          imagemap:        imagemap,
+          bild_breite:     bild_breite,
+          bild_hoehe:      bild_hoehe,
+          offset_x:        offset_x,
+          offset_y:        offset_y,
+          breite_original: breite_original,
+          hoehe_original:  hoehe_original
       )
 
       sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
-      puts sz.id
+      @@szenen["#{band}_#{seiteStart}"] << sz
 
-      Rails.cache.write("szene_#{filepath}_#{nummer}_#{beschreibung}_#{rect}_#{koordinate_x}_#{koordinate_y}_#{blickwinkel}", sz)
       return [sz]
-    }
-
 
   end
 

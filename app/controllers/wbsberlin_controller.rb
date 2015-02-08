@@ -7,7 +7,6 @@ class WbsberlinController < ApplicationController
   # GET /wbs_berlin
   # GET /wbs_berlin.json
   def index
-    # todo: limit 100?!
     @wbsberlin = Wbberlin.all.limit(100)
   end
 

@@ -6,8 +6,6 @@ class FormulareController < ApplicationController
   # GET /formulare
   # GET /formulare.json
   def index
-
-    # todo: limit 100?!
     @formulare = Formular.all.limit(100)
 
 

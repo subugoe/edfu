@@ -7,7 +7,6 @@ class StellenController < ApplicationController
   # GET /stellen
   # GET /stellen.json
   def index
-    # todo: limit 100?!
     @stellen = Stelle.all.limit(100)
   end
 

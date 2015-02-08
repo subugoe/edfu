@@ -62,7 +62,30 @@ class Formular < ActiveRecord::Base
         :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
 
         :typ                      => 'formular', # ---
-        :id                       => "formular-#{self[:uid]}" # ---
+        :id                       => "formular-#{self[:uid]}", # ---
+
+        # --- szene
+
+        # :szene_hoehe => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.hoehe }},
+        # :szene_prozent => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.prozent_z }},
+        # :szene_bild_hoehe => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.bild_hoehe}},
+        # :szene_bild_polygon => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.polygon }},
+        # :szene_bild_rect => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.rect }},
+        # :szene_bild_name => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.name }},
+        # :szene_grau => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.grau }},
+        # :szene_blickwinkel => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.blickwinkel }},
+        # :szene_uid => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.id }},
+        # :szene_bild_offset_y => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.offset_y }},
+        # :szene_bild_offset_x => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.offset_x }},
+        # :szene_nummer => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.nummer }},
+        # :szene_beschreibung => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.beschreibung }},
+        # :szene_bild_dateiname => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.dateiname }},
+        # :szene_bild_breite => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.bild_breite }},
+        # :szene_koordinate_y => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.koordinate_y }},
+        # :szene_koordinate_x => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.koordinate_x }},
+        # :szene_breite => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.breite}},
+
+
     }
   end
 

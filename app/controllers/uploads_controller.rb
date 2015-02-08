@@ -123,10 +123,6 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-    # process scenes first, the info will be used for the other entities
-    # x.report("scenes processing:") {
-    process_szene
-    # }
 
     # x.report("formular  processing:") {
     process_formular
@@ -142,6 +138,10 @@ class UploadsController < ApplicationController
 
     # x.report("word processing:") {
     process_wort
+    # }
+
+    # x.report("scenes processing:") {
+    process_szene
     # }
 
     # x.report("solr processing:") {
@@ -416,7 +416,7 @@ class UploadsController < ApplicationController
 
       if (iStelle == '')
 
-        Edfulog.new("ERROR", "UploadController-OL", "Stellen fehlt", "STELLE", iStelle, '', uid)
+        Edfulog.new("ERROR", "UploadController-OL", "Leere Stelle", "STELLE", iStelle, '', uid)
       else
         manipulate_stelle_string_and_create(iStelle, uid, o)
       end
