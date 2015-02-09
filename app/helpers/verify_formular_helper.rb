@@ -570,8 +570,11 @@ module VerifyFormularHelper
           bildString = typ + ', pl. ' + bildString
         end
       else
-        Edfulog.new("ERROR", "FL", "Keine Abbildungsregel für erstes Element im Bildstring (#{bildString})", "Photo", origPhoto, '', uid)
+
         pos = bildString.index(",")
+
+        Edfulog.new("ERROR", "FL", "Keine Abbildungsregel für #{bildString[0...pos]}", "Photo", origPhoto, '', uid)
+
 
         bildString = bildString[pos..-1]
 
