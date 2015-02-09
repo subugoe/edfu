@@ -7,7 +7,7 @@ class StellenController < ApplicationController
   # GET /stellen
   # GET /stellen.json
   def index
-    @stellen = Stelle.all.limit(100)
+    @stellen = Stelle.all #.limit(100)
   end
 
   # GET /stellen/1

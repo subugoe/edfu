@@ -6,7 +6,7 @@ class OrteController < ApplicationController
   # GET /orte
   # GET /orte.json
   def index
-    @orte = Ort.all.limit(100)
+    @orte = Ort.all #.limit(100)
   end
 
   # GET /orte/1

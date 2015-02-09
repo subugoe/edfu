@@ -6,7 +6,7 @@ class EdfulogsController  < ApplicationController
     # GET /edfulogs
     # GET /edfulogs.json
     def index
-      @edfulogs = Edfulog.all.limit(100)
+      @edfulogs = Edfulog.all #.limit(100)
 
 
     end

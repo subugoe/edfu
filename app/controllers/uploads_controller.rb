@@ -177,8 +177,8 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -212,8 +212,8 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
