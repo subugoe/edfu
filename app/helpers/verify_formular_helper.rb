@@ -142,7 +142,16 @@ module VerifyFormularHelper
     end
 
     if szOriginal != seitezeile
-      Edfulog.new("ERROR", "FL", "Änderung der Seitezeile", "SEITEZEILE", szOriginal, seitezeile, uid)
+
+      str = ''
+      if seitezeile == szOriginal.strip
+        str = "Änderung an Seitezeile (leerzeichan am Anfang oder Ende entfernt)"
+      else
+        str = "Änderung an Seitezeile"
+      end
+
+      Edfulog.new("ERROR", "FL", str, "SEITEZEILE", szOriginal, seitezeile, uid)
+
     end
     #if (kommentar.length) > 0
     #  logger.error "[FL], Kommentar zur Seitezeile, SEITEZEILE, '#{kommentar}', , #{uid}"
@@ -377,7 +386,15 @@ module VerifyFormularHelper
     photo = photo.gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if origPhoto != photo
-      Edfulog.new("ERROR", "FL", "Photostring verändert", "Photo", origPhoto, photo, uid)
+
+      str = ''
+      if photo == origPhoto.strip
+        str = "Änderung an Photostring (leerzeichan am Anfang oder Ende entfernt)"
+      else
+        str = "Änderung an Photostring"
+      end
+
+      Edfulog.new("ERROR", "FL", str, "Photo", origPhoto, photo, uid)
     end
 
     # Sonderfälle
@@ -635,7 +652,15 @@ module VerifyFormularHelper
                        .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  uebersetzung != origUebers
-      Edfulog.new("ERROR", "FL", "Übersetzung verändert", "TEXTDEUTSC", origUebers, uebersetzung, uid)
+
+      str = ''
+      if uebersetzung == origUebers.strip
+        str = "Änderung an Übersetzung (leerzeichan am Anfang oder Ende entfernt)"
+      else
+        str = "Änderung an Übersetzung"
+      end
+
+      Edfulog.new("ERROR", "FL", str, "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     # log wenn 'Z' in Ort auftritt oder ein Fragezeichen

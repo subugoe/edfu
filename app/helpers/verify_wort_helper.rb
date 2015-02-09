@@ -121,7 +121,15 @@ module VerifyWortHelper
 
     if bEdfu != belegstellenEdfu
       edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
-      Edfulog.new("ERROR", "WL", "Änderung an Belegstelle, BelegstellenEdfu", "BelegstellenEdfu", belegstellenEdfu, bEdfu, uid)
+
+      str = ''
+      if bEdfu == belegstellenEdfu.strip
+        str = "Änderung an Belegstelle (leerzeichan am Anfang oder Ende entfernt)"
+      else
+        str = "Änderung an Belegstelle"
+      end
+
+      Edfulog.new("ERROR", "WL", str, "Belegstelle", belegstellenEdfu, bEdfu, uid)
     end
 
 
@@ -163,7 +171,15 @@ module VerifyWortHelper
 
       if wb != belegstellenWb
         wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-        Edfulog.new("ERROR", "WL", "Änderung an Belegstelle", "BelegstellenWb", belegstellenWb, wb, uid)
+
+        str = ''
+        if wb == belegstellenWb.strip
+          str = "Änderung an Belegstelle (leerzeichan am Anfang oder Ende entfernt)"
+        else
+          str = "Änderung an Belegstellen"
+        end
+
+        Edfulog.new("ERROR", "WL", str, "BelegstellenWb", belegstellenWb, wb, uid)
       end
 
 
