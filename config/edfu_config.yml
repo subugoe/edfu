@@ -6,6 +6,12 @@ defaults: &defaults
     -
       user_name: jp@edfu.de
       user_password: adminadmin
+    -
+      user_name: graeff@edfu.de
+      user_password: g_edfu_import
+    -
+      user_name: beucke@edfu.de
+      user_password: b_edfu_import
 
 development:
   <<: *defaults
