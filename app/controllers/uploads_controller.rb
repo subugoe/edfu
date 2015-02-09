@@ -123,28 +123,31 @@ class UploadsController < ApplicationController
 
     deleteDB
 
-
-    # x.report("formular  processing:") {
-    process_formular
-    # }
-
-    # x.report("topo  processing:") {
-    process_ort
-    # }
-
-    # x.report("gods  processing:") {
-    process_gott
-    # }
-
-    # x.report("word processing:") {
-    process_wort
-    # }
-
-    # x.report("scenes processing:") {
+# x.report("scenes processing:") {
     process_szene
-    # }
+# }
 
-    # x.report("solr processing:") {
+# x.report("formular  processing:") {
+    process_formular
+# }
+
+# x.report("topo  processing:") {
+    process_ort
+# }
+
+# x.report("gods  processing:") {
+    process_gott
+# }
+
+# x.report("word processing:") {
+    process_wort
+# }
+
+# # x.report("scenes processing:") {
+# process_szene
+# # }
+
+# x.report("solr processing:") {
     cleanupSolr
     updateSolr
     # }
@@ -654,8 +657,7 @@ class UploadsController < ApplicationController
 
             if band.to_i > 8
 
-
-              Edfulog.new("ERROR", filePath, "Band > 8 (Spalte #{columnDict['volume']})", '', row, '', '')
+              Edfulog.new("ERROR", filePath, "Band > 8 (Spalte #{columnDict['volume']}, Band=#{band})", '', row, '', '')
 
               next
             end
@@ -664,10 +666,10 @@ class UploadsController < ApplicationController
               seiteStart = 0
             end
 
-            stellen = Stelle.where(
-                band:        band,
-                seite_start: seiteStart
-            )
+            # stellen = Stelle.where(
+            #     band:        band,
+            #     seite_start: seiteStart
+            # )
 
           end
 
@@ -681,7 +683,7 @@ class UploadsController < ApplicationController
           if nummer.to_s.match(/[,\/\s]+/)
             temp = nummer.to_i
 
-            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Spalte #{columnDict['plate']})", '', row, '', '')
+            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Spalte #{columnDict['plate']}, Szenennummer=#{nummer})", '', row, '', '')
             nummer = temp
           end
 
