@@ -101,6 +101,11 @@ module VerifyGottHelper
       seitezeile = seitezeile.to_s
     end
 
+    if originalSEITEZEILE.class == Float
+      originalSEITEZEILE = originalSEITEZEILE.to_s
+    end
+
+
     szsz         = seitezeile.gsub(' ', '')
     halbeLaenge  = (szsz.length / 2).to_i
     halberString = szsz[halbeLaenge..-1]
