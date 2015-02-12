@@ -8,7 +8,7 @@ class Formular < ActiveRecord::Base
   extend EdfuModelHelper
 
   # iXYZ - 'i' for imported
-  attr_accessor :iphoto, :photo_kommentar, :iliteratur
+  attr_accessor :iphoto, :photo_kommentar, :iliteratur, :szenen
 
 
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
@@ -26,7 +26,8 @@ class Formular < ActiveRecord::Base
       stelle = ''
     end
 
-    return {
+    #h = Hash.new
+    h = {
         :sql_uid                  => self[:uid], # ---
 
         :sort                     => stelle, # ---
@@ -63,43 +64,53 @@ class Formular < ActiveRecord::Base
 
         :typ                      => 'formular', # ---
         :id                       => "formular-#{self[:uid]}", # ---
-
-        # --- szene
-
-        # :szene_hoehe => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.hoehe }},
-        # :szene_prozent => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.prozent_z }},
-        # :szene_bild_hoehe => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.bild_hoehe}},
-        # :szene_bild_polygon => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.polygon }},
-        # :szene_bild_rect => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.rect }},
-        # :szene_bild_name => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.name }},
-        # :szene_grau => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.grau }},
-        # :szene_blickwinkel => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.blickwinkel }},
-        # :szene_uid => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.id }},
-        # :szene_bild_offset_y => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.offset_y }},
-        # :szene_bild_offset_x => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.offset_x }},
-        # :szene_nummer => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.nummer }},
-        # :szene_beschreibung => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.beschreibung }},
-        # :szene_bild_dateiname => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.dateiname }},
-        # :szene_bild_breite => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.bild_breite }},
-        # :szene_koordinate_y => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.koordinate_y }},
-        # :szene_koordinate_x => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.koordinate_x }},
-        # :szene_breite => self.stellen.collect { |stelle| stelle.szenen.collect { |szene| szene.breite}},
-
-
     }
+    # --- szene
+
+    if self.szenen !=nil && self.szenen.size > 0
+
+      #puts "--->  formular hat (#{self.szenen.size}) Szenen"
+
+      h.merge!({
+                  :szene_hoehe          => self.szenen.collect { |szene| szene.hoehe },
+                  :szene_prozent_z        => self.szenen.collect { |szene| szene.prozent_z },
+                  :szene_bild_hoehe     => self.szenen.collect { |szene| szene.bild_hoehe },
+                  :szene_bild_polygon   => self.szenen.collect { |szene| szene.polygon },
+                  :szene_bild_rect      => self.szenen.collect { |szene| szene.rect },
+                  :szene_bild_name      => self.szenen.collect { |szene| szene.name },
+                  :szene_grau           => self.szenen.collect { |szene| szene.grau },
+                  :szene_blickwinkel    => self.szenen.collect { |szene| szene.blickwinkel },
+                  :szene_uid            => self.szenen.collect { |szene| szene.id },
+                  :szene_bild_offset_y  => self.szenen.collect { |szene| szene.offset_y },
+                  :szene_bild_offset_x  => self.szenen.collect { |szene| szene.offset_x },
+                  :szene_nummer         => self.szenen.collect { |szene| szene.nummer },
+                  :szene_beschreibung   => self.szenen.collect { |szene| szene.beschreibung },
+                  :szene_bild_dateiname => self.szenen.collect { |szene| szene.dateiname },
+                  :szene_bild_breite    => self.szenen.collect { |szene| szene.bild_breite },
+                  :szene_koordinate_y   => self.szenen.collect { |szene| szene.koordinate_y },
+                  :szene_koordinate_x   => self.szenen.collect { |szene| szene.koordinate_x },
+                  :szene_breite         => self.szenen.collect { |szene| szene.breite }
+              })
+
+      #puts h
+
+    end
+
+    return h
+
   end
 
 
   private
 
 
-  def add_to_solr
-
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (to_solr_string)
-    solr.commit
-
-  end
+  # def add_to_solr
+  #
+  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+  #   solr.add (to_solr_string)
+  #   solr.commit
+  #
+  # end
 
 end
 

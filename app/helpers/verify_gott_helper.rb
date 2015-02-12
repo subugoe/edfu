@@ -13,7 +13,7 @@ module VerifyGottHelper
 
     stellen = Array.new
 
-    re3     = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
+    re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
 
 
     originalSEITEZEILE = seitezeile
@@ -97,13 +97,13 @@ module VerifyGottHelper
     end
 
 
-    if seitezeile.class == Float
-      seitezeile = seitezeile.to_s
-    end
-
-    if originalSEITEZEILE.class == Float
-      originalSEITEZEILE = originalSEITEZEILE.to_s
-    end
+    # if seitezeile.class == Float
+    #   seitezeile = seitezeile.to_s
+    # end
+    #
+    # if originalSEITEZEILE.class == Float
+    #   originalSEITEZEILE = originalSEITEZEILE.to_s
+    # end
 
 
     szsz         = seitezeile.gsub(' ', '')
@@ -220,7 +220,7 @@ module VerifyGottHelper
 
 
       startZeile ||= 1
-      stopZeile ||= 30
+      stopZeile  ||= 30
 
       dezimal_band = roemisch_nach_dezimal(band.to_s.strip).to_i
 
@@ -228,33 +228,38 @@ module VerifyGottHelper
       if startSeite > 0 and dezimal_band > 0
 
 
-        stelle_obj                  = Stelle.new
-        stelle_obj.tempel           = 'Edfu'
-        stelle_obj.band             = dezimal_band
-        stelle_obj.bandseite        = "#{band}, #{'%03i' % (startSeite)}"
-        stelle_obj.bandseitezeile   = "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}"
-        stelle_obj.seite_start      = startSeite
-        stelle_obj.seite_stop       = stopSeite
-        stelle_obj.zeile_start      = startZeile
-        stelle_obj.zeile_stop       = stopZeile
-        stelle_obj.stelle_anmerkung = stelleAnmerkung
-        stelle_obj.stelle_unsicher  = stopUnsicher
-        stelle_obj.zerstoerung      = false
-        stelle_obj.freigegeben      = StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+        stelle_obj = Stelle.fetch(
+            "gott",
+            'Edfu',
+            dezimal_band,
+            "#{band}, #{'%03i' % (startSeite)}",
+            "#{band}, #{'%03i' % (startSeite)}, #{'%02i' % (startZeile)}",
+            startSeite,
+            stopSeite,
+            startZeile,
+            stopZeile,
+            stelleAnmerkung,
+            stopUnsicher,
+            false,
+            StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+        )
 
-        stellen << stelle_obj
+        if stelle_obj.class == Array
+          stelle_obj = stelle_obj[0]
 
 
+          stellen << stelle_obj
+
+        end
 
         if startZeile > 30
-          Edfulog.new("ERROR", "GL",  "Startzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
+          Edfulog.new("ERROR", "GL", "Startzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
 
 
         if stopZeile > 30
-          Edfulog.new("ERROR", "GL",  "Stopzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
+          Edfulog.new("ERROR", "GL", "Stopzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
-
 
 
       else

@@ -109,13 +109,13 @@ class Stelle < ActiveRecord::Base
   private
 
 
-  def add_to_solr
-
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (to_solr_string)
-    solr.commit
-
-  end
+  # def add_to_solr
+  #
+  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+  #   solr.add (to_solr_string)
+  #   solr.commit
+  #
+  # end
 
 end
 

@@ -254,6 +254,7 @@ module VerifyFormularHelper
         freigegeben
     )
 
+
     return stelle
 
   end
@@ -421,7 +422,7 @@ module VerifyFormularHelper
     re2  = Regexp.new('^D03_[0-9]+')
     re3  = Regexp.new('^D05_[0-9]+a*')
     re4  = Regexp.new('^e[0-9]+')
-    re5  = Regexp.new('^(E. [XVI]+), (pl. [DCLXVI0-9]+)')
+    re5  = Regexp.new('^(E. [XVI]+), ([pl. ]*[DCLXVI0-9]+)')
     re6  = Regexp.new('^\([^)]*\)(\s*\**)')
     re7  = Regexp.new('^[DCLXVI]+')
     re8  = Regexp.new('^\)\s*\**')
@@ -557,8 +558,14 @@ module VerifyFormularHelper
       elsif re5.match(bildString)
         # Fall (n+1): Verweis auf Tafeln im Edfou Buch
         m          = re5.match(bildString)
+        m2 = m[2]
+
+        unless m[2].include?("pl. ")
+          m2 = "pl. #{m[2]}"
+        end
+
         typ        = m[1]
-        name       = m[2]
+        name       = m2
         # rest = m.group(3)
 
         # kombi aus strip & führendes/endende Komma abschneiden
@@ -673,8 +680,8 @@ module VerifyFormularHelper
 
     #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
     # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
-    if uebersetzung.match re101 or uebersetzung.match re102
-      Edfulog.new("ERROR", "FL", "Vermutlich kaputte Akzente in Übersetzung", "TEXTDEUTSC", origUebers, uebersetzung, uid)
+    if (uebersetzung.match(re101) || uebersetzung.match(re102))
+      Edfulog.new("ERROR", "FL", "'Z' oder '?' innerhalb eines Wortes", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     return uebersetzung

@@ -10,6 +10,7 @@ class Wort < ActiveRecord::Base
   has_one :wbberlin
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
+  attr_accessor :szenen
 
   def to_solr_string
 
@@ -66,12 +67,12 @@ class Wort < ActiveRecord::Base
   private
 
 
-  def add_to_solr
-
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (to_solr_string)
-    solr.commit
-
-  end
+  # def add_to_solr
+  #
+  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+  #   solr.add (to_solr_string)
+  #   solr.commit
+  #
+  # end
 
 end

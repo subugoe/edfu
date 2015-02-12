@@ -17,7 +17,6 @@ module VerifyOrtHelper
     originalStelle = stelle
 
 
-
     if stelle == 'VIII, 73, 5; 73, 7 (sic; statt   lies wohl  , gegen Anm. 6);'
       # 240
       stelle = 'VIII, 73, 5; 73, 7 (sic - statt   lies wohl  , gegen Anm. 6)'
@@ -34,7 +33,7 @@ module VerifyOrtHelper
       # 509
       stelle = 'VI, 209, 4 (Gau); 209, 5 (Stadt); 216, 9; 217, 2; 224, 11; 237, 6; 242, 16; 243, 6; 244, 4; 245, 5; 247, 5; 249, 13; 261, 11; 263, 10; 270, 2; 273, 8; 273, 10; 276, 11; 278, 16; 282, 8; 282, 11; 283, 7; 283, 13; 284, 15; 285, 11; 288, 4; 288, 7; 290, 4; 291, 5;'
     elsif uid == 579
-      anm = stelle
+      anm    = stelle
       stelle = ''
     elsif stelle == 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([]; wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
       # 619
@@ -99,6 +98,7 @@ module VerifyOrtHelper
     bandNr = 0
 
 
+    @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
     teile.each do |teil|
 
@@ -107,7 +107,7 @@ module VerifyOrtHelper
         m3 = re3.match(teil)
 
         if not m3
-          Edfulog.new("ERROR", "OL",  "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
+          Edfulog.new("ERROR", "OL", "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
         else
 
           myBand = m3[1].strip() unless m3[1].empty?
@@ -116,10 +116,11 @@ module VerifyOrtHelper
             bandNr = roemisch_nach_dezimal(myBand)
           end
 
+          #puts m3[2]
           seiteStart = (m3[2].strip()).to_i
-          seiteStop = seiteStart
+          seiteStop  = seiteStart
           zeileStart = 100
-          zeileStop = 100
+          zeileStop  = 100
 
           if m3[3].index(' - ') != nil
             seiteStop = (m3[3].split(' - ')[1]).to_i
@@ -127,15 +128,16 @@ module VerifyOrtHelper
             zeileStart = (m3[3].split(' - ')[0]).to_i
 
             begin
-              zeileStop = (m3[4].match(/(^\s*;\s*)(.*)(\s*;\s*$)/)[2]).to_i
+              #puts m3[4]
+              zeileStop = (m3[4].match(/(^[\s,]*)(\d*)([\s;]*$)/)[2]).to_i
             rescue NoMethodError
               Edfulog.new("ERROR", "OL", "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
             end
 
             kommentar = ''
           else
-            z = m3[3].gsub(' ', '').gsub('/', '-')
-            zeilen = z.split('-')
+            z          = m3[3].gsub(' ', '').gsub('/', '-')
+            zeilen     = z.split('-')
             zeileStart = (zeilen[0]).to_i
 
             if zeilen.length == 1
@@ -148,36 +150,79 @@ module VerifyOrtHelper
 
           end
 
-          stelle_obj = Stelle.new
-          stelle_obj.tempel = 'Edfu'
-          stelle_obj.band = bandNr
-          stelle_obj.bandseite = "#{myBand}, #{'%03i' % (seiteStart)}"
-          stelle_obj.bandseitezeile = "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}"
-          stelle_obj.seite_start = seiteStart
-          stelle_obj.seite_stop = seiteStop
-          stelle_obj.zeile_start = zeileStart
-          stelle_obj.zeile_stop = zeileStop
-          stelle_obj.stelle_anmerkung = kommentar
-          stelle_obj.stelle_unsicher = false
-          stelle_obj.zerstoerung = false
-          stelle_obj.freigegeben = StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
+          stelle_obj = Stelle.fetch(
+              "ort",
+              'Edfu',
+              bandNr,
+              "#{myBand}, #{'%03i' % (seiteStart)}",
+              "#{myBand}, #{'%03i' % (seiteStart)}, #{'%02i' % (zeileStart)}",
+              seiteStart,
+              seiteStop,
+              zeileStart,
+              zeileStop,
+              kommentar,
+              false,
+              false,
+              StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
+          )
+
+          if stelle_obj.class == Array
+            stelle_obj          = stelle_obj[0]
+
+            #---
+
+            szenen              = Szene.szenen["#{bandNr}_#{seiteStart}"]
+
+            #puts "Band: #{band}, Seitestart: #{seiteStart}"
+            #puts "Szenen: #{szenen.size}" if szenen != nil && szenen.size > 0
 
 
+
+            if (szenen != nil && szenen.size > 0)
+
+              szenen.each { |szene|
+
+                stelle_obj.szenen << szene
+                szene.stellen << stelle_obj
+
+                # todo: required? ort.stellen...szenen
+                ort.szenen = Array.new if ort.szenen == nil
+                ort.szenen << szene
+
+                stz = StellenSzenen.fetch(stelle_obj, szene)
+
+                if stz.class == Array
+
+                  stz = stz[0]
+
+                  @stelle_szene_batch << stz
+
+                end
+
+              }
+
+            end
+          end
+          #---
+
+          # todo: hier steigt er aus !!! Array hat keine m. zugehoerigZU???
           stelle_obj.zugehoerigZu = ort
           ort.stellen << stelle_obj
 
           if zeileStart > 30
-            Edfulog.new("ERROR", "OL",  "Startzeile > 30", "STELLE", originalStelle, '', uid)
+            Edfulog.new("ERROR", "OL", "Startzeile > 30", "STELLE", originalStelle, '', uid)
           end
 
 
           if zeileStop > 30
-            Edfulog.new("ERROR", "OL",  "Stopzeile > 30", "STELLE", originalStelle, '', uid)
+            Edfulog.new("ERROR", "OL", "Stopzeile > 30", "STELLE", originalStelle, '', uid)
           end
 
 
         end
       end
     end
+
+    return @stelle_szene_batch
   end
 end

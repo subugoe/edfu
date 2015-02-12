@@ -25,6 +25,9 @@ class CreateSzenen < ActiveRecord::Migration
       t.string :breite_original
       t.string :hoehe_original
 
+      t.string :band
+      t.string :seiteStart
+
       #t.references :stellen, polymorphic: true
 
       #t.timestamps

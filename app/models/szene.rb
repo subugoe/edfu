@@ -9,11 +9,12 @@ class Szene < ActiveRecord::Base
   #before_validation :check_data
 
 
-  @@szenen = Hash.new(Array.new)
+  @@szenen = Hash.new()
 
   def self.szenen
     return @@szenen
   end
+
 
   def self.fetch(
       nummer,
@@ -42,35 +43,43 @@ class Szene < ActiveRecord::Base
 
   )
 
-      sz = Szene.new(
-          nummer:          nummer,
-          beschreibung:    beschreibung,
-          rect:            rect,
-          koordinate_x:    koordinate_x,
-          koordinate_y:    koordinate_y,
-          blickwinkel:     blickwinkel,
-          breite:          breite,
-          prozent_z:       prozent_z,
-          hoehe:           hoehe,
-          grau:            grau,
-          polygon:         polygon,
-          # aus szenebild
-          name:            name,
-          dateiname:       dateiname,
-          imagemap:        imagemap,
-          bild_breite:     bild_breite,
-          bild_hoehe:      bild_hoehe,
-          offset_x:        offset_x,
-          offset_y:        offset_y,
-          breite_original: breite_original,
-          hoehe_original:  hoehe_original
-      )
 
-      sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
+    sz = Szene.new(
+        nummer:          nummer,
+        beschreibung:    beschreibung,
+        rect:            rect,
+        koordinate_x:    koordinate_x,
+        koordinate_y:    koordinate_y,
+        blickwinkel:     blickwinkel,
+        breite:          breite,
+        prozent_z:       prozent_z,
+        hoehe:           hoehe,
+        grau:            grau,
+        polygon:         polygon,
+        # aus szenebild
+        name:            name,
+        dateiname:       dateiname,
+        imagemap:        imagemap,
+        bild_breite:     bild_breite,
+        bild_hoehe:      bild_hoehe,
+        offset_x:        offset_x,
+        offset_y:        offset_y,
+        breite_original: breite_original,
+        hoehe_original:  hoehe_original,
+        band:            band,
+        seiteStart:      seiteStart
 
-      @@szenen["#{band}_#{seiteStart}"] << sz
+    )
 
-      return [sz]
+
+    sz.id                             = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
+
+
+    @@szenen["#{band}_#{seiteStart}"] = Array.new if @@szenen["#{band}_#{seiteStart}"] == nil
+    @@szenen["#{band}_#{seiteStart}"] << sz
+
+
+    return [sz]
 
   end
 
@@ -125,13 +134,13 @@ class Szene < ActiveRecord::Base
   private
 
 
-  def add_to_solr
-
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (to_solr_string)
-    solr.commit
-
-  end
+  # def add_to_solr
+  #
+  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+  #   solr.add (to_solr_string)
+  #   solr.commit
+  #
+  # end
 
 
 end

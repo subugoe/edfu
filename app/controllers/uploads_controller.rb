@@ -121,34 +121,43 @@ class UploadsController < ApplicationController
     #Benchmark.bm(7) do |x|
 
 
+    puts "deleteDB"
     deleteDB
 
 # x.report("scenes processing:") {
+    puts "process_szene"
     process_szene
 # }
 
 # x.report("formular  processing:") {
-    process_formular
+#puts "process_formular"
+#process_formular
 # }
 
 # x.report("topo  processing:") {
+    puts "process_ort"
     process_ort
 # }
 
 # x.report("gods  processing:") {
+    puts "process_gott"
     process_gott
 # }
 
 # x.report("word processing:") {
+    puts "process_wort"
     process_wort
 # }
 
-# # x.report("scenes processing:") {
-# process_szene
-# # }
+
+    puts "save_Szenen"
+    save_szenen
 
 # x.report("solr processing:") {
+    puts "cleanupSolr"
     cleanupSolr
+
+    puts "updateSolr"
     updateSolr
     # }
 
@@ -174,14 +183,15 @@ class UploadsController < ApplicationController
     Wort.delete_all
     Wbberlin.delete_all
     Szene.delete_all
+    StellenSzenen.delete_all
 
 
   end
 
   def cleanupSolr
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    # solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -215,8 +225,8 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    # solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
@@ -226,7 +236,7 @@ class UploadsController < ApplicationController
   def process_formular
 
 
-    max_batch_size = 1500
+    max_batch_size = 500
     n              = 50000
     i              = 0
 
@@ -238,7 +248,7 @@ class UploadsController < ApplicationController
     @literatur_batch          = Array.new
     @formular_photo_batch     = Array.new
     @formular_literatur_batch = Array.new
-
+    @stelle_szene_batch       = Array.new if @stelle_szene_batch == nil
 
     # excel               = Roo::Excel.new("public/uploads/Formular.xls")
     excel                     = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
@@ -268,7 +278,7 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      #break if i==1500
+      #break if i==15
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
@@ -300,7 +310,42 @@ class UploadsController < ApplicationController
       s                          = create_stellen(seitezeile, band, uID)
       if s.class == Array
         s = s[0]
+
+        seiteStart = s.seite_start
+        band       = s.band
+
+        szenen = Szene.szenen["#{band}_#{seiteStart}"]
+
+        #puts "Band: #{band}, Seitestart: #{seiteStart}"
+        #puts "Szenen: #{szenen.size}" if szenen != nil && szenen.size > 0
+
+        if szenen != nil && szenen.size > 0
+
+          szenen.each { |szene|
+
+            s.szenen << szene
+            szene.stellen << s
+
+            # todo: required? ort.stellen...szenen
+            f.szenen = Array.new if f.szenen == nil
+            f.szenen << szene
+
+            stz = StellenSzenen.fetch(s, szene)
+
+            if stz.class == Array
+
+              stz = stz[0]
+
+              @stelle_szene_batch << stz
+
+            end
+
+          }
+
+        end
+
         @stelle_batch << s
+
       end
 
       s.zugehoerigZu = f
@@ -308,6 +353,7 @@ class UploadsController < ApplicationController
       #f.bandseitezeile = s.bandseitezeile
 
       f.stellen << s
+
 
       # --- Photos
 
@@ -364,7 +410,6 @@ class UploadsController < ApplicationController
         @literatur_batch.clear
       end
 
-      i += 1
     end
 
 
@@ -375,7 +420,7 @@ class UploadsController < ApplicationController
     Literatur.import @literatur_batch if @literatur_batch.size > 0
     FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
     FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
-    Formular.import @formular_batch if @photo_batch.size > 0
+    Formular.import @formular_batch if @formular_batch.size > 0
 
 
   end
@@ -388,11 +433,16 @@ class UploadsController < ApplicationController
     # excel               = Roo::Excel.new("public/uploads/Topo.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_ort.original_filename}")
     excel.default_sheet = excel.sheets.first
-    i                   = 1
+    i                   = 0
 
-    @ort_solr_batch = Array.new
+    max_batch_size      = 500
+    @ort_batch          = Array.new
+    @ort_solr_batch     = Array.new
+    @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
     excel.each do |row|
+
+      i += 1
 
       # not process the header
       if i==1
@@ -405,6 +455,8 @@ class UploadsController < ApplicationController
       iStelle = row[0] ||= ''
 
       uid = Integer(row[5]) || ''
+
+      puts uid
 
       o = Ort.new(
 
@@ -421,18 +473,26 @@ class UploadsController < ApplicationController
 
         Edfulog.new("ERROR", "UploadController-OL", "Leere Stelle", "STELLE", iStelle, '', uid)
       else
-        manipulate_stelle_string_and_create(iStelle, uid, o)
+        @stelle_szene_batch += manipulate_stelle_string_and_create(iStelle, uid, o)
       end
 
 
-      o.save
+      @ort_batch << o
+
 
       @ort_solr_batch << o.to_solr_string
       @ort_solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
 
+      if @ort_batch.size == max_batch_size
 
-      i += 1
+        Ort.import @ort_batch
+        @ort_batch.clear
+      end
+
     end
+
+    Ort.import @ort_batch if @ort_batch.size > 0
+    @ort_batch.clear
 
   end
 
@@ -444,12 +504,14 @@ class UploadsController < ApplicationController
     # excel               = Roo::Excel.new("public/uploads/Gods.xls")
     excel               = Roo::Excel.new("public/uploads/#{@uploaded_gott.original_filename}")
     excel.default_sheet = excel.sheets.first
-    i                   = 1
+    i                   = 0
 
-    @gott_solr_batch = Array.new
-
+    @gott_solr_batch    = Array.new
+    @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
     excel.each do |row|
+
+      i += 1
 
       # not process the header
       if i==1
@@ -464,6 +526,11 @@ class UploadsController < ApplicationController
       uid        = Integer(row[9]) || ''
       seitezeile = row[7] || ''
       band       = row[6] || ''
+
+      if seitezeile.class == Float
+        seitezeile = seitezeile.to_s
+        seitezeile.gsub!('.', ',')
+      end
 
       g = Gott.new(
 
@@ -484,6 +551,49 @@ class UploadsController < ApplicationController
       stellen.each { |stelle|
         stelle.zugehoerigZu = g
         g.stellen << stelle
+
+
+        #---
+
+
+        seiteStart = stelle.seite_start
+        b          = stelle.band
+
+        szenen = Szene.szenen["#{b}_#{seiteStart}"]
+
+        #puts "Band: #{band}, Seitestart: #{seiteStart}"
+        #puts "Szenen: #{szenen.size}" if szenen != nil && szenen.size > 0
+
+        if szenen != nil && szenen.size > 0
+
+          szenen.each { |szene|
+
+            stelle.szenen << szene
+            szene.stellen << stelle
+
+            # todo: required? ort.stellen...szenen
+            g.szenen = Array.new if g.szenen == nil
+            g.szenen << szene
+
+            stz = StellenSzenen.fetch(stelle, szene)
+
+            if stz.class == Array
+
+              stz = stz[0]
+
+              @stelle_szene_batch << stz
+
+            end
+          }
+
+        end
+
+        @stelle_batch << stelle
+
+
+        #---
+
+
       }
 
       g.save
@@ -491,7 +601,7 @@ class UploadsController < ApplicationController
       @gott_solr_batch << g.to_solr_string
       @gott_solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
 
-      i += 1
+
     end
 
   end
@@ -508,7 +618,8 @@ class UploadsController < ApplicationController
     i                   = 0
     uniqueId            = false
 
-    @word_solr_batch = Array.new
+    @word_solr_batch    = Array.new
+    @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
     excel.each do |row|
 
@@ -565,6 +676,46 @@ class UploadsController < ApplicationController
       stellen.each { |stelle|
         stelle.zugehoerigZu = w
         w.stellen << stelle
+
+
+        #---
+
+        seiteStart = stelle.seite_start
+        b          = stelle.band
+
+        szenen = Szene.szenen["#{b}_#{seiteStart}"]
+
+        #puts "Band: #{band}, Seitestart: #{seiteStart}"
+        #puts "Szenen: #{szenen.size}" if szenen != nil && szenen.size > 0
+
+        if szenen != nil && szenen.size > 0
+
+          szenen.each { |szene|
+
+            stelle.szenen << szene
+            szene.stellen << stelle
+
+            # todo: required? ort.stellen...szenen
+            w.szenen = Array.new if w.szenen == nil
+            w.szenen << szene
+
+            stz = StellenSzenen.fetch(stelle, szene)
+            if stz.class == Array
+
+              stz = stz[0]
+              @stelle_szene_batch << stz
+
+            end
+          }
+
+        end
+
+        # todo: find a better place for initialization
+        @stelle_batch = Array.new if @stelle_batch == nil
+        @stelle_batch << stelle
+
+        #---
+
       }
 
       w.save
@@ -578,19 +729,45 @@ class UploadsController < ApplicationController
 
   end
 
+  def save_szenen
+
+    @szene_batch      = Array.new
+    @szene_solr_batch = Array.new
+
+    Szene.szenen.each { |key, value_array|
+      value_array.each { |szene|
+        @szene_batch << szene
+        @szene_solr_batch << szene.to_solr_string
+      }
+
+    }
+
+
+    # if @szene_batch != nil && @szene_batch > 0
+    #   @szene_batch.each { |szene|
+    #     @szene_solr_batch << szene.to_solr_string
+    #   }
+    # end
+
+    Szene.import @szene_batch if @szene_batch.size > 0
+
+    # puts "stelle_szene_batch: #{@stelle_szene_batch.size}"
+    StellenSzenen.import @stelle_szene_batch if @stelle_szene_batch.size > 0
+
+  end
 
   def process_szene
 
     # Szeneninformation aus CSV Dateien (aus Imagemap)
 
-    max_batch_size    = 1500
-    szene_bildDict    = Hash.new
-    bilderColumnDict  = Hash.new
-    @szene_solr_batch = Array.new
+    #max_batch_size    = 1500
+    #szene_bildDict    = Hash.new
+    bilderColumnDict = Hash.new
+    #@szene_solr_batch = Array.new
 
-    @szenebilder_batch = Array.new
-    @szene_batch       = Array.new
-    @stelle_batch      = Array.new
+    #@szenebilder_batch = Array.new
+    #@szene_batch       = Array.new
+    #@stelle_batch      = Array.new
 
 
     CSV.foreach("Daten/tempelplan.csv", :col_sep => ';') do |bildRow|
@@ -649,7 +826,9 @@ class UploadsController < ApplicationController
           # --- stellen
 
 
-          stellen = nil
+          # stellen    = nil
+          band       = 0
+          seiteStart = 0
 
           if row[columnDict['volume']] != nil && row[columnDict['volume']] != ''
 
@@ -657,7 +836,7 @@ class UploadsController < ApplicationController
 
             if band.to_i > 8
 
-              Edfulog.new("ERROR", filePath, "Band > 8 (Spalte #{columnDict['volume']}, Band=#{band})", '', row, '', '')
+              Edfulog.new("ERROR", filePath, "Band > 8 (Position #{columnDict['volume']+1}, Band='#{band}')", '', row, '', '')
 
               next
             end
@@ -683,7 +862,7 @@ class UploadsController < ApplicationController
           if nummer.to_s.match(/[,\/\s]+/)
             temp = nummer.to_i
 
-            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Spalte #{columnDict['plate']}, Szenennummer=#{nummer})", '', row, '', '')
+            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
             nummer = temp
           end
 
@@ -710,44 +889,50 @@ class UploadsController < ApplicationController
           end
 
 
-          sz = Szene.new(
-              nummer:          nummer,
-              beschreibung:    beschreibung,
-              rect:            rect,
-              koordinate_x:    row[columnDict['coord-x']],
-              koordinate_y:    row[columnDict['coord-y']],
-              blickwinkel:     row[columnDict['angleOfView']],
-              breite:          row[columnDict['extent-width']],
-              prozent_z:       row[columnDict['height-percent']],
-              hoehe:           row[columnDict['extent-height-percent']].to_f,
-              grau:            grau,
-              polygon:         polygon,
+          sz = Szene.fetch(
+              nummer,
+              beschreibung,
+              rect,
+              row[columnDict['coord-x']],
+              row[columnDict['coord-y']],
+              row[columnDict['angleOfView']],
+              row[columnDict['extent-width']],
+              row[columnDict['height-percent']],
+              row[columnDict['extent-height-percent']].to_f,
+              grau,
+              polygon,
               # aus szenebild
-              name:            name,
-              dateiname:       dateiname,
-              imagemap:        imagemap,
-              bild_breite:     breite,
-              bild_hoehe:      hoehe,
-              offset_x:        offset_x,
-              offset_y:        offset_y,
-              breite_original: breite_original,
-              hoehe_original:  hoehe_original
+              name,
+              dateiname,
+              imagemap,
+              breite,
+              hoehe,
+              offset_x,
+              offset_y,
+              breite_original,
+              hoehe_original,
+              band,
+              seiteStart
           )
 
 
-          sz.stellen << stellen unless stellen == nil
+          # todo: szenen und stellen über stellen verbinden
+          # todo: szenen_stellen Tabelle mit anpassen
+          #sz.stellen << stellen unless stellen == nil
 
-          sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
+          #sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
-          sz.save
+          # todo: per batch speichern
+          #sz.save
 
-          @szene_solr_batch << sz.to_solr_string
+          # todo: solr-batch erst nach verbindung mit stellen aufbauen (also ganz zum schluss)
+          #@szene_solr_batch << sz.to_solr_string
 
 
-          if @szene_batch.size == max_batch_size
-            Szene.import @szene_batch if @szene_batch.size > 0
-            @szene_batch.clear
-          end
+          # if @szene_batch.size == max_batch_size
+          #   Szene.import @szene_batch if @szene_batch.size > 0
+          #   @szene_batch.clear
+          # end
 
         else
           # [betrifft],  text,       spalte, original, neu, uid
@@ -755,7 +940,7 @@ class UploadsController < ApplicationController
         end
       end
 
-      Szene.import @szene_batch if @szene_batch.size > 0
+      #Szene.import @szene_batch if @szene_batch.size > 0
 
     end
 

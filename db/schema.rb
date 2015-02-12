@@ -142,6 +142,8 @@ ActiveRecord::Schema.define(version: 20150205110436) do
     t.string "offset_y"
     t.string "breite_original"
     t.string "hoehe_original"
+    t.string "band"
+    t.string "seiteStart"
   end
 
   create_table "uploads", force: :cascade do |t|

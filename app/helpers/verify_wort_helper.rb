@@ -38,10 +38,10 @@ module VerifyWortHelper
 
     bEdfu = belegstellenEdfu
 
-    if bEdfu.strip().end_with? (';')
-      i     = bEdfu.rindex(';')
-      bEdfu = bEdfu[0..i-1]
-    end
+    # if bEdfu.strip().end_with? (';')
+    #   i     = bEdfu.rindex(';')
+    #   bEdfu = bEdfu[0..i-1]
+    # end
 
     # 2132, 2276, 2325
     bEdfu = bEdfu.gsub(/E VII/, 'VII')
@@ -223,7 +223,7 @@ module VerifyWortHelper
           end
         rescue ArgumentError
 
-          Edfulog.new("ERROR", "WL", "Datensatz fehlerhaft", "BelegstellenWb",  wb, '', uid)
+          Edfulog.new("ERROR", "WL", "Datensatz fehlerhaft", "BelegstellenWb", wb, '', uid)
         end
 
         if wbTeile[1].index(',') != nil
@@ -282,16 +282,16 @@ module VerifyWortHelper
       anmerkung = "#{anmerkung.strip() || ''}"
     end
 
-
-    edfuBandNr     = 0
+    band           = ''
+    #edfuBandNr     = 0
     edfuSeiteStart = 0
     zerstoerung    = false
     bandRoemisch   = ''
     bandDezimal    = 0
 
     if bEdfu.length > 0
-      belegstellen = bEdfu.split(';')
-
+      belegstellen = bEdfu.strip.split(';')
+      a            = belegstellen.size
       belegstellen.each { |b|
         b = b.strip()
 
@@ -304,6 +304,7 @@ module VerifyWortHelper
 
         end
 
+        # todo: check this
         if b.index(',') == nil
           if edfuSeiteStart != 0
             b = edfuSeiteStart.to_s + ', ' + b
@@ -321,8 +322,8 @@ module VerifyWortHelper
 
             bandRoemisch = m20[1].strip()
             bandDezimal  = roemisch_nach_dezimal bandRoemisch
-            edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
-          elsif edfuBandNr == 0
+            #edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
+          elsif bandDezimal == 0
             Edfulog.new("ERROR", "WL", "Fehlende Bandangabe", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
@@ -352,42 +353,48 @@ module VerifyWortHelper
             edfuAnmerkung = m20[6].strip()
           end
 
-          if m20[5] == '>'
+
+          # todo: Stern (chassinat_verbessert) und Klammer (schreiber_verbessert)
+          if m20[5] == ">"
             klammer = true
-          elsif m20[5] == '>*'
+          elsif m20[5] == ">*"
             stern = true
           elsif (m20[5]).length > 2
             Edfulog.new("ERROR", "WL", "Bandangabe zu lang (#{b})", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
 
-          stelle                  = Stelle.new
-          stelle.tempel           = 'Edfu'
-          stelle.band             = edfuBandNr
-          stelle.bandseite        = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}"
-          stelle.bandseitezeile   = "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}"
-          stelle.seite_start      = edfuSeiteStart
-          stelle.seite_stop       = edfuSeiteStop
-          stelle.zeile_start      = edfuZeileStart
-          stelle.zeile_stop       = edfuZeileStop
-          stelle.stelle_anmerkung = edfuAnmerkung
-          stelle.stelle_unsicher  = false
-          stelle.zerstoerung      = false
-          stelle.freigegeben      = StellenHelper.getFromBanddict((edfuBandNr).to_i, 'freigegeben')
+          stelle = Stelle.fetch(
+              "wort",
+              'Edfu',
+              bandDezimal,
+              "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}",
+              "#{bandRoemisch}, #{'%03i' % (edfuSeiteStart)}, #{'%02i' % (edfuZeileStart)}",
+              edfuSeiteStart,
+              edfuSeiteStop,
+              edfuZeileStart,
+              edfuZeileStop,
+              edfuAnmerkung,
+              false,
+              false,
+              StellenHelper.getFromBanddict((bandDezimal).to_i, 'freigegeben')
+          )
+          if stelle.class == Array
+            stelle = stelle[0]
 
-          stellen << stelle
-
+            stellen << stelle
+          end
 
           if edfuZeileStart == nil
             Edfulog.new("ERROR", "WL", "Startzeile ungültig", "BelegstellenEdfu", bEdfu, '', uid)
           elsif edfuZeileStart > 30
-            Edfulog.new("ERROR", "WL", "Startzeile > 30",  "BelegstellenEdfu", bEdfu, '', uid)
+            Edfulog.new("ERROR", "WL", "Startzeile > 30 (#{edfuZeileStart})", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
           if edfuZeileStop == nil
             Edfulog.new("ERROR", "WL", "Stopzeile ungültig", "BelegstellenEdfu", bEdfu, '', uid)
           elsif edfuZeileStop > 30
-            Edfulog.new("ERROR", "WL", "Stopzeile > 30",  "BelegstellenEdfu", bEdfu, '', uid)
+            Edfulog.new("ERROR", "WL", "Stopzeile > 30 (#{edfuZeileStop})", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
 
@@ -395,7 +402,11 @@ module VerifyWortHelper
 
           Edfulog.new("ERROR", "WL", "Belegstelle (#{b}) verworfen", "BelegstellenEdfu", bEdfu, '', uid)
         end
+
+        # bildString = bildString.strip.sub(/^[,.:\s]*/, '').strip # m[2]
+
       }
+
     end
 
 

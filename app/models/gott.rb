@@ -12,7 +12,7 @@ class Gott < ActiveRecord::Base
 
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  attr_accessor :transliteration_nosuffix
+  attr_accessor :transliteration_nosuffix, :szenen
 
 
   def to_solr_string
@@ -61,12 +61,12 @@ class Gott < ActiveRecord::Base
   private
 
 
-  def add_to_solr
-
-    solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-    solr.add (to_solr_string)
-    solr.commit
-  end
+  # def add_to_solr
+  #
+  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
+  #   solr.add (to_solr_string)
+  #   solr.commit
+  # end
 
 
 end
