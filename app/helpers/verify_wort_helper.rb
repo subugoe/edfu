@@ -381,9 +381,9 @@ module VerifyWortHelper
           )
           if stelle.class == Array
             stelle = stelle[0]
-
-            stellen << stelle
           end
+
+          stellen << stelle unless stellen.include? stelle
 
           if edfuZeileStart == nil
             Edfulog.new("ERROR", "WL", "Startzeile ungültig", "BelegstellenEdfu", bEdfu, '', uid)

@@ -13,6 +13,11 @@ class Stelle < ActiveRecord::Base
   belongs_to :zugehoerigZu, polymorphic: true
   has_and_belongs_to_many :szenen, :dependent => :delete_all
 
+  @@stellen = Hash.new
+
+  def self.stellen
+    return @@stellen
+  end
 
   def start
     return "#{self[:band]}#{'%03i' % self[:seite_start]}#{'%03i' % self[:zeile_start]}"
@@ -68,31 +73,39 @@ class Stelle < ActiveRecord::Base
   )
 
 
-    Rails.cache.fetch("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
+
+    #Rails.cache.fetch("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
+
+    stelle = @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"]
+
+    return stelle if stelle != nil
 
 
-      s = Stelle.new(
-          tempel:           tempel,
-          band:             band,
-          bandseite:        bandseite,
-          bandseitezeile:   bandseitezeile,
-          seite_start:      seite_start,
-          seite_stop:       seite_stop,
-          zeile_start:      zeile_start,
-          zeile_stop:       zeile_stop,
-          stelle_anmerkung: stelle_anmerkung,
-          stelle_unsicher:  stelle_unsicher,
-          zerstoerung:      zerstoerung,
-          freigegeben:      freigegeben
-      )
+    s = Stelle.new(
+        tempel:           tempel,
+        band:             band,
+        bandseite:        bandseite,
+        bandseitezeile:   bandseitezeile,
+        seite_start:      seite_start,
+        seite_stop:       seite_stop,
+        zeile_start:      zeile_start,
+        zeile_stop:       zeile_stop,
+        stelle_anmerkung: stelle_anmerkung,
+        stelle_unsicher:  stelle_unsicher,
+        zerstoerung:      zerstoerung,
+        freigegeben:      freigegeben
+    )
 
 
-      s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
+    s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
-      Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
+    @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"] = s
 
-      return [s]
-    }
+    #Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
+
+    return [s]
+
+    #}
 
 
   end

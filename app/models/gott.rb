@@ -16,14 +16,18 @@ class Gott < ActiveRecord::Base
 
 
   def to_solr_string
+
+
     begin
       stelle = self.stellen.first.start
     rescue NoMethodError
+
       Edfulog.new("ERROR", "GL-Model", "Fehlerhafter Start in Seitezeile (solr sort daher 'Act--' statt 'Act--<stelle>')", "SEITEZEILE", '', '', self.uid)
       stelle = ''
     end
 
-    return {
+
+    h =  {
         :sql_uid                  => self[:uid], # ---
         :transliteration          => self[:transliteration], # ---
         :transliteration_nosuffix => self[:transliteration], # ? ---
@@ -55,6 +59,12 @@ class Gott < ActiveRecord::Base
         :typ                      => 'gott', # ---
         :id                       => "gott-#{self[:uid]}" # ---
     }
+
+
+    puts stelle
+
+    return h
+
   end
 
 

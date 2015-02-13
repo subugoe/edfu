@@ -98,7 +98,7 @@ module VerifyOrtHelper
     bandNr = 0
 
 
-    @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
+    @ort_stelle_szene_batch = Array.new if @ort_stelle_szene_batch == nil
 
     teile.each do |teil|
 
@@ -116,7 +116,7 @@ module VerifyOrtHelper
             bandNr = roemisch_nach_dezimal(myBand)
           end
 
-          #puts m3[2]
+
           seiteStart = (m3[2].strip()).to_i
           seiteStop  = seiteStart
           zeileStart = 100
@@ -128,7 +128,7 @@ module VerifyOrtHelper
             zeileStart = (m3[3].split(' - ')[0]).to_i
 
             begin
-              #puts m3[4]
+
               zeileStop = (m3[4].match(/(^[\s,]*)(\d*)([\s;]*$)/)[2]).to_i
             rescue NoMethodError
               Edfulog.new("ERROR", "OL", "Fehlerhafte Stelle", "STELLE", originalStelle, '', uid)
@@ -173,9 +173,6 @@ module VerifyOrtHelper
 
             szenen              = Szene.szenen["#{bandNr}_#{seiteStart}"]
 
-            #puts "Band: #{band}, Seitestart: #{seiteStart}"
-            #puts "Szenen: #{szenen.size}" if szenen != nil && szenen.size > 0
-
 
 
             if (szenen != nil && szenen.size > 0)
@@ -186,18 +183,22 @@ module VerifyOrtHelper
                 szene.stellen << stelle_obj
 
                 # todo: required? ort.stellen...szenen
-                ort.szenen = Array.new if ort.szenen == nil
-                ort.szenen << szene
+                #ort.szenen = Array.new if ort.szenen == nil
+                #ort.szenen << szene
 
                 stz = StellenSzenen.fetch(stelle_obj, szene)
+
+
+
 
                 if stz.class == Array
 
                   stz = stz[0]
 
-                  @stelle_szene_batch << stz
+                  @ort_stelle_szene_batch << stz
 
                 end
+
 
               }
 
@@ -223,6 +224,6 @@ module VerifyOrtHelper
       end
     end
 
-    return @stelle_szene_batch
+    return @ort_stelle_szene_batch
   end
 end

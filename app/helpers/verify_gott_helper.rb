@@ -199,7 +199,7 @@ module VerifyGottHelper
           zeilen = komponenten[1].strip()
           if zeilen.match(/f/)
 
-            stopUnsicher = true
+            stopUnsicher = true   # todo: ff. steht eigentlich für folgende zeilen, hier aber stop unsicher !!!
             # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
             zeilen       = zeilen.gsub(/\s*f+\.*/, '')
           end
@@ -246,11 +246,9 @@ module VerifyGottHelper
 
         if stelle_obj.class == Array
           stelle_obj = stelle_obj[0]
-
-
-          stellen << stelle_obj
-
         end
+
+        stellen << stelle_obj unless stellen.include? stelle_obj
 
         if startZeile > 30
           Edfulog.new("ERROR", "GL", "Startzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)

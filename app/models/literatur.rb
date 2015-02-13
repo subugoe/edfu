@@ -6,20 +6,28 @@ class Literatur < ActiveRecord::Base
 
   has_and_belongs_to_many :formulare
 
+  @@literaturen = Hash.new
+
   def self.fetch(beschreibung, detail)
 
-    Rails.cache.fetch("literatur_#{beschreibung}_#{detail}") {
+    #Rails.cache.fetch("literatur_#{beschreibung}_#{detail}") {
 
-      l              = Literatur.new
-      l.beschreibung = beschreibung
-      l.detail       = detail
+    lit = @@literaturen["literatur_#{beschreibung}_#{detail}"]
 
-      l.id = ActiveRecord::Base.connection.execute("select nextval('literaturen_id_seq')").first['nextval']
+    return lit if lit != nil
 
-      Rails.cache.write("literatur_#{beschreibung}_#{detail}", l)
+    l              = Literatur.new
+    l.beschreibung = beschreibung
+    l.detail       = detail
 
-      return [l]
-    }
+    l.id                                               = ActiveRecord::Base.connection.execute("select nextval('literaturen_id_seq')").first['nextval']
+
+    #Rails.cache.write("literatur_#{beschreibung}_#{detail}", l)
+
+    @@literaturen["literatur_#{beschreibung}_#{detail}"] = l
+
+    return [l]
+    #}
 
   end
 
