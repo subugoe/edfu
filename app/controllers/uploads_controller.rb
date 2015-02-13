@@ -635,6 +635,8 @@ class UploadsController < ApplicationController
     max_batch_size      = 500
     @wort_batch         = Array.new
     @word_solr_batch    = Array.new
+    @wbberlin_batch     = Array.new
+
     # @stelle_batch             = Array.new if @stelle_batch == nil
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
@@ -735,6 +737,7 @@ class UploadsController < ApplicationController
 
 
       @wort_batch << w
+      @wbberlin_batch << w.wbberlin
 
       @word_solr_batch << w.to_solr_string
       @word_solr_batch << w.wbberlin.to_solr_string
@@ -751,6 +754,9 @@ class UploadsController < ApplicationController
 
     Wort.import @wort_batch if @wort_batch.size > 0
     @wort_batch.clear
+
+    Wbberlin.import @wbberlin_batch if @wbberlin_batch.site > 0
+    @wbberlin_batch.clear
 
   end
 
@@ -769,13 +775,13 @@ class UploadsController < ApplicationController
 
 
     Szene.import @szene_batch if @szene_batch.size > 0
-#    StellenSzenen.import @stelle_szene_batch if @stelle_szene_batch.size > 0
+    StellenSzenen.import @stelle_szene_batch if @stelle_szene_batch.size > 0
 
   end
 
   def save_stellen
 
-    @stelle_batch      = Array.new
+    @stelle_batch = Array.new
     #@stelle_solr_batch = Array.new
 
     Stelle.stellen.each_value { |stelle|

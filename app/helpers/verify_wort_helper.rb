@@ -264,8 +264,10 @@ module VerifyWortHelper
     dbWB.zeile_start = wbStart[1] || ''
     dbWB.zeile_stop  = wbStop[1] || ''
     dbWB.notiz       = wbAnmerkung || ''
-    dbWB.wort        = wort
+    #dbWB.wort        = wort
+    dbWB.id = ActiveRecord::Base.connection.execute("select nextval('wbsberlin_id_seq')").first['nextval']
 
+    wort.wbberlin  = dbWB
 
     #--- edfu
 
