@@ -903,12 +903,12 @@ class UploadsController < ApplicationController
             nummer = 0
           end
 
-          if nummer.to_s.match(/[,\/\s]+/)
-            temp = nummer.to_i
-
-            Edfulog.new("ERROR", filePath, "Fehlerhafte Plate (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
-            nummer = temp
-          end
+          # if nummer.to_s.match(/[,\/\s]+/)
+          #   temp = nummer.to_i
+          #
+          #   Edfulog.new("ERROR", filePath, "Fehlerhafte Plate (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
+          #   nummer = temp
+          # end
 
 
           unless beschreibung = row[columnDict['description']]
