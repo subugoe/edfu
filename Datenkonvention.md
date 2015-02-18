@@ -127,46 +127,46 @@
 		* Band (römisch), Seite und Zeile des Datensatzes im Band.
 	* Text
 	* Muster (Beispiele)
-		* **VI, 32, 5; **
+		* **VI, 32, 5;**
 			* <span style="color: red">Band 6, Seite 32, Zeile 5</span>
-		* **VI, 43, 4/5; **
+		* **VI, 43, 4/5;**
 			* <span style="color: red">Band 6, Seite 43, Zeile 4 und 5</span>
-		* **V, 227, 17 - 228, 1; **
+		* **V, 227, 17 - 228, 1;**
 			* <span style="color: red">Band 5, Seite 227, Zeile 17 - Seite 228, Zeile 1</span>
-		* **VII, 10, 7; 33, 18; 34, 12; 182, 7; 269, 14; V, 255, 15; **
-		* **VII, 183, 15 ([]); **
+		* **VII, 10, 7; 33, 18; 34, 12; 182, 7; 269, 14; V, 255, 15;**
+		* **VII, 183, 15 ([]);**
 			* <span style="color: red">[] bedeutet, die Stelle ist zerstört, kann aber als sicher angesehen werden.</span>
-		* **V, 35, 8; 145, 17 ([]?); **
+		* **V, 35, 8; 145, 17 ([]?);**
 			* <span style="color: red">([] ?)  - wie zuvor?</span>
-		* **VII, 22, 10 ([ ]); 256, 1; VI, 14, 3; 108, 3; 280, 8; V, 172, 13 ([]); **
+		* **VII, 22, 10 ([ ]); 256, 1; VI, 14, 3; 108, 3; 280, 8; V, 172, 13 ([]);**
 			* <span style="color: red">([ ])  - wie zuvor?</span>
-		* **VII, 185, 7/8 (?); **
+		* **VII, 185, 7/8 (?);**
 			* <span style="color: red">(?) ?</span>
-		* **V, 31, 5; 40, 14; 42, 5 (<>); 94, 14; **
+		* **V, 31, 5; 40, 14; 42, 5 (<>); 94, 14;**
 			* <span style="color: red"><> bedeutet, die Stelle muß korrigiert werden, weil dem Ägypter (Schreiber) ein Fehler unterlaufen ist.</span>
-		* **V, 302, 16 (<  >); **
+		* **V, 302, 16 (<  >);**
 			* <span style="color: red">(<  >) - wie zuvor?</span>
-		* **V, 355, 7 (<Smaj>); **
+		* **V, 355, 7 (<Smaj>);**
 			* <span style="color: red">Interpretation?</span>
-		* **VI, 90, 3 (30); 209, 13; **
+		* **VI, 90, 3 (30); 209, 13;**
 			* <span style="color: red">(30) weist auf zusätzliche Information in Zeile 30 hin, es handelt sich aber nicht um einen zweite Fall.</span>
-		* **VI, 36, 11; 208, Anm. 2; 328, 17/18; **
+		* **VI, 36, 11; 208, Anm. 2; 328, 17/18;**
 			* <span style="color: red">Anmerkung 2 betrifft gesamte Seite 208</span>
-		* **V, 174, 2; 182, 12; 183, 11 (Tempel: Det.:  ); 199, 5; 245, 12; 248, 11; 255, 12 (Det.:  ); 261, 10 (dito); 313, 11 (dito); **
-		* **VIII, 76, 8 (die Bewohner); V, 25, 10/11 ([R?]Tnw) **
+		* **V, 174, 2; 182, 12; 183, 11 (Tempel: Det.:  ); 199, 5; 245, 12; 248, 11; 255, 12 (Det.:  ); 261, 10 (dito); 313, 11 (dito);**
+		* **VIII, 76, 8 (die Bewohner); V, 25, 10/11 ([R?]Tnw)**
 			* <span style="color: red">?</span>
-		* **VII, 184, 13; 283, 12 (s. Anmerkung) VI, 275, 2; **
-		* **VII, 240, 2 (2x); **
+		* **VII, 184, 13; 283, 12 (s. Anmerkung) VI, 275, 2;**
+		* **VII, 240, 2 (2x);**
 			* <span style="color: red">?</span>
-		* **V, 42, 2 ("¦A-Fnxw"); 143, 5; **
-		* **VII, 264, 13; 276, 16 (--nw--); **
-		* **V, 132, 3 (Halle des Lebens); 135, 9; **
-		* **VIII, 53, 2; 61, 13; 62, 1 (konjiziert); 75, 6; 75, 7/8; **
-		* **VIII, 134, 17; 137, 15; 140, 10 (sic); 141, 9 ( ); **
-		* **VII, 23, 7; 24, 4; 31, 11 (Hnwt nwwt); 33, 13 (nb wTst); 43, 8; 58, 4 (  (sic)); **
-		* **V, 4, 1; 5, 4; 6, 7; 8, 8; 8, 9; 11, 5; 29, 2 ([...?);  **
+		* **V, 42, 2 ("¦A-Fnxw"); 143, 5;**
+		* **VII, 264, 13; 276, 16 (--nw--);**
+		* **V, 132, 3 (Halle des Lebens); 135, 9;**
+		* **VIII, 53, 2; 61, 13; 62, 1 (konjiziert); 75, 6; 75, 7/8;**
+		* **VIII, 134, 17; 137, 15; 140, 10 (sic); 141, 9 ( );**
+		* **VII, 23, 7; 24, 4; 31, 11 (Hnwt nwwt); 33, 13 (nb wTst); 43, 8; 58, 4 (  (sic));**
+		* **V, 4, 1; 5, 4; 6, 7; 8, 8; 8, 9; 11, 5; 29, 2 ([...?);**
 			* <span style="color: red">?</span>
-		* **VIII, 64, 8; V, 221, 1 ([?]-xpr); 274, 6 (dito); **
+		* **VIII, 64, 8; V, 221, 1 ([?]-xpr); 274, 6 (dito);**
 			* <span style="color: red">Bedeutung/Zusatzinformation?</span>
 		 		* ([]), ([ ]), ([]?), ([R?]Tnw), ([?]-xpr)
 			 	* (<>), (< >), (<Smaj>)
