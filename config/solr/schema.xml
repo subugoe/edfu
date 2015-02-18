@@ -97,7 +97,7 @@
 		<field name="bandseitezeile" type="string" indexed="true" stored="true" multiValued="true"/>
 		
 		<field name="szene_uid" type="int" indexed="true" stored="true" multiValued="true"/>
-		<field name="szene_nummer" type="int" indexed="true" stored="true" multiValued="true"/>
+		<field name="szene_nummer" type="string" indexed="true" stored="true" multiValued="true"/>
 		<field name="szene_beschreibung" type="text_ws" indexed="true" stored="true" multiValued="true"/>
 		<field name="szene_bild_name" type="string" indexed="true" stored="true" multiValued="true"/>
 		<field name="szene_bild_dateiname" type="string" indexed="true" stored="true" multiValued="true"/>
