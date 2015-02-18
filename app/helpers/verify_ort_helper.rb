@@ -183,23 +183,17 @@ module VerifyOrtHelper
                 szene.stellen << stelle_obj
 
                 # todo: required? ort.stellen...szenen
-                #ort.szenen = Array.new if ort.szenen == nil
-                #ort.szenen << szene
+                ort.szenen = Array.new if ort.szenen == nil
+                ort.szenen << szene
+
 
                 stz = StellenSzenen.fetch(stelle_obj, szene)
-
-
-
-
                 if stz.class == Array
 
                   stz = stz[0]
-
                   @ort_stelle_szene_batch << stz
 
                 end
-
-
               }
 
             end
