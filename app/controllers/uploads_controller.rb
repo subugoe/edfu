@@ -124,30 +124,26 @@ class UploadsController < ApplicationController
         puts "deleteDB"
         deleteDB
 
-# x.report("scenes processing:") {
+
         puts "process_szene"
         process_szene
-# }
 
-# x.report("formular  processing:") {
+
         puts "process_formular"
         process_formular
-# }
 
-# x.report("topo  processing:") {
+
         puts "process_ort"
         process_ort
-# }
 
-# x.report("gods  processing:") {
+
         puts "process_gott"
         process_gott
-# }
 
-# x.report("word processing:") {
+
         puts "process_wort"
         process_wort
-# }
+
 
         puts "save_Stellen"
         save_stellen
@@ -155,7 +151,7 @@ class UploadsController < ApplicationController
         puts "save_Szenen"
         save_szenen
 
-# x.report("solr processing:") {
+
         puts "cleanupSolr"
         cleanupSolr
 
@@ -168,9 +164,8 @@ class UploadsController < ApplicationController
 
   def deleteDB
 
-    # User.delete_all
 
-    Rails.cache.clear
+    # Rails.cache.clear
 
     Edfulog.delete_all
     Formular.delete_all
@@ -191,7 +186,7 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    # solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
     solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
@@ -229,7 +224,7 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    # solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
     solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
@@ -295,9 +290,7 @@ class UploadsController < ApplicationController
       end
 
 
-      f = Formular.new
-
-
+      f    = Formular.new
       f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
 
       f.uid                      = uID
@@ -351,9 +344,6 @@ class UploadsController < ApplicationController
       end
 
       s.zugehoerigZu = f
-      #f.bandseite      = s.bandseite
-      #f.bandseitezeile = s.bandseitezeile
-
       f.stellen << s
 
 
@@ -457,19 +447,18 @@ class UploadsController < ApplicationController
 
       iStelle = row[0] ||= ''
 
-      uid = Integer(row[5]) || ''
+      uid  = Integer(row[5]) || ''
 
       #puts uid
 
-      o   = Ort.new(
+      o    = Ort.new
+      o.id = ActiveRecord::Base.connection.execute("select nextval('orte_id_seq')").first['nextval']
 
-          uid:             uid,
-          transliteration: row[1] || '',
-          ort:             row[2] || '',
-          lokalisation:    row[3] || '',
-          anmerkung:       row[4] || ''
-
-      )
+      o.uid             = uid
+      o.transliteration = row[1] || ''
+      o.ort             = row[2] || ''
+      o.lokalisation    = row[3] || ''
+      o.anmerkung       = row[4] || ''
 
 
       if (iStelle == '')
@@ -539,19 +528,19 @@ class UploadsController < ApplicationController
         seitezeile.gsub!('.', ',')
       end
 
-      g = Gott.new(
+      g    = Gott.new
+      g.id = ActiveRecord::Base.connection.execute("select nextval('goetter_id_seq')").first['nextval']
 
-          uid:                      uid,
-          transliteration:          row[1] || '',
-          transliteration_nosuffix: row[1] || '',
-          ort:                      row[2] || '',
-          eponym:                   row[3] || '',
-          beziehung:                row[4] || '',
-          funktion:                 row[5] || '',
-          #band:                     band,
-          anmerkung:                row[8] || '',
+      g.uid                      = uid
+      g.transliteration          = row[1] || ''
+      g.transliteration_nosuffix = row[1] || ''
+      g.ort                      = row[2] || ''
+      g.eponym                   = row[3] || ''
+      g.beziehung                = row[4] || ''
+      g.funktion                 = row[5] || ''
+      #band:                     band,
+      g.anmerkung                = row[8] || ''
 
-      )
 
       stellen = manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band)
 
@@ -577,8 +566,8 @@ class UploadsController < ApplicationController
             szene.stellen << stelle
 
             # todo: required? ort.stellen...szenen
-            # g.szenen = Array.new if g.szenen == nil
-            # g.szenen << szene
+            g.szenen = Array.new if g.szenen == nil
+            g.szenen << szene
 
             stz = StellenSzenen.fetch(stelle, szene)
 
@@ -679,7 +668,9 @@ class UploadsController < ApplicationController
       belegstellenEdfu = row[4] || ''
       belegstellenWb   = row[5] || ''
 
-      w                          = Wort.new
+      w    = Wort.new
+      w.id = ActiveRecord::Base.connection.execute("select nextval('worte_id_seq')").first['nextval']
+
       w.uid                      = uid
       w.transliteration          = row[0] || ''
       w.transliteration_nosuffix = row[0] || ''
@@ -755,7 +746,7 @@ class UploadsController < ApplicationController
     Wort.import @wort_batch if @wort_batch.size > 0
     @wort_batch.clear
 
-    Wbberlin.import @wbberlin_batch if @wbberlin_batch.site > 0
+    Wbberlin.import @wbberlin_batch if @wbberlin_batch.size > 0
     @wbberlin_batch.clear
 
   end
@@ -775,7 +766,18 @@ class UploadsController < ApplicationController
 
 
     Szene.import @szene_batch if @szene_batch.size > 0
-    StellenSzenen.import @stelle_szene_batch if @stelle_szene_batch.size > 0
+    @szene_batch.clear
+
+    sz     = StellenSzenen.stellenszenen
+    sz_arr = Array.new
+
+    sz.each { |key, value_array|
+      sz_arr << value_array
+    }
+
+
+    StellenSzenen.import sz_arr if sz_arr.size > 0
+    #@stelle_szene_batch.clear
 
   end
 
@@ -792,6 +794,7 @@ class UploadsController < ApplicationController
     }
 
     Stelle.import @stelle_batch if @stelle_batch.size > 0
+    @stelle_batch.clear
 
 
   end
@@ -903,7 +906,7 @@ class UploadsController < ApplicationController
           if nummer.to_s.match(/[,\/\s]+/)
             temp = nummer.to_i
 
-            Edfulog.new("ERROR", filePath, "Fehlerhafte Szenennummer (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
+            Edfulog.new("ERROR", filePath, "Fehlerhafte Plate (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
             nummer = temp
           end
 
