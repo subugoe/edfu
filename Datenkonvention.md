@@ -73,17 +73,17 @@
 		* **1546 oder 1908a**
 			* Typ=SW, Name=1546, Pfad=SW/1546
 			* Typ=SW, Name=1908a, Pfad=SW/1908a
-			* <span style="color: red">reg. Expr. /^[0-9]+a*/</span>
+			* reg. Expr. /^[0-9]+a*/
 	
 	 	* **e073**
 			* Typ=e, Name=e073, Pfad=e/e073
 			* reg. Expr. /^e[0-9]+/
 		* **E. XIV, pl. DCLV oder E. XIV, pl. DLIII, DLIV oder E. XIII, pl. DXV, DXVI, DXVII**
 			* Typ=Edfou XIV, Name=pl. DCLV, Pfad=Edfou XIV/pl. DCLV
+			* reg. Expr. /^(E. [XVI]+), ([pl. ]*[DCLXVI0-9]+)/
 			* <span style="color: red">pl. DCLV steht für Platenummer</span>
 			* <span style="color: red">Fotos, die als Plates in einem Chassinat-Band vorliegen. Ein Plate ist eine Bildseite. Diese kann mehrere Grafiken enthalten.</span>
 			* <span style="color: red">Dateinamen enthalten ggf. Leerzeichen?</span>
-			* reg. Expr. /^(E. [XVI]+), ([pl. ]*[DCLXVI0-9]+)/
 		* **D05_6680 oder D03_0693**
 			* Typ=2005, Name=D0_6680, Pfad=2005/D0_6680
 			* reg. Expr. /^D05_[0-9]+a*/
@@ -91,8 +91,8 @@
 			* reg. Expr. /^D03_[0-9]+/
 		* **G3 oder G32 ff.**
 			* Typ=G, Name=G32, Pfad=G/G32
-			* <span style="color: red">Bedeutung von ff. ? Gehört ff. zum Namen?</span>
 			* reg. Expr. /^(G[0-9]+)\s*([f.]*)/	
+			* <span style="color: red">Bedeutung von ff. ? Gehört ff. zum Namen?</span>
 		* **Labrique Stylistique, pl. 11**
 			* Typ=Labrique, Stylistique, Name=pl. 11, Pfad=Labrique, Stylistique/pl. 11
 			* reg. Expr. /^;*\s*Labrique, Stylistique, (pl. [0-9.]*)/
@@ -128,28 +128,30 @@
 	* Text
 	* Muster (Beispiele)
 		* **VI, 32, 5; **
+			* <span style="color: red">Band 6, Seite 32, Zeile 5</span>
 		* **VI, 43, 4/5; **
+			* <span style="color: red">Band 6, Seite 43, Zeile 4 und 5</span>
 		* **V, 227, 17 - 228, 1; **
+			* <span style="color: red">Band 5, Seite 227, Zeile 17 - Seite 228, Zeile 1</span>
 		* **VII, 10, 7; 33, 18; 34, 12; 182, 7; 269, 14; V, 255, 15; **
-		* **VIII, 46, 11/12; **
 		* **VII, 183, 15 ([]); **
 			* <span style="color: red">[] bedeutet, die Stelle ist zerstört, kann aber als sicher angesehen werden.</span>
 		* **V, 35, 8; 145, 17 ([]?); **
-			* <span style="color: red">([] ?) ?</span>
+			* <span style="color: red">([] ?)  - wie zuvor?</span>
 		* **VII, 22, 10 ([ ]); 256, 1; VI, 14, 3; 108, 3; 280, 8; V, 172, 13 ([]); **
-			* <span style="color: red">([ ]) ?</span>
+			* <span style="color: red">([ ])  - wie zuvor?</span>
 		* **VII, 185, 7/8 (?); **
 			* <span style="color: red">(?) ?</span>
 		* **V, 31, 5; 40, 14; 42, 5 (<>); 94, 14; **
-			* <span style="color: red"><> bedeutet, die Stelle muß korrigiert werden, weil dem Ägypter oder Chassinat hier ein Fehler unterlaufen ist.</span>
+			* <span style="color: red"><> bedeutet, die Stelle muß korrigiert werden, weil dem Ägypter (Schreiber) ein Fehler unterlaufen ist.</span>
 		* **V, 302, 16 (<  >); **
-			* <span style="color: red">(<  >) ?</span>
+			* <span style="color: red">(<  >) - wie zuvor?</span>
 		* **V, 355, 7 (<Smaj>); **
-			* <span style="color: red">?</span>
+			* <span style="color: red">Interpretation?</span>
 		* **VI, 90, 3 (30); 209, 13; **
 			* <span style="color: red">(30) weist auf zusätzliche Information in Zeile 30 hin, es handelt sich aber nicht um einen zweite Fall.</span>
 		* **VI, 36, 11; 208, Anm. 2; 328, 17/18; **
-			* <span style="color: blue">Anmerkung 2 betrifft gesamte Seite 208</span>
+			* <span style="color: red">Anmerkung 2 betrifft gesamte Seite 208</span>
 		* **V, 174, 2; 182, 12; 183, 11 (Tempel: Det.:  ); 199, 5; 245, 12; 248, 11; 255, 12 (Det.:  ); 261, 10 (dito); 313, 11 (dito); **
 		* **VIII, 76, 8 (die Bewohner); V, 25, 10/11 ([R?]Tnw) **
 			* <span style="color: red">?</span>
@@ -291,12 +293,12 @@
 			* <span style="color: red">Band 7, Seite 46, Zeile 8?</span>
 		* **VII, 018, 02; 018, 08; **
 		* **VII, <097, 05>* **
-			* <span style="color: red">Bedeutung von <> und *?</span>
 			* <span style="color: red">Band 7, Seite 97, Zeile 5?</span>
+			* <span style="color: red"><> - bedeutet, die Stelle muß korrigiert werden, weil dem Ägypter (Schreiber)  ein Fehler unterlaufen ist</span>
+			* <span style="color: red">* - bedeutet, die Stelle muß korrigiert werden, weil dem Chassinat hier ein Fehler unterlaufen ist</span>
 		* **VIII, 124, 01; VII, 161, 07 **
 		* **VIII, 140, 02 - 03; 140, 15 **
 		* **VIII, 077, 06 f.; 081, 13 **
-			* <span style="color: red">Stop unsicher?</span>
 			* <span style="color: red">Band 8, Seite 77, Zeile 6 - 7?</span>
 		* **VIII, <012, 08>\*; <056, 12>\* **
 * **BelegstellenWb**: 
@@ -358,6 +360,7 @@
 * Stelle-Szene
 	* Eine Stelle kann mit beliebig vielen Szenen verbunden sein.
 	* Eine Szene kann mit beliebig vielen Stellen verbunden sein.
+	* Das Mapping von Stelle auf Szene erfolgt per Band und Startseite
 
 
 
