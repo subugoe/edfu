@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-Dir.chdir("/home/jenkins/edfu/")
+#Dir.chdir("/home/jenkins/edfu/")
 
 
 #puts "\nstop web container"
