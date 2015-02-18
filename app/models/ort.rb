@@ -29,7 +29,7 @@ class Ort < ActiveRecord::Base
       stelle = ''
     end
 
-    return {
+    h = {
         :sql_uid                  => self[:uid],
         :sort                     => "#{self[:transliteration]}--#{stelle}", # ---
 
@@ -57,8 +57,38 @@ class Ort < ActiveRecord::Base
         :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
 
         :typ                      => 'ort', # ---
-        :id                       => "ort-#{self[:uid]}" # ---
+        :id                       => "ort-#{self[:uid]}", # ---
     }
+
+    # --- szene
+
+    if self.szenen !=nil && self.szenen.size > 0
+
+      h.merge!({
+                   :szene_hoehe          => self.szenen.collect { |szene| szene.hoehe },
+                   :szene_prozent_z      => self.szenen.collect { |szene| szene.prozent_z },
+                   :szene_bild_hoehe     => self.szenen.collect { |szene| szene.bild_hoehe },
+                   :szene_bild_polygon   => self.szenen.collect { |szene| szene.polygon },
+                   :szene_bild_rect      => self.szenen.collect { |szene| szene.rect },
+                   :szene_bild_name      => self.szenen.collect { |szene| szene.name },
+                   :szene_grau           => self.szenen.collect { |szene| szene.grau },
+                   :szene_blickwinkel    => self.szenen.collect { |szene| szene.blickwinkel },
+                   :szene_uid            => self.szenen.collect { |szene| szene.id },
+                   :szene_bild_offset_y  => self.szenen.collect { |szene| szene.offset_y },
+                   :szene_bild_offset_x  => self.szenen.collect { |szene| szene.offset_x },
+                   :szene_nummer         => self.szenen.collect { |szene| szene.nummer },
+                   :szene_beschreibung   => self.szenen.collect { |szene| szene.beschreibung },
+                   :szene_bild_dateiname => self.szenen.collect { |szene| szene.dateiname },
+                   :szene_bild_breite    => self.szenen.collect { |szene| szene.bild_breite },
+                   :szene_koordinate_y   => self.szenen.collect { |szene| szene.koordinate_y },
+                   :szene_koordinate_x   => self.szenen.collect { |szene| szene.koordinate_x },
+                   :szene_breite         => self.szenen.collect { |szene| szene.breite }
+               })
+
+    end
+
+    return h
+
   end
 
 

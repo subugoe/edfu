@@ -53,6 +53,8 @@ class Stelle < ActiveRecord::Base
 
         :typ              => 'stelle', # ---
         :id               => "stelle-#{self[:id]}" # ---
+
+        # todo: add szene?
     }
   end
 
