@@ -3,7 +3,7 @@
 # use this script if you start the containers for the first time; then use restart.rb
 
 
-#Dir.chdir("/home/jenkins/edfu/")
+Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
 
 
 if File.exist?("temp/pids/server.pid")

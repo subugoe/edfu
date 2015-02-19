@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-#Dir.chdir("/home/jenkins/edfu/")
+Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
 
 
 #puts "\nstop web container"
