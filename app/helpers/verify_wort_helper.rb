@@ -381,9 +381,9 @@ module VerifyWortHelper
               false,
               StellenHelper.getFromBanddict((bandDezimal).to_i, 'freigegeben')
           )
-          if stelle.class == Array
-            stelle = stelle[0]
-          end
+          # if stelle.class == Array
+          #   stelle = stelle[0]
+          # end
 
           stellen << stelle unless stellen.include? stelle
 

@@ -244,9 +244,9 @@ module VerifyGottHelper
             StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
         )
 
-        if stelle_obj.class == Array
-          stelle_obj = stelle_obj[0]
-        end
+        # if stelle_obj.class == Array
+        #   stelle_obj = stelle_obj[0]
+        # end
 
         stellen << stelle_obj unless stellen.include? stelle_obj
 

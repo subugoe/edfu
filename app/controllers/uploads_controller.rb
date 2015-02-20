@@ -186,8 +186,8 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -224,8 +224,8 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
@@ -305,8 +305,8 @@ class UploadsController < ApplicationController
       # --- Stellen
 
       s                          = create_stellen(seitezeile, band, uID)
-      if s.class == Array
-        s = s[0]
+      # if s.class == Array
+      #   s = s[0]
 
         seiteStart = s.seite_start
         band       = s.band
@@ -341,7 +341,7 @@ class UploadsController < ApplicationController
 
         # @stelle_batch << s
 
-      end
+      #end
 
       s.zugehoerigZu = f
       f.stellen << s
@@ -786,7 +786,7 @@ class UploadsController < ApplicationController
     @stelle_batch = Array.new
     #@stelle_solr_batch = Array.new
 
-    Stelle.stellen.each_value { |stelle|
+    Stelle.stellen.each{ |stelle|
 
       @stelle_batch << stelle
       #@stelle_solr_batch << stelle.to_solr_string

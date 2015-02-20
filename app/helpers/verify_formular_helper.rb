@@ -665,7 +665,7 @@ module VerifyFormularHelper
 
       str = ''
       if uebersetzung == origUebers.strip
-        str = "Änderung an Übersetzung (leerzeichan am Anfang oder Ende entfernt)"
+        str = "Änderung an Übersetzung (Leerzeichen an Anfang oder Ende entfernt)"
       else
         str = "Änderung an Übersetzung"
       end

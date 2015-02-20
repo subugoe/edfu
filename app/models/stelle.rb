@@ -13,7 +13,8 @@ class Stelle < ActiveRecord::Base
   belongs_to :zugehoerigZu, polymorphic: true
   has_and_belongs_to_many :szenen, :dependent => :delete_all
 
-  @@stellen = Hash.new
+  # changed from hash to array, because earlier for stellen would be overwritten
+  @@stellen = Array.new
 
   def self.stellen
     return @@stellen
@@ -78,9 +79,9 @@ class Stelle < ActiveRecord::Base
 
     #Rails.cache.fetch("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
 
-    stelle = @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"]
+    #stelle = @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"]
 
-    return stelle if stelle != nil
+    #return stelle if stelle != nil
 
 
     s = Stelle.new(
@@ -101,11 +102,13 @@ class Stelle < ActiveRecord::Base
 
     s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
-    @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"] = s
+    #@@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"] = s
+    @@stellen << s
 
     #Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
 
-    return [s]
+    #return [s]
+    return s
 
     #}
 

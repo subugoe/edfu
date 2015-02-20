@@ -160,14 +160,14 @@ module VerifyOrtHelper
               seiteStop,
               zeileStart,
               zeileStop,
-              kommentar,
+              kommentar, # todo: sind hier nur stellen anmerkungen drin?
               false,
               false,
               StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
           )
 
-          if stelle_obj.class == Array
-            stelle_obj          = stelle_obj[0]
+          # if stelle_obj.class == Array
+          #   stelle_obj          = stelle_obj[0]
 
             #---
 
@@ -197,7 +197,7 @@ module VerifyOrtHelper
               }
 
             end
-          end
+          #end
           #---
 
           # todo: hier steigt er aus !!! Array hat keine m. zugehoerigZU???
