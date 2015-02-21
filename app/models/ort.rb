@@ -62,7 +62,7 @@ class Ort < ActiveRecord::Base
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+        :stelle_anmerkung         => anmerkungen, # ---
 
         :typ                      => 'ort', # ---
         :id                       => "ort-#{self[:uid]}", # ---
