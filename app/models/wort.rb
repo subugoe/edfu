@@ -22,15 +22,21 @@ class Wort < ActiveRecord::Base
     end
 
     anmerkungen = self.stellen.collect { |stelle|
-
       if stelle.stelle_anmerkung = ''
         ' '
       else
         stelle.stelle_anmerkung
       end
-
     }
 
+
+    anmerkungen = self.stellen.collect { |stelle|
+      if stelle.stelle_anmerkung = ''
+        ' '
+      else
+        stelle.stelle_anmerkung
+      end
+    }
 
     h           = {
         :sql_uid                  => self[:uid],

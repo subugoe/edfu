@@ -27,19 +27,13 @@ class Formular < ActiveRecord::Base
     end
 
 
-    anmerkungen = Array.new
-    if self.stellen.size >= 1
-      self.stellen.each { |stelle|
-
-        a = stelle.stelle_anmerkung
-
-        a ||= ''
-        anmerkungen << a
-
-      }
-    else
-      anmerkungen << ''
-    end
+    anmerkungen = self.stellen.collect { |stelle|
+      if stelle.stelle_anmerkung = ''
+        ' '
+      else
+        stelle.stelle_anmerkung
+      end
+    }
 
     #h = Hash.new
     h = {
