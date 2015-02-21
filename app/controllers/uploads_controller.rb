@@ -129,16 +129,16 @@ class UploadsController < ApplicationController
         process_szene
 
 
-        # puts "process_formular"
-        # process_formular
-        #
-        #
-        # puts "process_ort"
-        # process_ort
-        #
-        #
-        # puts "process_gott"
-        # process_gott
+        puts "process_formular"
+        process_formular
+
+
+        puts "process_ort"
+        process_ort
+
+
+        puts "process_gott"
+        process_gott
 
 
         puts "process_wort"
@@ -647,7 +647,7 @@ class UploadsController < ApplicationController
 
       end
 
-      break if i==3
+      #break if i==3
 
       if row[2] != nil and row[2] != ''
         begin
