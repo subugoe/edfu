@@ -129,16 +129,16 @@ class UploadsController < ApplicationController
         process_szene
 
 
-        puts "process_formular"
-        process_formular
-
-
-        puts "process_ort"
-        process_ort
-
-
-        puts "process_gott"
-        process_gott
+        # puts "process_formular"
+        # process_formular
+        #
+        #
+        # puts "process_ort"
+        # process_ort
+        #
+        #
+        # puts "process_gott"
+        # process_gott
 
 
         puts "process_wort"
@@ -186,8 +186,8 @@ class UploadsController < ApplicationController
 
   def cleanupSolr
 
-    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.update :data => '<delete><query>*:*</query></delete>'
     solr.update :data => '<commit/>'
 
@@ -224,8 +224,8 @@ class UploadsController < ApplicationController
 
   def add_to_solr(solr_string_array)
 
-    #solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-    solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
+    solr = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
+    #solr = RSolr.connect :url => "http://localhost:8983/solr/collection1"
     solr.add (solr_string_array)
     solr.commit
 
@@ -308,38 +308,38 @@ class UploadsController < ApplicationController
       # if s.class == Array
       #   s = s[0]
 
-        seiteStart = s.seite_start
-        band       = s.band
+      seiteStart                 = s.seite_start
+      band                       = s.band
 
-        szenen = Szene.szenen["#{band}_#{seiteStart}"]
+      szenen = Szene.szenen["#{band}_#{seiteStart}"]
 
 
-        if szenen != nil && szenen.size > 0
+      if szenen != nil && szenen.size > 0
 
-          szenen.each { |szene|
+        szenen.each { |szene|
 
-            s.szenen << szene
-            szene.stellen << s
+          s.szenen << szene
+          szene.stellen << s
 
-            # todo: required? ort.stellen...szenen
-            f.szenen = Array.new if f.szenen == nil
-            f.szenen << szene
+          # todo: required? ort.stellen...szenen
+          f.szenen = Array.new if f.szenen == nil
+          f.szenen << szene
 
-            stz = StellenSzenen.fetch(s, szene)
+          stz = StellenSzenen.fetch(s, szene)
 
-            if stz.class == Array
+          if stz.class == Array
 
-              stz = stz[0]
+            stz = stz[0]
 
-              @stelle_szene_batch << stz
+            @stelle_szene_batch << stz
 
-            end
+          end
 
-          }
+        }
 
-        end
+      end
 
-        # @stelle_batch << s
+      # @stelle_batch << s
 
       #end
 
@@ -647,7 +647,7 @@ class UploadsController < ApplicationController
 
       end
 
-      #break if i==100
+      break if i==3
 
       if row[2] != nil and row[2] != ''
         begin
@@ -786,7 +786,7 @@ class UploadsController < ApplicationController
     @stelle_batch = Array.new
     #@stelle_solr_batch = Array.new
 
-    Stelle.stellen.each{ |stelle|
+    Stelle.stellen.each { |stelle|
 
       @stelle_batch << stelle
       #@stelle_solr_batch << stelle.to_solr_string

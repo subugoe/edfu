@@ -143,21 +143,19 @@ module VerifyFormularHelper
 
     if szOriginal != seitezeile
 
-      str = ''
-      if seitezeile == szOriginal.strip
-        str = "Änderung an Seitezeile (leerzeichan am Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Seitezeile"
+      #str = ''
+      if seitezeile == szOriginal
+        Edfulog.new("ERROR", "FL", "Änderung an Seitezeile", "SEITEZEILE", szOriginal, seitezeile, uid)
       end
 
-      Edfulog.new("ERROR", "FL", str, "SEITEZEILE", szOriginal, seitezeile, uid)
+
 
     end
     #if (kommentar.length) > 0
     #  logger.error "[FL], Kommentar zur Seitezeile, SEITEZEILE, '#{kommentar}', , #{uid}"
     #end
     if (seitezeile.scan(/[^0-9, -]/)).length > 0
-      Edfulog.new("ERROR", "FL", "Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
+      Edfulog.new("INFO", "FL", "Evtl. Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
     end
 
     if anmerkung != nil and anmerkung != ''
@@ -387,15 +385,7 @@ module VerifyFormularHelper
     photo = photo.gsub(/\( 3909, 3910 \) \*/, '( 3909, 3910 )*')
 
     if origPhoto != photo
-
-      str = ''
-      if photo == origPhoto.strip
-        str = "Änderung an Photostring (leerzeichan am Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Photostring"
-      end
-
-      Edfulog.new("ERROR", "FL", str, "Photo", origPhoto, photo, uid)
+      Edfulog.new("ERROR", "FL", "Änderung an Photostring", "Photo", origPhoto, photo, uid)
     end
 
     # Sonderfälle
@@ -650,7 +640,7 @@ module VerifyFormularHelper
 
     origUebers = uebersetzung
 
-    uebersetzung = uebersetzung.strip
+    uebersetzung = uebersetzung
                        .gsub(/dZtruit/, 'détruit')
                        .gsub(/enti\?rement/, 'entièrement')
                        .gsub(/moitiZ/, 'moitié')
@@ -663,14 +653,14 @@ module VerifyFormularHelper
 
     if  uebersetzung != origUebers
 
-      str = ''
-      if uebersetzung == origUebers.strip
-        str = "Änderung an Übersetzung (Leerzeichen an Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Übersetzung"
-      end
+      # str = ''
+      # if uebersetzung == origUebers.strip
+      #   str = "Änderung an Übersetzung (Leerzeichen an Anfang oder Ende entfernt)"
+      # else
+      #   str = "Änderung an Übersetzung"
+      # end
 
-      Edfulog.new("ERROR", "FL", str, "TEXTDEUTSC", origUebers, uebersetzung, uid)
+      Edfulog.new("INFO", "FL", "Evtl. Fehler in Übersetzung", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
@@ -681,7 +671,7 @@ module VerifyFormularHelper
     #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
     # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
     if (uebersetzung.match(re101) || uebersetzung.match(re102))
-      Edfulog.new("ERROR", "FL", "'Z' oder '?' innerhalb eines Wortes", "TEXTDEUTSC", origUebers, uebersetzung, uid)
+      Edfulog.new("INFO", "FL", "'Z' oder '?' innerhalb eines Wortes", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     return uebersetzung

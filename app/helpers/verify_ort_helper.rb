@@ -71,15 +71,7 @@ module VerifyOrtHelper
     end
 
     if stelle != originalStelle
-
-      str = ''
-      if stelle == originalStelle.strip
-        str = "Änderung an Stelle (leerzeichan am Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Stelle"
-      end
-
-      Edfulog.new("ERROR", "OL", str, "STELLE", originalStelle, stelle, uid)
+      Edfulog.new("ERROR", "OL", "Änderung an Stelle", "STELLE", originalStelle, stelle, uid)
     end
 
     if ort.anmerkung != nil and ort.anmerkung != ''

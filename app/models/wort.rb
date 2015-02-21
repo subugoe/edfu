@@ -21,7 +21,14 @@ class Wort < ActiveRecord::Base
       stelle = ''
     end
 
-    h = {
+    anmerkungen = self.stellen.collect { |stelle|
+
+      stelle.stelle_anmerkung
+
+    }
+
+
+    h           = {
         :sql_uid                  => self[:uid],
 
         :transliteration          => self[:transliteration],
@@ -45,7 +52,7 @@ class Wort < ActiveRecord::Base
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
-        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+        :stelle_anmerkung         => anmerkungen,
 
         :sort                     => "Ddt--#{stelle}", # ---
 
@@ -89,6 +96,7 @@ class Wort < ActiveRecord::Base
                })
 
     end
+
 
     return h
 

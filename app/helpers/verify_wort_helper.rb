@@ -122,14 +122,7 @@ module VerifyWortHelper
     if bEdfu != belegstellenEdfu
       edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
 
-      str = ''
-      if bEdfu == belegstellenEdfu.strip
-        str = "Änderung an Belegstelle (leerzeichan am Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Belegstelle"
-      end
-
-      Edfulog.new("ERROR", "WL", str, "Belegstelle", belegstellenEdfu, bEdfu, uid)
+      Edfulog.new("ERROR", "WL", "Änderung an Belegstelle", "Belegstelle", belegstellenEdfu, bEdfu, uid)
     end
 
 
@@ -172,14 +165,7 @@ module VerifyWortHelper
       if wb != belegstellenWb
         wbAnmerkung = 'ursprünglich: ' + belegstellenWb
 
-        str = ''
-        if wb == belegstellenWb.strip
-          str = "Änderung an Belegstelle (leerzeichan am Anfang oder Ende entfernt)"
-        else
-          str = "Änderung an Belegstellen"
-        end
-
-        Edfulog.new("ERROR", "WL", str, "BelegstellenWb", belegstellenWb, wb, uid)
+        Edfulog.new("ERROR", "WL", "Änderung an Belegstellen", "BelegstellenWb", belegstellenWb, wb, uid)
       end
 
 
@@ -364,6 +350,7 @@ module VerifyWortHelper
           elsif (m20[5]).length > 2
             Edfulog.new("ERROR", "WL", "Bandangabe zu lang (#{b})", "BelegstellenEdfu", bEdfu, '', uid)
           end
+
 
 
           stelle = Stelle.fetch(

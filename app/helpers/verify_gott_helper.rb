@@ -136,16 +136,7 @@ module VerifyGottHelper
     seitezeile = seitezeile.gsub(/und/, ';')
 
     if originalSEITEZEILE != seitezeile
-
-      str = ''
-      if seitezeile == originalSEITEZEILE.strip
-        str = "Änderung an Seitezeile (leerzeichan am Anfang oder Ende entfernt)"
-      else
-        str = "Änderung an Seitezeile"
-      end
-
-
-      Edfulog.new("ERROR", "GL", str, "SEITEZEILE", originalSEITEZEILE, seitezeile, uid)
+      Edfulog.new("ERROR", "GL", "Änderung an Seitezeile", "SEITEZEILE", originalSEITEZEILE, seitezeile, uid)
     end
 
 

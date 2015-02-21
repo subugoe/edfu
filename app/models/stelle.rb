@@ -47,7 +47,7 @@ class Stelle < ActiveRecord::Base
         :freigegeben      => self.freigegeben, # ---
         :zerstoerung      => self.zerstoerung, # ---
 
-        :stelle_anmerkung => self.stelle_anmerkung.to_s, # ---
+        :stelle_anmerkung => self.stelle_anmerkung, # ---
         :stelle_unsicher  => self.stelle_unsicher, # ---
 
         :besitzer         => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu_id}",
@@ -83,6 +83,7 @@ class Stelle < ActiveRecord::Base
 
     #return stelle if stelle != nil
 
+    stelle_anmerkung ||= ''
 
     s = Stelle.new(
         tempel:           tempel,

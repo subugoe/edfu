@@ -26,6 +26,21 @@ class Formular < ActiveRecord::Base
       stelle = ''
     end
 
+
+    anmerkungen = Array.new
+    if self.stellen.size >= 1
+      self.stellen.each { |stelle|
+
+        a = stelle.stelle_anmerkung
+
+        a ||= ''
+        anmerkungen << a
+
+      }
+    else
+      anmerkungen << ''
+    end
+
     #h = Hash.new
     h = {
         :sql_uid                  => self[:uid], # ---
@@ -40,7 +55,7 @@ class Formular < ActiveRecord::Base
         :szene_nummer             => self[:szeneID], #
 
         :photo                    => self.photos.collect { |photo| photo.name }, # ---
-        :photo_kommentar          => self.photos.collect { |photo| photo.kommentar }, # ---
+        :photo_kommentar          => self.photos.collect { |photo| photo.kommentar.to_s }, # ---
         :photo_pfad               => self.photos.collect { |photo| photo.pfad }, # ---
 
         :literatur                => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
@@ -58,7 +73,7 @@ class Formular < ActiveRecord::Base
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
+        :stelle_anmerkung         => anmerkungen, # ---
 
         :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
 
