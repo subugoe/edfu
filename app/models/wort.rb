@@ -23,7 +23,11 @@ class Wort < ActiveRecord::Base
 
     anmerkungen = self.stellen.collect { |stelle|
 
-      stelle.stelle_anmerkung
+      if stelle.stelle_anmerkung = ''
+        ' '
+      else
+        stelle.stelle_anmerkung
+      end
 
     }
 
@@ -97,6 +101,8 @@ class Wort < ActiveRecord::Base
 
     end
 
+
+    #puts h
 
     return h
 
