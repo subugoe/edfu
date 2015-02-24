@@ -26,9 +26,9 @@ class Formular < ActiveRecord::Base
       stelle = ''
     end
 
-
     anmerkungen = self.stellen.collect { |stelle|
-      if stelle.stelle_anmerkung = ''
+
+      if stelle.stelle_anmerkung == ''
         ' '
       else
         stelle.stelle_anmerkung
@@ -36,7 +36,7 @@ class Formular < ActiveRecord::Base
     }
 
     #h = Hash.new
-    h = {
+    h           = {
         :sql_uid                  => self[:uid], # ---
 
         :sort                     => stelle, # ---

@@ -27,7 +27,7 @@ class Gott < ActiveRecord::Base
     end
 
     anmerkungen = self.stellen.collect { |stelle|
-      if stelle.stelle_anmerkung = ''
+      if stelle.stelle_anmerkung == ''
         ' '
       else
         stelle.stelle_anmerkung
