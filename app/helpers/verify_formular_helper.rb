@@ -94,8 +94,10 @@ module VerifyFormularHelper
   def create_stellen(seitezeile, band, uid)
 
     anmerkung = ''
+    #kommentar = ''
 
     freigegeben = StellenHelper.getFromBanddict((band).to_i, 'freigegeben')
+
 
     ## Sonderfälle
     szOriginal  = seitezeile
@@ -109,35 +111,41 @@ module VerifyFormularHelper
       seitezeile = "078, 14 / Kol. 2"
     end
 
-    kommentar = []
+
 
     if seitezeile.index('nach ') == 0
-      kommentar  += ['nach']
+      #anmerkung  += ['nach']
+      anmerkung = seitezeile
       seitezeile = seitezeile.gsub('nach ', '')
     end
 
     if seitezeile.index(', Z') != nil
-      kommentar  += [seitezeile[seitezeile.index(', Z') + 2..-1]]
+      #anmerkung  += [seitezeile[seitezeile.index(', Z') + 2..-1]]
+      anmerkung = seitezeile
       seitezeile = seitezeile[0..seitezeile.index(', Z')]
     end
 
     if seitezeile.index(' / Z') != nil
-      kommentar  += [seitezeile[seitezeile.index(' / Z') + 3..-1]]
+      #anmerkung  += [seitezeile[seitezeile.index(' / Z') + 3..-1]]
+      anmerkung = seitezeile
       seitezeile = seitezeile[0..seitezeile.index(' / Z')]
     end
 
     if seitezeile.index(', Kol') != nil
-      kommentar += [seitezeile[seitezeile.index(', Kol') + 2..-1]]
+      #anmerkung += [seitezeile[seitezeile.index(', Kol') + 2..-1]]
+      anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(', Kol')]
     end
 
     if seitezeile.index(' / kol') != nil
-      kommentar += [seitezeile[seitezeile.index(' / kol') + 3..-1]]
+      #anmerkung += [seitezeile[seitezeile.index(' / kol') + 3..-1]]
+      anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(' / kol')]
     end
 
     if seitezeile.index(' / ') != nil
-      kommentar += [seitezeile[seitezeile.index(' / ') + 3..-1]]
+      #anmerkung += [seitezeile[seitezeile.index(' / ') + 3..-1]]
+      anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(' / ')]
     end
 
@@ -158,11 +166,11 @@ module VerifyFormularHelper
       Edfulog.new("INFO", "FL", "Evtl. Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
     end
 
-    if anmerkung != nil and anmerkung != ''
-      anmerkung += "; #{kommentar}"
-    else
-      anmerkung = "#{kommentar}"
-    end
+    # if anmerkung != nil and anmerkung != ''
+    #   anmerkung += "; #{kommentar}"
+    # else
+    #   anmerkung = "#{kommentar}"
+    # end
 
     result = []
 
@@ -295,7 +303,7 @@ module VerifyFormularHelper
       # 1711-1713
       when 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983 (Z 6), D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
         photo           = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        photo_kommentar = 'D05_4983 (Z 6)'
+        #photo_kommentar = 'D05_4983 (Z 6)'
       # 1818-1820
       when 'D05_6097, D05_6098, D05_6100, D05_6101, D06_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
         photo = 'D05_6097, D05_6098, D05_6100, D05_6101, D05_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
@@ -353,19 +361,19 @@ module VerifyFormularHelper
     if photo.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
       photo           = photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
                                    '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
-      photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
+      #photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
     # 8399, 9011, 9012
     if uid == 8399 or uid == 9011 or uid == 9012
       photo           = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
-      photo_kommentar = 'E. VII, 252, 5'
+      #photo_kommentar = 'E. VII, 252, 5'
     end
 
     # 9950
     if uid == 9950
       photo           = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
-      photo_kommentar = 'E VIII, 122, 5 - 124, 18'
+      #photo_kommentar = 'E VIII, 122, 5 - 124, 18'
     end
 
     # 5629-5650, 6135
@@ -390,10 +398,10 @@ module VerifyFormularHelper
 
     # Sonderfälle
 
-    photo_name      = Array.new
-    photo_typ       = Array.new
-    photo_pfad      = Array.new
-    photo_kommentar = Array.new
+    #photo_name      = Array.new
+    #photo_typ       = Array.new
+    #photo_pfad      = Array.new
+    #photo_kommentar = Array.new
 
     photosDict   = {}
     photoTypDict = {
@@ -596,15 +604,15 @@ module VerifyFormularHelper
           bildString = ''
         end
         # todo is empty?
-        if photo_kommentar.size > 0
-          if kommentar
-            kommentar = "#{photo_kommentar}; #{kommentar}"
-          else
-            kommentar = photo_kommentar
-          end
-        else
-          kommentar = photo_kommentar
-        end
+        # if photo_kommentar.size > 0
+        #   if kommentar
+        #     kommentar = "#{photo_kommentar}; #{kommentar}"
+        #   else
+        #     kommentar = photo_kommentar
+        #   end
+        # else
+        #   kommentar = photo_kommentar
+        # end
 
         typ  = photoTypDict[typ]['name']
         pfad = "#{typ}/#{name}"
