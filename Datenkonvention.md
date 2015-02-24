@@ -1,5 +1,7 @@
 # Edfu Daten 
 
+* Für die korrekte Wiedergabe von  Tansliterationen sollte der TrueType-Font 'Transliteration Font Italic' vorhanden sein [(siehe hier)](http://dev.adw-goe.de/cz/forschung/forschungsprojekte-akademienprogramm/edfu-projekt/die-datenbanken-des-edfu-projekts/edfu-explorer-manual/?sword_list[]=font&sword_list[]=italic&no_cache=1).
+
 ## Datenquellen, Definition und Konvention
 
 ### Formular.xsl (Formular)
@@ -15,13 +17,14 @@
 	* Transliteration mit Suffix
 	* Text
 * **BAND**: 
-	* Publikationsband 
+	* Chassinat Publikationsband 
 	* Zahl (1 - 8)
 	* Gäste dürfen zur Zeit nur die Bände 7 und 8 einsehen
+		* freigegeben
 * **SEITEZEILE**: 
 	* Seite und Zeile des Datensatzes im Band
 	* Referenziert zugehörige Stellen im Chassinat-Band
-	* Formularen sind immer genau mit einer Stelle verbunden
+	* <span style="color: red">Formulare sind immer genau mit einer Stelle verbunden?</span>
 	* Aufbau
 		* Seite, Zeile
 	* Text
@@ -63,12 +66,19 @@
 * **TEXTTYP**: 
 	* Szenentyp
 	* Text
-	* <span style="color: red">Position im Tempel?</span>
+	* <span style="color: red">Bedeutung: Position im Tempel? Gruppierung von Szenen?</span>
 * **Photo**: 
 	* Komma separierte Auflistung einzelner Photos.
 	* Text
 	* Wenn vorhanden (z.B. Photo D03_225 = D03_225.jpg), dann Link erstellen.
 		* <span style="color: red">d.h. prüfen, ob Bild im Dateisystem vorhanden ist, nur Link erstellen, wenn Bild vorhanden</span>
+		* <span style="color: red">wo sind die Photos abgelegt?</span> 
+			* Verzeichnisse vorhanden für:
+				* 2003
+				* 2005
+				* 2011
+				* SW
+				* siehe: http://adw-goe.de/fileadmin/edfu-data/jp.txt
 	* Muster (Beispiele)
 		* **1546 oder 1908a**
 			* Typ=SW, Name=1546, Pfad=SW/1546
@@ -81,8 +91,8 @@
 		* **E. XIV, pl. DCLV oder E. XIV, pl. DLIII, DLIV oder E. XIII, pl. DXV, DXVI, DXVII**
 			* Typ=Edfou XIV, Name=pl. DCLV, Pfad=Edfou XIV/pl. DCLV
 			* reg. Expr. /^(E. [XVI]+), ([pl. ]*[DCLXVI0-9]+)/
-			* <span style="color: red">pl. DCLV steht für Platenummer</span>
-			* <span style="color: red">Fotos, die als Plates in einem Chassinat-Band vorliegen. Ein Plate ist eine Bildseite. Diese kann mehrere Grafiken enthalten.</span>
+			* <span style="color: red">pl. DCLV steht für Platenummer (Szenenummer)</span>
+			* <span style="color: red">Es handelt sich um Photos, die als Plates in einem Chassinat-Band vorliegen. Ein Plate ist eine Bildseite, diese kann mehrere Grafiken enthalten.</span>
 			* <span style="color: red">Dateinamen enthalten ggf. Leerzeichen?</span>
 		* **D05_6680 oder D03_0693**
 			* Typ=2005, Name=D0_6680, Pfad=2005/D0_6680
@@ -92,7 +102,7 @@
 		* **G3 oder G32 ff.**
 			* Typ=G, Name=G32, Pfad=G/G32
 			* reg. Expr. /^(G[0-9]+)\s*([f.]*)/	
-			* <span style="color: red">Bedeutung von ff. ? Gehört ff. zum Namen?</span>
+			* <span style="color: red">Bedeutung von ff. ? Gehört ff. zum Namen? Oder und Folgende, d.h. G33, G34, etc.</span>
 		* **Labrique Stylistique, pl. 11**
 			* Typ=Labrique, Stylistique, Name=pl. 11, Pfad=Labrique, Stylistique/pl. 11
 			* reg. Expr. /^;*\s*Labrique, Stylistique, (pl. [0-9.]*)/
@@ -227,7 +237,7 @@
 	* Text
 	* i.d.R. konkreter Bereich, selten Semikolon separierte Auflistung einzelner Stellen.
 	* mit f. am Ende bedeutet plus folgende Zeile
-	* mit ff. am Ende bedeutet der Zeilenstop ist unsicher (mehrere folgezeilen)
+	* mit ff. am Ende bedeutet der Zeilenstop ist unsicher (mehrere Folgezeilen)
 	* Muster (Beispiele)
 		* **078, 002; **
 			* <span style="color: red">Seite 78, Zeile 2 ?</span>
@@ -240,7 +250,7 @@
 		* **120, 004ff.; **
 			* <span style="color: red">ff steht für Stop unsicher, d.h. mehrere folgende Zeilen</span>
 		* **187, 8 f. **
-			* <span style="color: red">f steht für und die folgende Zeile</span>
+			* <span style="color: red">f steht für  diese und die folgende Zeile</span>
 			* <span style="color: red">Seite 187, Zeile 8 - 9?</span>
 		* **009, 006/007; **
 			* <span style="color: red">Zeile 6 und 7?</span>
@@ -295,7 +305,7 @@
 		* **VII, <097, 05>* **
 			* <span style="color: red">Band 7, Seite 97, Zeile 5?</span>
 			* <span style="color: red"><> - bedeutet, die Stelle muß korrigiert werden, weil dem Ägypter (Schreiber)  ein Fehler unterlaufen ist</span>
-			* <span style="color: red">* - bedeutet, die Stelle muß korrigiert werden, weil dem Chassinat hier ein Fehler unterlaufen ist</span>
+			* <span style="color: red">* - bedeutet, die Stelle muß korrigiert werden, weil dem Chassinat ein Fehler unterlaufen ist</span>
 		* **VIII, 124, 01; VII, 161, 07 **
 		* **VIII, 140, 02 - 03; 140, 15 **
 		* **VIII, 077, 06 f.; 081, 13 **
@@ -309,7 +319,8 @@
 	* Muster (Beispiele)
 		* **I, 046 - 047, 03**
 			* <span style="color: red">Seite 46 - 47</span>
-			* <span style="color: red">Ziffer nach dem Komma bezeichnet keine Zeile, sondern eine Schreibung - was bedeutet das?</span>
+			* <span style="color: red">Ziffer nach dem Komma bezeichnet keine Zeile, sondern eine Schreibung.</span>
+				* <span style="color: red">was bedeutet das?</span>
 		* **I, 001, 02 - 07 **
 		* **I, 003, 12 - 004, 09 **
 		* **I, 005, 03 **
@@ -366,3 +377,5 @@
 
 ## Offene Fragen? 
 * Welche Felder (Solr) werden tatsächlich für das FE benötigt?
+* Was bestimmt die Stelle-Szene-Beziehung?
+	* Band, Startseite?	
