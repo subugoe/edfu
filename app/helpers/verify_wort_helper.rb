@@ -169,12 +169,17 @@ module VerifyWortHelper
         wb = 'III, 026,01 - 027, 19'
 
       end
-    # I, 046 - 047, 03
-      m = wb.match(/([VI]*)\s*,?\s*([0-9]*) - ([0-9]*). ([0-9]*)/)
-
+      # I, 046 - 047, 03
+      #m = wb.match(/([VI]*)\s*,?\s*([0-9]*) - ([0-9]*). ([0-9]*)/)
+      m = wb.match(/([VI]*),([ 0-9,]*) ([0-9]*) - ([0-9]*). ([0-9]*)/)
       if m
-        addToWbStelleAnmerkung(wb)
-        wb = "#{m[1]}, #{m[2]}, #{m[4]} - #{m[3]}, #{m[4]}"
+        if m[2] == ''
+          addToWbStelleAnmerkung(wb)
+          wb = "#{m[1]}, #{m[3]}, #{m[5]} - #{m[4]}, #{m[5]}"
+        # else
+        #   str = m[2].gsub(/,/, '').strip
+        #   wb = "#{m[1]}, #{str}, #{m[3]} - #{m[4]}, #{m[5]}"
+        end
       end
 
       if wb != belegstellenWb
@@ -236,6 +241,7 @@ module VerifyWortHelper
         end
 
         if wbTeile[1].index(',') != nil
+
           # Komma im zweiten Teil: unterschiedliche Seiten
           wbSeiteZeile2 = wbTeile[1].split(',')
           wbSeiteStop   = (wbSeiteZeile2[0].strip()).to_i
