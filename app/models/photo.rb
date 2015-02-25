@@ -18,6 +18,8 @@ class Photo < ActiveRecord::Base
 
     return photo if photo != nil
 
+    kommentar = ' ' if kommentar == ''
+
     p           = Photo.new
     p.pfad      = pfad
     p.name      = name
