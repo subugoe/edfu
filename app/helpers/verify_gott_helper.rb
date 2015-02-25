@@ -17,7 +17,7 @@ module VerifyGottHelper
 
 
     originalSEITEZEILE = seitezeile
-    stelleAnmerkung    = ''
+    @stelleAnmerkung   = ''
 
     if seitezeile == '066, 011ff,;'
       # 84
@@ -27,8 +27,9 @@ module VerifyGottHelper
       seitezeile = '264, 0 - 269, 30;'
     elsif seitezeile == '2,7?'
       # 1178
-      seitezeile      = '2, 7'
-      stelleAnmerkung = '2,7?'
+      seitezeile = '2, 7'
+      addToStelleAnmerkung('2,7?')
+
     elsif seitezeile == '052, 006 und 008;'
       # 2376
       seitezeile = '052, 6-8'
@@ -43,15 +44,15 @@ module VerifyGottHelper
       seitezeile = '149, 3'
     elsif seitezeile == '90, 3 (25);'
       # 4093
-      seitezeile      = '90, 3;'
-      stelleAnmerkung = '(25)'
+      seitezeile = '90, 3;'
+      addToStelleAnmerkung('(25)')
     elsif seitezeile == '39, 11/f.'
       # 5487
       seitezeile = '39, 11f.'
     elsif seitezeile == '90,3 (36)'
       # 5758
-      seitezeile      = '90,3'
-      stelleAnmerkung = '(36)'
+      seitezeile = '90,3'
+      addToStelleAnmerkung('(36)')
     elsif seitezeile == '33,14 33,14'
       # 5791
       seitezeile = '33, 14'
@@ -156,6 +157,8 @@ module VerifyGottHelper
 
 
       stopUnsicher = false
+      plusFolgende = false
+
       #if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
       #sz          = match[2]
       komponenten  = sz.split(',')
@@ -188,14 +191,17 @@ module VerifyGottHelper
 
         if komponenten.size == 2
           zeilen = komponenten[1].strip()
-          if zeilen.match(/f/)
 
-            stopUnsicher = true   # todo: ff. steht eigentlich für folgende zeilen, hier aber stop unsicher !!!
-            # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
-            zeilen       = zeilen.gsub(/\s*f+\.*/, '')
+          if zeilen.match(/ff/)
+            stopUnsicher = true
+            addToStelleAnmerkung(sz)
+            zeilen = zeilen.gsub(/\s*f+\.*/, '')
+          elsif zeilen.match(/f/)
+            plusFolgende = true
+            addToStelleAnmerkung(sz)
+            zeilen = zeilen.gsub(/\s*f+\.*/, '')
           end
 
-          # eigentlich sub, beim testen hat sub in python aber nicht nur das erste Vorkommen ersetz
           zeilen = zeilen.gsub(/[ \/-]+/, '-')
           zs     = zeilen.split('-')
 
@@ -204,7 +210,12 @@ module VerifyGottHelper
 
             stopZeile = (zs[1]).to_i
           else
-            stopZeile = startZeile
+            # todo check this
+            if plusFolgende
+              stopZeile = startZeile + 1
+            else
+              stopZeile = startZeile
+            end
           end
         end
       end
@@ -229,7 +240,7 @@ module VerifyGottHelper
             stopSeite,
             startZeile,
             stopZeile,
-            stelleAnmerkung,
+            @stelleAnmerkung,
             stopUnsicher,
             false,
             StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
@@ -261,5 +272,12 @@ module VerifyGottHelper
 
   end
 
+  def addToStelleAnmerkung(str)
+    if @stelleAnmerkung == ''
+      @stelleAnmerkung = str
+    else
+      @stelleAnmerkung += "; #{str}"
+    end
+  end
 
 end

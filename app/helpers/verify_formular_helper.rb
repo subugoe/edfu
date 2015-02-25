@@ -603,6 +603,7 @@ module VerifyFormularHelper
           kommentar  = 'E. VIII, 118, 7'
           bildString = ''
         end
+
         # todo is empty?
         # if photo_kommentar.size > 0
         #   if kommentar

@@ -32,9 +32,10 @@ module VerifyOrtHelper
     elsif stelle == 'VI, 209 4 (Gau); 209, 5 (Stadt); 216, 9; 217, 2; 224, 11; 237, 6; 242, 16; 243, 6; 244, 4; 245, 5; 247, 5; 249, 13; 261, 11; 263, 10; 270, 2; 273, 8; 273, 10; 276, 11; 278, 16; 282, 8; 282, 11; 283, 7; 283, 13; 284, 15; 285, 11; 288, 4; 288, 7; 290, 4; 291, 5;'
       # 509
       stelle = 'VI, 209, 4 (Gau); 209, 5 (Stadt); 216, 9; 217, 2; 224, 11; 237, 6; 242, 16; 243, 6; 244, 4; 245, 5; 247, 5; 249, 13; 261, 11; 263, 10; 270, 2; 273, 8; 273, 10; 276, 11; 278, 16; 282, 8; 282, 11; 283, 7; 283, 13; 284, 15; 285, 11; 288, 4; 288, 7; 290, 4; 291, 5;'
-    elsif uid == 579
-      anm    = stelle
-      stelle = ''
+    # in Tabelle geändert
+    # elsif uid == 579
+    #   anm    = stelle
+    #   stelle = ''
     elsif stelle == 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([]; wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
       # 619
       stelle= 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
@@ -74,13 +75,13 @@ module VerifyOrtHelper
       Edfulog.new("ERROR", "OL", "Änderung an Stelle", "STELLE", originalStelle, stelle, uid)
     end
 
-    if ort.anmerkung != nil and ort.anmerkung != ''
-      if anm != nil and anm != ''
-        ort.anmerkung += "; #{anm}"
-      end
-    else
-      ort.anmerkung = anm || ''
-    end
+    # if ort.anmerkung != nil and ort.anmerkung != ''
+    #   if anm != nil and anm != ''
+    #     ort.anmerkung += "; #{anm}"
+    #   end
+    # else
+    #   ort.anmerkung = anm || ''
+    # end
 
     # match als strip(char)-Ersatz
     teile = stelle.strip.split(';') #.match(/(^\s*;\s*)(.*)(\s*;\s*$)/))[2].split(';')

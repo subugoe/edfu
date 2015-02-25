@@ -29,12 +29,21 @@ module VerifyWortHelper
     ]
 
 
-    re20          = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
+    re20           = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
 
     #--- edfu
 
 
-    edfuAnmerkung = ''
+    @edfuAnmerkung = ''
+    @wbAnmerkung   = ''
+
+
+    edfuStopUnsicher = false
+    edfuPlusFolgende = false
+
+    wbStopUnsicher = false
+    wbPlusFolgende = false
+
 
     bEdfu = belegstellenEdfu
 
@@ -47,7 +56,7 @@ module VerifyWortHelper
     bEdfu = bEdfu.gsub(/E VII/, 'VII')
 
     # 3189, 3239
-    bEdfu = bEdfu.gsub(' f.', '')
+    #bEdfu = bEdfu.gsub(' f.', '')
 
     # 3514
     bEdfu = bEdfu.gsub('; ;', ';')
@@ -55,8 +64,8 @@ module VerifyWortHelper
 
     if bEdfu.index('zum Beispiel') == 0
       # 1266, 1296, 2781, 2811
-      bEdfu         = bEdfu.gsub(/zum Beispiel/, '')
-      edfuAnmerkung = '(Beispiele) '
+      bEdfu = bEdfu.gsub(/zum Beispiel/, '')
+      addToEdfuStelleAnmerkung('(Beispiele)')
 
     elsif bEdfu == 'VIII, 026, 4; 033 16 '
       # 3189
@@ -120,7 +129,7 @@ module VerifyWortHelper
 
 
     if bEdfu != belegstellenEdfu
-      edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
+      #edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
 
       Edfulog.new("ERROR", "WL", "Änderung an Belegstelle", "Belegstelle", belegstellenEdfu, bEdfu, uid)
     end
@@ -138,8 +147,8 @@ module VerifyWortHelper
       wbID = 0
     elsif wb.length > 0
       if wb == 'nach II, 123, 12 - 124*'
-        wb          = 'nach II, 123, 12 - 124, 1'
-        wbAnmerkung = '*'
+        addToWbStelleAnmerkung(wb)
+        wb = 'nach II, 123, 12 - 124, 1'
 
       elsif wb == 'I, 171, 03 - 12; 18 - 21'
         # 356
@@ -160,24 +169,39 @@ module VerifyWortHelper
         wb = 'III, 026,01 - 027, 19'
 
       end
+    # I, 046 - 047, 03
+      m = wb.match(/([VI]*)\s*,?\s*([0-9]*) - ([0-9]*). ([0-9]*)/)
 
-
-      if wb != belegstellenWb
-        wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-
-        Edfulog.new("ERROR", "WL", "Änderung an Belegstellen", "BelegstellenWb", belegstellenWb, wb, uid)
+      if m
+        addToWbStelleAnmerkung(wb)
+        wb = "#{m[1]}, #{m[2]}, #{m[4]} - #{m[3]}, #{m[4]}"
       end
 
+      if wb != belegstellenWb
+        #wbAnmerkung = 'ursprünglich: ' + belegstellenWb
+
+        Edfulog.new("INFO", "WL", "Änderung an Belegstellen", "BelegstellenWb", belegstellenWb, wb, uid)
+      end
+
+      if wb.match(/ff/)
+        wbStopUnsicher= true
+        addToWbStelleAnmerkung(wb)
+      elsif wb.match(/f/)
+        wbPlusFolgende = true
+        addToWbStelleAnmerkung(wb)
+      end
 
       # vornach =  1 'nach '
       # vornach = -1 'vor '
       vornach = 0
       if wb.index('nach ') == 0
         vornach = 1
-        wb      = wb.gsub(/nach /, '')
+        addToWbStelleAnmerkung(wb)
+        wb = wb.gsub(/nach /, '')
       elsif wb.index('vor ') == 0
         vornach = -1
-        wb      = wb.gsub(/vor /, '')
+        addToWbStelleAnmerkung(wb)
+        wb = wb.gsub(/vor /, '')
       end
 
       wbBand_roemisch = wb[0 .. wb.index(',')-1]
@@ -185,11 +209,10 @@ module VerifyWortHelper
       wb = wb[wb.index(',') + 1 .. -1].strip()
     end
 
-
     wbBand = roemisch_nach_dezimal(wbBand_roemisch)
 
-    wb = wb.gsub(' -', '-').gsub('- ', '-')
 
+    wb = wb.gsub(' -', '-').gsub('- ', '-')
     if wb.index('-') != nil
       # Range
       wbTeile = wb.split('-')
@@ -219,7 +242,12 @@ module VerifyWortHelper
           wbZeileStop   = (wbSeiteZeile2[1].strip()).to_i
         else
           # Range innerhalb einer Seite
-          wbZeileStop = (wbTeile[1].strip()).to_i
+          if wbPlusFolgende
+            wbZeileStop = (wbTeile[1].strip()).to_i + 1
+          else
+            wbZeileStop = (wbTeile[1].strip()).to_i
+          end
+
         end
 
         wbStart = [wbSeiteStart, wbZeileStart]
@@ -239,7 +267,11 @@ module VerifyWortHelper
         wbStart = [0, 0]
       end
 
-      wbStop = wbStart
+      if wbPlusFolgende
+        wbStop = [wbStart[0], wbStart[1] + 1]
+      else
+        wbStop = wbStart
+      end
     end
 
 
@@ -249,26 +281,26 @@ module VerifyWortHelper
     dbWB.seite_stop  = wbStop[0] || ''
     dbWB.zeile_start = wbStart[1] || ''
     dbWB.zeile_stop  = wbStop[1] || ''
-    dbWB.notiz       = wbAnmerkung || ''
+    dbWB.notiz       = @wbAnmerkung
     #dbWB.wort        = wort
-    dbWB.id = ActiveRecord::Base.connection.execute("select nextval('wbsberlin_id_seq')").first['nextval']
+    dbWB.id          = ActiveRecord::Base.connection.execute("select nextval('wbsberlin_id_seq')").first['nextval']
 
     wort.wbberlin  = dbWB
 
     #--- edfu
 
-    anmerkung        = ''
-
-    if edfuAnmerkung != '' or edfuAnmerkung.length != 0
-      if anmerkung == nil or anmerkung == ''
-        anmerkung = "#{edfuAnmerkung.strip()}"
-      else
-        anmerkung = "#{edfuAnmerkung.strip()}; #{anmerkung.strip() || ''}"
-      end
-
-    else
-      anmerkung = "#{anmerkung.strip() || ''}"
-    end
+    #anmerkung        = ''
+    #
+    # if edfuAnmerkung != '' or edfuAnmerkung.length != 0
+    #   if anmerkung == nil or anmerkung == ''
+    #     anmerkung = "#{edfuAnmerkung.strip()}"
+    #   else
+    #     anmerkung = "#{edfuAnmerkung.strip()}; #{anmerkung.strip() || ''}"
+    #   end
+    #
+    # else
+    #   anmerkung = "#{anmerkung.strip() || ''}"
+    # end
 
     band           = ''
     #edfuBandNr     = 0
@@ -283,9 +315,18 @@ module VerifyWortHelper
       belegstellen.each { |b|
         b = b.strip()
 
+        if b.match(/ff/)
+          edfuStopUnsicher = true
+          addToEdfuStelleAnmerkung(b)
+        elsif b.match(/f/)
+          edfuPlusFolgende = true
+          addToEdfuStelleAnmerkung(b)
+        end
+
+
         klammer = false
         stern   = false
-
+        # todo: is there any STELLE with "%"
         if b.index('%') != nil
           zerstoerung = true
           b           = b.gsub('%', '').gsub('&', '')
@@ -306,8 +347,8 @@ module VerifyWortHelper
         m20 = re20.match(b)
 
         if m20
-          if (m20[1]).length > 0
 
+          if (m20[1]).length > 0
             bandRoemisch = m20[1].strip()
             bandDezimal  = roemisch_nach_dezimal bandRoemisch
             #edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
@@ -317,7 +358,7 @@ module VerifyWortHelper
 
           edfuSeiteStart = m20[3].to_i
           edfuSeiteStop  = edfuSeiteStart
-          edfuAnmerkung  = ''
+          #edfuAnmerkung  = ''
 
           if m20[4].index(' - ') != nil
             edfuZeileStart = (m20[4].split(' - ')[0]).to_i
@@ -329,7 +370,12 @@ module VerifyWortHelper
 
             if zeilen.length == 1
               edfuZeileStart = zeilen[0].to_i
-              edfuZeileStop  = edfuZeileStart
+              if edfuPlusFolgende
+                edfuZeileStop = edfuZeileStart+1
+              else
+                edfuZeileStop = edfuZeileStart
+              end
+
 
             elsif zeilen.length == 2
               edfuZeileStart = (zeilen[0]).to_i
@@ -338,19 +384,20 @@ module VerifyWortHelper
               Edfulog.new("ERROR", "WL", "Zu viele Komponenten", "BelegstellenEdfu", bEdfu, '', uid)
             end
 
-            edfuAnmerkung = m20[6].strip()
+            #edfuAnmerkung = m20[6].strip()
           end
 
 
           # todo: Stern (chassinat_verbessert) und Klammer (schreiber_verbessert)
           if m20[5] == ">"
+            addToEdfuStelleAnmerkung(bEdfu)
             klammer = true
           elsif m20[5] == ">*"
+            addToEdfuStelleAnmerkung(bEdfu)
             stern = true
           elsif (m20[5]).length > 2
             Edfulog.new("ERROR", "WL", "Bandangabe zu lang (#{b})", "BelegstellenEdfu", bEdfu, '', uid)
           end
-
 
 
           stelle = Stelle.fetch(
@@ -363,8 +410,8 @@ module VerifyWortHelper
               edfuSeiteStop,
               edfuZeileStart,
               edfuZeileStop,
-              edfuAnmerkung,
-              false,
+              @edfuAnmerkung,
+              edfuStopUnsicher,
               false,
               StellenHelper.getFromBanddict((bandDezimal).to_i, 'freigegeben')
           )
@@ -409,5 +456,20 @@ module VerifyWortHelper
     return parts
   end
 
+  def addToEdfuStelleAnmerkung(str)
+    #if @edfuAnmerkung == ''
+    @edfuAnmerkung = str
+    #else
+    #  @edfuAnmerkung += "; #{str}"
+    #end
+  end
+
+  def addToWbStelleAnmerkung(str)
+    #if @wbAnmerkung == ''
+    @wbAnmerkung = str
+    #else
+    # @wbAnmerkung += "; #{str}"
+    #end
+  end
 
 end
