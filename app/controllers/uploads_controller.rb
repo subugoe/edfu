@@ -13,10 +13,7 @@ require 'stellen_helper'
 
 
 class UploadsController < ApplicationController
-  include VerifyFormularHelper
-  include VerifyOrtHelper
-  include VerifyGottHelper
-  include VerifyWortHelper
+  include VerifyFormularHelper, VerifyOrtHelper, VerifyGottHelper, VerifyWortHelper, Celluloid
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -73,22 +70,10 @@ class UploadsController < ApplicationController
     end
 
 
-    processed = false
-
-    #Benchmark.bm(7) do |x|
-    #  x.report("processing all:") {
-    processed = process_files
-    #  }
-    #end
+    self.async.process_files
 
     respond_to do |format|
-
-      if processed
-        format.html { redirect_to uploads_path, notice: "Upload was successfully created." }
-      else
-        format.html { redirect_to uploads_path, alert: "Upload not created!" }
-      end
-
+      format.html { redirect_to uploads_path, notice: "Dateien übertragen." }
     end
 
   end
@@ -124,7 +109,6 @@ class UploadsController < ApplicationController
         puts "deleteDB"
         deleteDB
 
-
         puts "process_szene"
         process_szene
 
@@ -135,7 +119,6 @@ class UploadsController < ApplicationController
 
         puts "process_ort"
         process_ort
-
 
         puts "process_gott"
         process_gott
@@ -160,6 +143,7 @@ class UploadsController < ApplicationController
 
       }
     end
+
   end
 
   def deleteDB
@@ -277,7 +261,7 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      #break if i==15
+      #break if i==30
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
