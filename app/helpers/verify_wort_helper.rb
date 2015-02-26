@@ -34,7 +34,7 @@ module VerifyWortHelper
     #--- edfu
 
 
-    @edfuAnmerkung = ''
+
     @wbAnmerkung   = ''
 
 
@@ -319,6 +319,8 @@ module VerifyWortHelper
       belegstellen = bEdfu.strip.split(';')
       a            = belegstellen.size
       belegstellen.each { |b|
+
+        @edfuAnmerkung = ''
         b = b.strip()
 
         if b.match(/ff/)
@@ -396,10 +398,10 @@ module VerifyWortHelper
 
           # todo: Stern (chassinat_verbessert) und Klammer (schreiber_verbessert)
           if m20[5] == ">"
-            addToEdfuStelleAnmerkung(bEdfu)
+            addToEdfuStelleAnmerkung(b)
             klammer = true
           elsif m20[5] == ">*"
-            addToEdfuStelleAnmerkung(bEdfu)
+            addToEdfuStelleAnmerkung(b)
             stern = true
           elsif (m20[5]).length > 2
             Edfulog.new("ERROR", "WL", "Bandangabe zu lang (#{b})", "BelegstellenEdfu", bEdfu, '', uid)
