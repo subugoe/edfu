@@ -1,6 +1,7 @@
 # encoding: utf-8 
 
 require 'edfu_model_helper'
+require 'edfu_solr_helper'
 require 'rsolr'
 #require 'celluloid/autostart'
 
