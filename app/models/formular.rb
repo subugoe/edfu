@@ -26,14 +26,14 @@ class Formular < ActiveRecord::Base
       stelle = ''
     end
 
-    anmerkungen = self.stellen.collect { |stelle|
-
-      if stelle.stelle_anmerkung == ''
-        ' '
-      else
-        stelle.stelle_anmerkung
-      end
-    }
+    # anmerkungen = self.stellen.collect { |stelle|
+    #
+    #   if stelle.stelle_anmerkung == ''
+    #     ' '
+    #   else
+    #     stelle.stelle_anmerkung
+    #   end
+    # }
 
     #h = Hash.new
     h           = {
@@ -67,7 +67,7 @@ class Formular < ActiveRecord::Base
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-        :stelle_anmerkung         => anmerkungen, # ---
+        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, # ---
 
         :stelle_id                => self.stellen.collect { |stelle| "stelle-#{stelle.id}" }, # ---
 

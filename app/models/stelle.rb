@@ -59,6 +59,19 @@ class Stelle < ActiveRecord::Base
     }
   end
 
+  # checks the value, and returns ' ' if value is ''. Solr will remuve values with '' whiche causes issues in the FE
+  # STELLE: The arrays passed in the »arrays« argument do not have identical numbers of values:
+  #   (bandseitezeile: 0, band: 0, seite_start: 0, seite_stop: 0, zeile_start: 0, zeile_stop: 0, unsicher: 0, zerstoerung: 0, anmerkung: 0)
+  def self.checkValue(value)
+
+    if (value == '' || value == nil)
+      return ' '
+    else
+      value
+    end
+
+  end
+
   def self.fetch(
       typ,
           tempel,
@@ -83,18 +96,16 @@ class Stelle < ActiveRecord::Base
 
     #return stelle if stelle != nil
 
-    stelle_anmerkung ||= ''
-
     s = Stelle.new(
         tempel:           tempel,
-        band:             band,
-        bandseite:        bandseite,
-        bandseitezeile:   bandseitezeile,
-        seite_start:      seite_start,
-        seite_stop:       seite_stop,
-        zeile_start:      zeile_start,
-        zeile_stop:       zeile_stop,
-        stelle_anmerkung: stelle_anmerkung,
+        band:             checkValue(band),
+        bandseite:        checkValue(bandseite),
+        bandseitezeile:   checkValue(bandseitezeile),
+        seite_start:      checkValue(seite_start),
+        seite_stop:       checkValue(seite_stop),
+        zeile_start:      checkValue(zeile_start),
+        zeile_stop:       checkValue(zeile_stop),
+        stelle_anmerkung: checkValue(stelle_anmerkung),
         stelle_unsicher:  stelle_unsicher,
         zerstoerung:      zerstoerung,
         freigegeben:      freigegeben

@@ -26,13 +26,13 @@ class Gott < ActiveRecord::Base
       stelle = ''
     end
 
-    anmerkungen = self.stellen.collect { |stelle|
-      if stelle.stelle_anmerkung == ''
-        ' '
-      else
-        stelle.stelle_anmerkung
-      end
-    }
+    # anmerkungen = self.stellen.collect { |stelle|
+    #   if stelle.stelle_anmerkung == ''
+    #     ' '
+    #   else
+    #     stelle.stelle_anmerkung
+    #   end
+    # }
 
     h = {
         :sql_uid                  => self[:uid], # ---
@@ -50,7 +50,7 @@ class Gott < ActiveRecord::Base
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, # ---
-        :stelle_anmerkung         => anmerkungen, # ---
+        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, #anmerkungen, # ---
 
         :seite_start              => self.stellen.collect { |stelle| stelle.seite_start }, # ---
         :seite_stop               => self.stellen.collect { |stelle| stelle.seite_stop }, # ---

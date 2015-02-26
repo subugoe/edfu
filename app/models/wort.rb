@@ -30,13 +30,13 @@ class Wort < ActiveRecord::Base
     }
 
 
-    anmerkungen = self.stellen.collect { |stelle|
-      if stelle.stelle_anmerkung == ''
-        ' '
-      else
-        stelle.stelle_anmerkung
-      end
-    }
+    # anmerkungen = self.stellen.collect { |stelle|
+    #   if stelle.stelle_anmerkung == ''
+    #     ' '
+    #   else
+    #     stelle.stelle_anmerkung
+    #   end
+    # }
 
     h           = {
         :sql_uid                  => self[:uid],
@@ -62,7 +62,7 @@ class Wort < ActiveRecord::Base
         :zerstoerung              => self.stellen.collect { |stelle| stelle.zerstoerung }, # ---
         :freigegeben              => self.stellen.collect { |stelle| stelle.freigegeben }, # ---
         :stelle_unsicher          => self.stellen.collect { |stelle| stelle.stelle_unsicher }, #
-        :stelle_anmerkung         => anmerkungen,
+        :stelle_anmerkung         => self.stellen.collect { |stelle| stelle.stelle_anmerkung }, #anmerkungen, # ---
 
         :sort                     => "Ddt--#{stelle}", # ---
 

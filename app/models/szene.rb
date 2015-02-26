@@ -46,24 +46,24 @@ class Szene < ActiveRecord::Base
 
     sz = Szene.new(
         nummer:          nummer,
-        beschreibung:    beschreibung,
-        rect:            rect,
-        koordinate_x:    koordinate_x,
-        koordinate_y:    koordinate_y,
-        blickwinkel:     blickwinkel,
-        breite:          breite,
-        prozent_z:       prozent_z,
-        hoehe:           hoehe,
+        beschreibung:    checkValue(beschreibung),
+        rect:            checkValue(rect),
+        koordinate_x:    checkValue(koordinate_x),
+        koordinate_y:    checkValue(koordinate_y),
+        blickwinkel:     checkValue(blickwinkel),
+        breite:          checkValue(breite),
+        prozent_z:       checkValue(prozent_z),
+        hoehe:           checkValue(hoehe),
         grau:            grau,
         polygon:         polygon,
         # aus szenebild
-        name:            name,
-        dateiname:       dateiname,
+        name:            checkValue(name),
+        dateiname:       checkValue(dateiname),
         imagemap:        imagemap,
-        bild_breite:     bild_breite,
-        bild_hoehe:      bild_hoehe,
-        offset_x:        offset_x,
-        offset_y:        offset_y,
+        bild_breite:     checkValue(bild_breite),
+        bild_hoehe:      checkValue(bild_hoehe),
+        offset_x:        checkValue(offset_x),
+        offset_y:        checkValue(offset_y),
         breite_original: breite_original,
         hoehe_original:  hoehe_original,
         band:            band,
@@ -131,8 +131,22 @@ class Szene < ActiveRecord::Base
   end
 
 
-  private
 
+
+  # checks the value, and returns ' ' if value is ''. Solr will remuve values with '' whiche causes issues in the FE
+  # Szene: The arrays passed in the »arrays« argument do not have identical numbers of values:
+  # (uid: 1, nummer: 1, beschreibung: 0, bild_name: 1, bild_dateiname: 1, bild_hoehe: 1, bild_breite: 1, bild_offset_x: 1, bild_offset_y: 1, bild_rect: 1, koordinate_x: 1, koordinate_y: 1, breite: 1, hoehe: 1, prozent_z: 1, blickwinkel: 1)
+  def self.checkValue(value)
+
+    if (value == '' || value == nil)
+      return ' '
+    else
+      value
+    end
+
+  end
+
+  private
 
   # def add_to_solr
   #
