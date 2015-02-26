@@ -4,7 +4,7 @@ defaults: &defaults
       user_name: admin@edfu.de
       user_password: adminadmin
     -
-      user_name: jp@edfu.de
+      user_name: panzer@sub.uni-goettingen.de
       user_password: adminadmin
     -
       user_name: graeff@edfu.de
