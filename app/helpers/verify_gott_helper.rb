@@ -217,7 +217,7 @@ module VerifyGottHelper
             @stelleAnmerkung,
             stopUnsicher,
             false,
-            StellenHelper.banddict((dezimal_band).to_i, 'freigegeben')
+            banddict((dezimal_band).to_i, 'freigegeben')
         )
 
         stellen << stelle_obj unless stellen.include? stelle_obj

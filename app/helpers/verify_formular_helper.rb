@@ -1,21 +1,9 @@
 # encoding: utf-8
 
-require 'edfu_data_mappings'
-require 'stellen_helper'
-
 module VerifyFormularHelper
-  include EdfuDataMappings #, Celluloid
-
+  include EdfuDataMappings
 
   private
-
-
-  def szSplit(s)
-    parts = s.gsub(' ', '').split(',')
-    parts = [(parts[0]).to_i, (parts[1]).to_i]
-
-    return parts
-  end
 
   def create_literaturen(uid, formular)
 
@@ -51,7 +39,7 @@ module VerifyFormularHelper
 
     anmerkung = ''
 
-    freigegeben = StellenHelper.banddict((band).to_i, 'freigegeben')
+    freigegeben = banddict((band).to_i, 'freigegeben')
 
 
     ## Sonderfälle
@@ -586,6 +574,13 @@ module VerifyFormularHelper
     end
 
     return uebersetzung
+  end
+
+  def szSplit(s)
+    parts = s.gsub(' ', '').split(',')
+    parts = [(parts[0]).to_i, (parts[1]).to_i]
+
+    return parts
   end
 
 end

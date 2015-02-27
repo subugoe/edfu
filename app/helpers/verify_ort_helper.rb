@@ -1,14 +1,9 @@
 # encoding: utf-8
 
-require 'edfu_data_mappings'
-require 'stellen_helper'
-
 module VerifyOrtHelper
-  include EdfuDataMappings # , Celluloid
-
+  include EdfuDataMappings
 
   private
-
 
   def manipulate_stelle_string_and_create(stelle, uid, ort)
 
@@ -149,7 +144,7 @@ module VerifyOrtHelper
               kommentar, # todo: sind hier nur stellen anmerkungen drin?
               false,
               false,
-              StellenHelper.banddict(bandNr.to_i, 'freigegeben')
+              banddict(bandNr.to_i, 'freigegeben')
           )
 
           #---

@@ -1,15 +1,9 @@
 # encoding: utf-8
 
-require 'edfu_data_mappings'
-require 'stellen_helper'
-
 module VerifyWortHelper
   include EdfuDataMappings
 
-  #attr_accessor :dbWB, :stellen
-
   private
-
 
   def manipulate_and_create_belegstellen_and_stelle(belegstellenEdfu, belegstellenWb, uid, wort)
 
@@ -378,7 +372,7 @@ module VerifyWortHelper
               @edfuAnmerkung,
               edfuStopUnsicher,
               false,
-              StellenHelper.banddict((bandDezimal).to_i, 'freigegeben')
+              banddict((bandDezimal).to_i, 'freigegeben')
           )
 
           stellen << stelle unless stellen.include? stelle
