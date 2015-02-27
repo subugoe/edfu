@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-require 'edfu_numerics_conversion_helper'
+require 'edfu_data_mappings'
 require 'stellen_helper'
 
 module VerifyGottHelper
-  include EdfuNumericsConversionHelper # , Celluloid
+  include EdfuDataMappings # , Celluloid
 
 
   private
@@ -98,15 +98,6 @@ module VerifyGottHelper
     end
 
 
-    # if seitezeile.class == Float
-    #   seitezeile = seitezeile.to_s
-    # end
-    #
-    # if originalSEITEZEILE.class == Float
-    #   originalSEITEZEILE = originalSEITEZEILE.to_s
-    # end
-
-
     szsz         = seitezeile.gsub(' ', '')
     halbeLaenge  = (szsz.length / 2).to_i
     halberString = szsz[halbeLaenge..-1]
@@ -146,22 +137,10 @@ module VerifyGottHelper
     teile.each { |sz|
 
 
-      # todo check the following
-
-      # if match = seitezeile.match(/(^\s*;*\s*)([0-9 ,]*)(\s*;*\s*$)/) #(/(^\s*;\s*)(.*)(\s*;\s*$)/)
-
-
-      #szs = match[2].split(';')
-      #if szs.length == 1 and szs[0].length > 1
-      #sz = szs[0]
-
-
       stopUnsicher = false
       plusFolgende = false
 
-      #if match = sz.match(/(^\s*,*\s*)([0-9 ,]*)(\s*,*\s*$)/)
-      #sz          = match[2]
-      komponenten  = sz.split(',')
+      komponenten = sz.split(',')
       if komponenten.length == 1
         # nur eine Komponente: nur eine Seitenzahl vorhanden, mit Zeile 0 ergänzen
         match = sz.match(/([0-9]*)(.*)/)
@@ -243,12 +222,8 @@ module VerifyGottHelper
             @stelleAnmerkung,
             stopUnsicher,
             false,
-            StellenHelper.getFromBanddict((dezimal_band).to_i, 'freigegeben')
+            StellenHelper.banddict((dezimal_band).to_i, 'freigegeben')
         )
-
-        # if stelle_obj.class == Array
-        #   stelle_obj = stelle_obj[0]
-        # end
 
         stellen << stelle_obj unless stellen.include? stelle_obj
 
@@ -256,11 +231,9 @@ module VerifyGottHelper
           Edfulog.new("ERROR", "GL", "Startzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
 
-
         if stopZeile > 30
           Edfulog.new("ERROR", "GL", "Stopzeile > 30", "SEITEZEILE", originalSEITEZEILE, '', uid)
         end
-
 
       else
         Edfulog.new("ERROR", "GL", "Startseite oder Band nicht ermittelbar", "SEITEZEILE", originalSEITEZEILE, '', uid)

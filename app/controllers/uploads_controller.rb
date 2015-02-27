@@ -73,7 +73,7 @@ class UploadsController < ApplicationController
     self.async.process_files
 
     respond_to do |format|
-      format.html { redirect_to uploads_path, notice: "Dateien übertragen." }
+      format.html { redirect_to uploads_path, notice: "File(s) staged." }
     end
 
   end

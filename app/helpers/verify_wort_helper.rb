@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-require 'edfu_numerics_conversion_helper'
+require 'edfu_data_mappings'
 require 'stellen_helper'
 
 module VerifyWortHelper
-  include EdfuNumericsConversionHelper
+  include EdfuDataMappings
 
   #attr_accessor :dbWB, :stellen
 
@@ -15,27 +15,12 @@ module VerifyWortHelper
 
     stellen = Array.new
 
-    # wird unter der Tabelle BERLIN (WB_BERLIN) hinzugefügt
-    berlin  = [
-        {
-            'uid'         => 0,
-            'band'        => 0,
-            'seite_start' => 0,
-            'seite_stop'  => 0,
-            'zeile_start' => 0,
-            'zeile_stop'  => 0,
-            'notiz'       => nil
-        }
-    ]
-
-
-    re20           = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
+    re20         = Regexp.new(/^\s*([VI]*)\s*,?\s*(<?)([0-9]*)\s*,\s*([0-9\/ -]*)(>?\*?)\s*(.*)$/)
 
     #--- edfu
 
 
-
-    @wbAnmerkung   = ''
+    @wbAnmerkung = ''
 
 
     edfuStopUnsicher = false
@@ -47,10 +32,6 @@ module VerifyWortHelper
 
     bEdfu = belegstellenEdfu
 
-    # if bEdfu.strip().end_with? (';')
-    #   i     = bEdfu.rindex(';')
-    #   bEdfu = bEdfu[0..i-1]
-    # end
 
     # 2132, 2276, 2325
     bEdfu = bEdfu.gsub(/E VII/, 'VII')
@@ -129,8 +110,6 @@ module VerifyWortHelper
 
 
     if bEdfu != belegstellenEdfu
-      #edfuAnmerkung += 'ursprünglich: ' + belegstellenEdfu
-
       Edfulog.new("ERROR", "WL", "Änderung an Belegstelle", "Belegstelle", belegstellenEdfu, bEdfu, uid)
     end
 
@@ -169,22 +148,16 @@ module VerifyWortHelper
         wb = 'III, 026,01 - 027, 19'
 
       end
-      # I, 046 - 047, 03
-      #m = wb.match(/([VI]*)\s*,?\s*([0-9]*) - ([0-9]*). ([0-9]*)/)
+      # e.g. I, 046 - 047, 03
       m = wb.match(/([VI]*),([ 0-9,]*) ([0-9]*) - ([0-9]*). ([0-9]*)/)
       if m
         if m[2] == ''
           addToWbStelleAnmerkung(wb)
           wb = "#{m[1]}, #{m[3]}, #{m[5]} - #{m[4]}, #{m[5]}"
-        # else
-        #   str = m[2].gsub(/,/, '').strip
-        #   wb = "#{m[1]}, #{str}, #{m[3]} - #{m[4]}, #{m[5]}"
         end
       end
 
       if wb != belegstellenWb
-        #wbAnmerkung = 'ursprünglich: ' + belegstellenWb
-
         Edfulog.new("INFO", "WL", "Änderung an Belegstellen", "BelegstellenWb", belegstellenWb, wb, uid)
       end
 
@@ -293,23 +266,11 @@ module VerifyWortHelper
 
     wort.wbberlin  = dbWB
 
+
     #--- edfu
 
-    #anmerkung        = ''
-    #
-    # if edfuAnmerkung != '' or edfuAnmerkung.length != 0
-    #   if anmerkung == nil or anmerkung == ''
-    #     anmerkung = "#{edfuAnmerkung.strip()}"
-    #   else
-    #     anmerkung = "#{edfuAnmerkung.strip()}; #{anmerkung.strip() || ''}"
-    #   end
-    #
-    # else
-    #   anmerkung = "#{anmerkung.strip() || ''}"
-    # end
 
     band           = ''
-    #edfuBandNr     = 0
     edfuSeiteStart = 0
     zerstoerung    = false
     bandRoemisch   = ''
@@ -321,7 +282,7 @@ module VerifyWortHelper
       belegstellen.each { |b|
 
         @edfuAnmerkung = ''
-        b = b.strip()
+        b              = b.strip()
 
         if b.match(/ff/)
           edfuStopUnsicher = true
@@ -359,14 +320,12 @@ module VerifyWortHelper
           if (m20[1]).length > 0
             bandRoemisch = m20[1].strip()
             bandDezimal  = roemisch_nach_dezimal bandRoemisch
-            #edfuBandNr   = bandDezimal # roemisch[m20[1].strip()]
           elsif bandDezimal == 0
             Edfulog.new("ERROR", "WL", "Fehlende Bandangabe", "BelegstellenEdfu", bEdfu, '', uid)
           end
 
           edfuSeiteStart = m20[3].to_i
           edfuSeiteStop  = edfuSeiteStart
-          #edfuAnmerkung  = ''
 
           if m20[4].index(' - ') != nil
             edfuZeileStart = (m20[4].split(' - ')[0]).to_i
@@ -391,8 +350,6 @@ module VerifyWortHelper
             else
               Edfulog.new("ERROR", "WL", "Zu viele Komponenten", "BelegstellenEdfu", bEdfu, '', uid)
             end
-
-            #edfuAnmerkung = m20[6].strip()
           end
 
 
@@ -421,11 +378,8 @@ module VerifyWortHelper
               @edfuAnmerkung,
               edfuStopUnsicher,
               false,
-              StellenHelper.getFromBanddict((bandDezimal).to_i, 'freigegeben')
+              StellenHelper.banddict((bandDezimal).to_i, 'freigegeben')
           )
-          # if stelle.class == Array
-          #   stelle = stelle[0]
-          # end
 
           stellen << stelle unless stellen.include? stelle
 
@@ -447,6 +401,7 @@ module VerifyWortHelper
           Edfulog.new("ERROR", "WL", "Belegstelle (#{b}) verworfen", "BelegstellenEdfu", bEdfu, '', uid)
         end
 
+        # todo: check this
         # bildString = bildString.strip.sub(/^[,.:\s]*/, '').strip # m[2]
 
       }
@@ -465,19 +420,11 @@ module VerifyWortHelper
   end
 
   def addToEdfuStelleAnmerkung(str)
-    #if @edfuAnmerkung == ''
     @edfuAnmerkung = str
-    #else
-    #  @edfuAnmerkung += "; #{str}"
-    #end
   end
 
   def addToWbStelleAnmerkung(str)
-    #if @wbAnmerkung == ''
     @wbAnmerkung = str
-    #else
-    # @wbAnmerkung += "; #{str}"
-    #end
   end
 
 end

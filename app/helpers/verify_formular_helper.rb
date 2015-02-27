@@ -1,51 +1,10 @@
 # encoding: utf-8
 
-require 'edfu_numerics_conversion_helper'
+require 'edfu_data_mappings'
 require 'stellen_helper'
 
 module VerifyFormularHelper
-  include EdfuNumericsConversionHelper #, Celluloid
-
-  def formular_literatur_relation_hash
-    {
-        1  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        2  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        3  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        4  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 2, 'detail' => '10 (38.), u. n. 40*'}],
-        5  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        6  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 4, 'detail' => '309, n. 11'},
-               {'literatur_beschreibung_key' => 5, 'detail' => '515, n. 135'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        7  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        8  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        9  => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        10 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        11 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'},
-               {'literatur_beschreibung_key' => 3, 'detail' => '145, n. 676'}],
-        12 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        13 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        14 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        15 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        16 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}],
-        17 => [{'literatur_beschreibung_key' => 1, 'detail' => '14, n. 51'}]
-    }
-  end
-
-  def literatur_beschreibung_hash
-    return {
-        1 => 'Bedier, in: GM 162, 1998',
-        2 => 'Budde/Kurth, in: EB 4, 1994',
-        3 => 'Labrique, Stylistique',
-        4 => 'Aufrère, L’univers minéral I',
-        5 => 'Aufrère, L’univers minéral II'
-    }
-  end
+  include EdfuDataMappings #, Celluloid
 
 
   private
@@ -58,8 +17,6 @@ module VerifyFormularHelper
     return parts
   end
 
-
-# per callback aufgerufen
   def create_literaturen(uid, formular)
 
     literaturen = Array.new
@@ -81,7 +38,6 @@ module VerifyFormularHelper
           literaturen << lit
         end
 
-        #literaturen << lit # unless self.literaturen.include? lit
         formular.literaturen << lit unless formular.literaturen.include? lit
 
       }
@@ -94,9 +50,8 @@ module VerifyFormularHelper
   def create_stellen(seitezeile, band, uid)
 
     anmerkung = ''
-    #kommentar = ''
 
-    freigegeben = StellenHelper.getFromBanddict((band).to_i, 'freigegeben')
+    freigegeben = StellenHelper.banddict((band).to_i, 'freigegeben')
 
 
     ## Sonderfälle
@@ -112,65 +67,48 @@ module VerifyFormularHelper
     end
 
 
-
     if seitezeile.index('nach ') == 0
-      #anmerkung  += ['nach']
-      anmerkung = seitezeile
+      anmerkung  = seitezeile
       seitezeile = seitezeile.gsub('nach ', '')
     end
 
     if seitezeile.index(', Z') != nil
-      #anmerkung  += [seitezeile[seitezeile.index(', Z') + 2..-1]]
-      anmerkung = seitezeile
+      anmerkung  = seitezeile
       seitezeile = seitezeile[0..seitezeile.index(', Z')]
     end
 
     if seitezeile.index(' / Z') != nil
-      #anmerkung  += [seitezeile[seitezeile.index(' / Z') + 3..-1]]
-      anmerkung = seitezeile
+      anmerkung  = seitezeile
       seitezeile = seitezeile[0..seitezeile.index(' / Z')]
     end
 
     if seitezeile.index(', Kol') != nil
-      #anmerkung += [seitezeile[seitezeile.index(', Kol') + 2..-1]]
       anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(', Kol')]
     end
 
     if seitezeile.index(' / kol') != nil
-      #anmerkung += [seitezeile[seitezeile.index(' / kol') + 3..-1]]
       anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(' / kol')]
     end
 
     if seitezeile.index(' / ') != nil
-      #anmerkung += [seitezeile[seitezeile.index(' / ') + 3..-1]]
       anmerkung = seitezeile
       seitezeile= seitezeile[0..seitezeile.index(' / ')]
     end
 
     if szOriginal != seitezeile
 
-      #str = ''
       if seitezeile == szOriginal
         Edfulog.new("ERROR", "FL", "Änderung an Seitezeile", "SEITEZEILE", szOriginal, seitezeile, uid)
       end
 
 
-
     end
-    #if (kommentar.length) > 0
-    #  logger.error "[FL], Kommentar zur Seitezeile, SEITEZEILE, '#{kommentar}', , #{uid}"
-    #end
+
     if (seitezeile.scan(/[^0-9, -]/)).length > 0
       Edfulog.new("INFO", "FL", "Evtl. Fehlerhafte Seitezeile", "SEITEZEILE", szOriginal, '', uid)
     end
-
-    # if anmerkung != nil and anmerkung != ''
-    #   anmerkung += "; #{kommentar}"
-    # else
-    #   anmerkung = "#{kommentar}"
-    # end
 
     result = []
 
@@ -260,7 +198,6 @@ module VerifyFormularHelper
         freigegeben
     )
 
-
     return stelle
 
   end
@@ -302,8 +239,8 @@ module VerifyFormularHelper
         photo = 'D05_5391, D05_5395, D05_5396, D05_5397, D05_5398, D05_5399, D05_5400, ( 3112 )*'
       # 1711-1713
       when 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983 (Z 6), D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        photo           = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
-        #photo_kommentar = 'D05_4983 (Z 6)'
+        photo = 'D05_4954, D05_4955, D05_4956, D05_4957, D05_4958, D05_4959, D05_4983, D05_4984, D05_4985, D05_4986, D05_4987, D05_4988'
+      #photo_kommentar = 'D05_4983 (Z 6)'
       # 1818-1820
       when 'D05_6097, D05_6098, D05_6100, D05_6101, D06_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
         photo = 'D05_6097, D05_6098, D05_6100, D05_6101, D05_6102, D05_6103, D05_6104, D05_6105, D05_6106, D05_6107, D05_6108, D05_6109, D05_6110, D05_6111, D05_6112, D05_6113, D05_6114, D05_6115, D05_6299, D05_6300'
@@ -359,20 +296,20 @@ module VerifyFormularHelper
 
     # 9741-9773
     if photo.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
-      photo           = photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
-                                   '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
+      photo = photo.gsub(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/,
+                         '( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 )*')
       #photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
     # 8399, 9011, 9012
     if uid == 8399 or uid == 9011 or uid == 9012
-      photo           = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
+      photo = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
       #photo_kommentar = 'E. VII, 252, 5'
     end
 
     # 9950
     if uid == 9950
-      photo           = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
+      photo = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
       #photo_kommentar = 'E VIII, 122, 5 - 124, 18'
     end
 
@@ -396,25 +333,11 @@ module VerifyFormularHelper
       Edfulog.new("ERROR", "FL", "Änderung an Photostring", "Photo", origPhoto, photo, uid)
     end
 
+
     # Sonderfälle
 
-    #photo_name      = Array.new
-    #photo_typ       = Array.new
-    #photo_pfad      = Array.new
-    #photo_kommentar = Array.new
 
-    photosDict   = {}
-    photoTypDict = {
-        'alt'                   => {'uid' => 0, 'name' => 'SW', 'jahr' => 1999},
-        'D03'                   => {'uid' => 1, 'name' => '2003', 'jahr' => 2003},
-        'D05'                   => {'uid' => 2, 'name' => '2005', 'jahr' => 2005},
-        'e'                     => {'uid' => 3, 'name' => 'e', 'jahr' => 1900},
-        'G'                     => {'uid' => 4, 'name' => 'G', 'jahr' => 1950},
-        'e-o'                   => {'uid' => 5, 'name' => 'e-o', 'jahr' => 1960},
-        'Labrique, Stylistique' => {'uid' => 6, 'name' => 'Labrique, Stylistique', 'jahr' => 1912},
-        'E. XIII'               => {'uid' => 7, 'name' => 'Edfou XIII', 'jahr' => 1913},
-        'E. XIV'                => {'uid' => 8, 'name' => 'Edfou XIV', 'jahr' => 1914},
-    }
+    photosDict = {}
 
     re1  = Regexp.new('^[0-9]+a*')
     re2  = Regexp.new('^D03_[0-9]+')
@@ -555,7 +478,7 @@ module VerifyFormularHelper
 
       elsif re5.match(bildString)
         # Fall (n+1): Verweis auf Tafeln im Edfou Buch
-        m          = re5.match(bildString)
+        m  = re5.match(bildString)
         m2 = m[2]
 
         unless m[2].include?("pl. ")
@@ -604,16 +527,6 @@ module VerifyFormularHelper
           bildString = ''
         end
 
-        # todo is empty?
-        # if photo_kommentar.size > 0
-        #   if kommentar
-        #     kommentar = "#{photo_kommentar}; #{kommentar}"
-        #   else
-        #     kommentar = photo_kommentar
-        #   end
-        # else
-        #   kommentar = photo_kommentar
-        # end
 
         typ  = photoTypDict[typ]['name']
         pfad = "#{typ}/#{name}"
@@ -661,24 +574,13 @@ module VerifyFormularHelper
                        .gsub(/ZtZ gravZe/, 'été gravée')
 
     if  uebersetzung != origUebers
-
-      # str = ''
-      # if uebersetzung == origUebers.strip
-      #   str = "Änderung an Übersetzung (Leerzeichen an Anfang oder Ende entfernt)"
-      # else
-      #   str = "Änderung an Übersetzung"
-      # end
-
       Edfulog.new("INFO", "FL", "Evtl. Fehler in Übersetzung", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end
 
     # log wenn 'Z' in Ort auftritt oder ein Fragezeichen
-
     re101 = Regexp.new('\wZ')
     re102 = Regexp.new('\w\?\w')
 
-    #if self[:uebersetzung].scan re101 or self[:uebersetzung].scan re102
-    # ergebnis von scan ist ungeeignet, da es ggf. ein leeres array liefert, also nie false ist
     if (uebersetzung.match(re101) || uebersetzung.match(re102))
       Edfulog.new("INFO", "FL", "'Z' oder '?' innerhalb eines Wortes", "TEXTDEUTSC", origUebers, uebersetzung, uid)
     end

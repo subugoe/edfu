@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-require 'edfu_numerics_conversion_helper'
+require 'edfu_data_mappings'
 require 'stellen_helper'
 
 module VerifyOrtHelper
-  include EdfuNumericsConversionHelper # , Celluloid
+  include EdfuDataMappings # , Celluloid
 
 
   private
@@ -32,10 +32,10 @@ module VerifyOrtHelper
     elsif stelle == 'VI, 209 4 (Gau); 209, 5 (Stadt); 216, 9; 217, 2; 224, 11; 237, 6; 242, 16; 243, 6; 244, 4; 245, 5; 247, 5; 249, 13; 261, 11; 263, 10; 270, 2; 273, 8; 273, 10; 276, 11; 278, 16; 282, 8; 282, 11; 283, 7; 283, 13; 284, 15; 285, 11; 288, 4; 288, 7; 290, 4; 291, 5;'
       # 509
       stelle = 'VI, 209, 4 (Gau); 209, 5 (Stadt); 216, 9; 217, 2; 224, 11; 237, 6; 242, 16; 243, 6; 244, 4; 245, 5; 247, 5; 249, 13; 261, 11; 263, 10; 270, 2; 273, 8; 273, 10; 276, 11; 278, 16; 282, 8; 282, 11; 283, 7; 283, 13; 284, 15; 285, 11; 288, 4; 288, 7; 290, 4; 291, 5;'
-    # in Tabelle geändert
-    # elsif uid == 579
-    #   anm    = stelle
-    #   stelle = ''
+      # in Tabelle geändert
+      # elsif uid == 579
+      #   anm    = stelle
+      #   stelle = ''
     elsif stelle == 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([]; wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
       # 619
       stelle= 'VI, 68, 3; 237, 9; 277, 6; 310, 13; V, 9, 2 ([], wohl Ägypten); 24, 8 (Ägypten: "das Versiegelte"); 44, 4 (Welt); 59, 5; 63, 1; 64, 7; 70, 3; 80, 6 (Welt); 84, 8 (Welt); 92, 1; 101, 13; 157, 12 (Welt);'
@@ -75,20 +75,13 @@ module VerifyOrtHelper
       Edfulog.new("ERROR", "OL", "Änderung an Stelle", "STELLE", originalStelle, stelle, uid)
     end
 
-    # if ort.anmerkung != nil and ort.anmerkung != ''
-    #   if anm != nil and anm != ''
-    #     ort.anmerkung += "; #{anm}"
-    #   end
-    # else
-    #   ort.anmerkung = anm || ''
-    # end
 
     # match als strip(char)-Ersatz
     teile = stelle.strip.split(';') #.match(/(^\s*;\s*)(.*)(\s*;\s*$)/))[2].split(';')
 
 
-    myBand = ''
-    bandNr = 0
+    myBand                  = ''
+    bandNr                  = 0
 
 
     @ort_stelle_szene_batch = Array.new if @ort_stelle_szene_batch == nil
@@ -156,41 +149,37 @@ module VerifyOrtHelper
               kommentar, # todo: sind hier nur stellen anmerkungen drin?
               false,
               false,
-              StellenHelper.getFromBanddict(bandNr.to_i, 'freigegeben')
+              StellenHelper.banddict(bandNr.to_i, 'freigegeben')
           )
 
-          # if stelle_obj.class == Array
-          #   stelle_obj          = stelle_obj[0]
+          #---
 
-            #---
-
-            szenen              = Szene.szenen["#{bandNr}_#{seiteStart}"]
+          szenen     = Szene.szenen["#{bandNr}_#{seiteStart}"]
 
 
+          if (szenen != nil && szenen.size > 0)
 
-            if (szenen != nil && szenen.size > 0)
+            szenen.each { |szene|
 
-              szenen.each { |szene|
+              stelle_obj.szenen << szene
+              szene.stellen << stelle_obj
 
-                stelle_obj.szenen << szene
-                szene.stellen << stelle_obj
-
-                # todo: required? ort.stellen...szenen
-                ort.szenen = Array.new if ort.szenen == nil
-                ort.szenen << szene
+              # todo: required? ort.stellen...szenen
+              ort.szenen = Array.new if ort.szenen == nil
+              ort.szenen << szene
 
 
-                stz = StellenSzenen.fetch(stelle_obj, szene)
-                if stz.class == Array
+              stz = StellenSzenen.fetch(stelle_obj, szene)
+              if stz.class == Array
 
-                  stz = stz[0]
-                  @ort_stelle_szene_batch << stz
+                stz = stz[0]
+                @ort_stelle_szene_batch << stz
 
-                end
-              }
+              end
+            }
 
-            end
-          #end
+          end
+
           #---
 
           # todo: hier steigt er aus !!! Array hat keine m. zugehoerigZU???

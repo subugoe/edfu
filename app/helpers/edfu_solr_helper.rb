@@ -3,7 +3,7 @@ module EdfuSolrHelper
   def stellenHash(model, spalte, transliteration)
 
     if (self.stellen.size == 0)
-      #stelle_freigegeben = ' '
+      #stelle_freigegeben = ' ' # no problem if not in solr
       stelle_zerstoerung = false
       stelle_unsicher    = true
       stelle_anmerkung   = ' '
@@ -14,10 +14,10 @@ module EdfuSolrHelper
       stelle_zeile_stop  = 0
 
       stelle_band           = 0
-      #stelle_bandseite      = ' '
+      #stelle_bandseite      = ' ' # no problem if not in solr
       stelle_bandseitezeile = ' '
 
-      #stelle_id = ' '
+      #stelle_id = ' ' # no problem if not in solr
 
       stelle                = ''
 
@@ -52,8 +52,6 @@ module EdfuSolrHelper
         sort                     = "#{transliteration}--#{stelle}"
       when "WL-Model"
         sort                     = "Ddt--#{stelle}"
-      else
-        puts "You just making it up!"
     end
 
     return {
@@ -72,7 +70,7 @@ module EdfuSolrHelper
         :bandseitezeile           => stelle_bandseitezeile,
 
         :stelle_id                => stelle_id,
-        :sort                     => "Act--#{stelle}"
+        :sort                     => sort
     }
   end
 

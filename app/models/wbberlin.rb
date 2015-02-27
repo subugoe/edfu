@@ -4,7 +4,7 @@ require 'rsolr'
 require 'edfu_numerics_conversion_helper'
 
 class Wbberlin < ActiveRecord::Base
-  include EdfuNumericsConversionHelper
+  include EdfuDataMappings
   extend EdfuModelHelper
 
   belongs_to :wort

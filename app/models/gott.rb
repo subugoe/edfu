@@ -2,12 +2,12 @@
 
 require 'edfu_model_helper'
 require 'edfu_solr_helper'
-require 'edfu_numerics_conversion_helper'
+#require 'edfu_numerics_conversion_helper'
 require 'rsolr'
 #require 'celluloid/autostart'
 
 class Gott < ActiveRecord::Base
-  include EdfuNumericsConversionHelper, EdfuSolrHelper
+  include EdfuDataMappings, EdfuSolrHelper
   extend EdfuModelHelper
 
 

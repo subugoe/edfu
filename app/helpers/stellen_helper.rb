@@ -1,7 +1,7 @@
 module StellenHelper
 
 
-  def self.getFromBanddict(bandId, element)
+  def self.banddict(bandId, element)
 
     bandDict = {
         1 => {'uid'        => 1, 'nummer' => 1, 'freigegeben' => false, 'literatur' => 'Chassinat, Émile; Le Temple d’Edfou I, 1892.',
@@ -22,13 +22,9 @@ module StellenHelper
               'tempel_uid' => 0}
     }
 
-
     begin
       return bandDict[bandId][element]
     rescue NoMethodError
-
-
-
       return nil
     end
 

@@ -30,7 +30,7 @@ class Scrape
 
 
 
-    file = File.join('config', 'edfu_mappings.yml')
+    file = File.join('config', 'edfu_szenen_mappings.yml')
 
     config = (YAML.load(File.open(file)))['defaults']
 
