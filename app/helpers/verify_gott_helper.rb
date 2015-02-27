@@ -1,20 +1,15 @@
 # encoding: utf-8
 
-require 'edfu_data_mappings'
-require 'stellen_helper'
-
 module VerifyGottHelper
-  include EdfuDataMappings # , Celluloid
-
+  include EdfuDataMappings
 
   private
-  def manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band)
 
+  def manipulate_seitezeile_string_and_create_stelle(seitezeile, uid, band)
 
     stellen = Array.new
 
     re3 = Regexp.new(/^\s*([VI]*)\s*,*\s*([0-9]*)\s*,\s*([0-9\/ -]*)\s*(.*)$/)
-
 
     originalSEITEZEILE = seitezeile
     @stelleAnmerkung   = ''

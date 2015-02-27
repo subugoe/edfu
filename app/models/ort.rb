@@ -1,9 +1,6 @@
 # encoding: utf-8 
 
-require 'edfu_model_helper'
-require 'edfu_solr_helper'
 require 'rsolr'
-# require 'celluloid/autostart'
 
 class Ort < ActiveRecord::Base
   include EdfuSolrHelper
@@ -51,7 +48,6 @@ class Ort < ActiveRecord::Base
     return h
 
   end
-
 
   private
 

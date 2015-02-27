@@ -1,7 +1,6 @@
 # encoding: utf-8 
 
 require 'rsolr'
-require 'edfu_numerics_conversion_helper'
 
 class Wbberlin < ActiveRecord::Base
   include EdfuDataMappings
@@ -49,18 +48,6 @@ class Wbberlin < ActiveRecord::Base
     }
   end
 
-
   private
-
-
-  # def add_to_solr
-  #
-  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-  #   solr.add (to_solr_string)
-  #   solr.commit
-  #
-  # end
-
-
 
 end

@@ -1,13 +1,9 @@
 # encoding: utf-8 
 
-require 'edfu_model_helper'
-require 'edfu_solr_helper'
-#require 'edfu_numerics_conversion_helper'
 require 'rsolr'
-#require 'celluloid/autostart'
 
 class Gott < ActiveRecord::Base
-  include EdfuDataMappings, EdfuSolrHelper
+  include EdfuSolrHelper
   extend EdfuModelHelper
 
 
@@ -22,17 +18,17 @@ class Gott < ActiveRecord::Base
     spalte = "SEITEZEILE"
 
     h = {
-        :sql_uid                  => self[:uid], # ---
-        :transliteration          => self[:transliteration], # ---
-        :transliteration_nosuffix => self[:transliteration], # ? ---
-        :ort                      => self[:ort], # ---
-        :eponym                   => self[:eponym], # ---
-        :beziehung                => self[:beziehung], # ---
-        :funktion                 => self[:funktion], # ---
-        :anmerkung                => self[:anmerkung], # ---
+        :sql_uid                  => self[:uid],
+        :transliteration          => self[:transliteration],
+        :transliteration_nosuffix => self[:transliteration],
+        :ort                      => self[:ort],
+        :eponym                   => self[:eponym],
+        :beziehung                => self[:beziehung],
+        :funktion                 => self[:funktion],
+        :anmerkung                => self[:anmerkung],
 
-        :typ                      => 'gott', # ---
-        :id                       => "gott-#{self[:uid]}", # ---
+        :typ                      => 'gott',
+        :id                       => "gott-#{self[:uid]}",
 
     }
 
@@ -49,7 +45,6 @@ class Gott < ActiveRecord::Base
     return h
 
   end
-
 
   private
 

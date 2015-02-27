@@ -1,9 +1,6 @@
 # encoding: utf-8 
 
 require 'rsolr'
-require 'edfu_model_helper'
-require 'edfu_numerics_conversion_helper'
-require 'celluloid/autostart'
 
 class Stelle < ActiveRecord::Base
   extend EdfuModelHelper
@@ -30,30 +27,30 @@ class Stelle < ActiveRecord::Base
 
   def to_solr_string
     return {
-        :sql_uid          => self[:id], # ---
+        :sql_uid          => self[:id],
 
-        :tempel           => self.tempel, # ---
+        :tempel           => self.tempel,
 
-        :band             => self.band, # ---
-        :bandseite        => self.bandseite, # ---
-        :bandseitezeile   => self.bandseitezeile, # ---
-        :seite_start      => self.seite_start, # ---
-        :seite_stop       => self.seite_stop, # ---
-        :zeile_start      => self.zeile_start, # ---
-        :zeile_stop       => self.zeile_stop, # ---
-        :start            => self.start, # ---
-        :stop             => self.stop, # ---
+        :band             => self.band,
+        :bandseite        => self.bandseite,
+        :bandseitezeile   => self.bandseitezeile,
+        :seite_start      => self.seite_start,
+        :seite_stop       => self.seite_stop,
+        :zeile_start      => self.zeile_start,
+        :zeile_stop       => self.zeile_stop,
+        :start            => self.start,
+        :stop             => self.stop,
 
-        :freigegeben      => self.freigegeben, # ---
-        :zerstoerung      => self.zerstoerung, # ---
+        :freigegeben      => self.freigegeben,
+        :zerstoerung      => self.zerstoerung,
 
-        :stelle_anmerkung => self.stelle_anmerkung, # ---
-        :stelle_unsicher  => self.stelle_unsicher, # ---
+        :stelle_anmerkung => self.stelle_anmerkung,
+        :stelle_unsicher  => self.stelle_unsicher,
 
         :besitzer         => "#{self.zugehoerigZu_type.downcase}-#{self.zugehoerigZu_id}",
 
-        :typ              => 'stelle', # ---
-        :id               => "stelle-#{self[:id]}" # ---
+        :typ              => 'stelle',
+        :id               => "stelle-#{self[:id]}"
 
         # todo: add szene?
     }
@@ -88,14 +85,6 @@ class Stelle < ActiveRecord::Base
           freigegeben
   )
 
-
-
-    #Rails.cache.fetch("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}") {
-
-    #stelle = @@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"]
-
-    #return stelle if stelle != nil
-
     s = Stelle.new(
         tempel:           tempel,
         band:             checkValue(band),
@@ -111,41 +100,15 @@ class Stelle < ActiveRecord::Base
         freigegeben:      freigegeben
     )
 
-
     s.id = ActiveRecord::Base.connection.execute("select nextval('stellen_id_seq')").first['nextval']
 
-    #@@stellen["stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}"] = s
     @@stellen << s
 
-    #Rails.cache.write("stelle_#{typ}_#{band}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", s)
-
-    #return [s]
     return s
-
-    #}
-
 
   end
 
-  # def after_commit
-  #   Rails.cache.write("stelle_#{bandseite}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}", self)
-  # end
-  #
-  # def after_destroy
-  #   Rails.cache.delete("stelle_#{bandseite}_#{seite_start}_#{seite_stop}_#{zeile_start}_#{zeile_stop}")
-  # end
-
-
   private
-
-
-  # def add_to_solr
-  #
-  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-  #   solr.add (to_solr_string)
-  #   solr.commit
-  #
-  # end
 
 end
 

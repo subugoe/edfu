@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-
 class Literatur < ActiveRecord::Base
   extend EdfuModelHelper
 
@@ -9,8 +8,6 @@ class Literatur < ActiveRecord::Base
   @@literaturen = Hash.new
 
   def self.fetch(beschreibung, detail)
-
-    #Rails.cache.fetch("literatur_#{beschreibung}_#{detail}") {
 
     lit = @@literaturen["literatur_#{beschreibung}_#{detail}"]
 
@@ -22,21 +19,10 @@ class Literatur < ActiveRecord::Base
 
     l.id                                               = ActiveRecord::Base.connection.execute("select nextval('literaturen_id_seq')").first['nextval']
 
-    #Rails.cache.write("literatur_#{beschreibung}_#{detail}", l)
-
     @@literaturen["literatur_#{beschreibung}_#{detail}"] = l
 
     return [l]
-    #}
 
   end
-
-  # def after_commit
-  #   Rails.cache.write("literatur_#{self.beschreibung}_#{self.detail}", self)
-  # end
-  #
-  # def after_destroy
-  #   Rails.cache.delete("literatur_#{self.beschreibung}_#{self.detail}")
-  # end
 
 end

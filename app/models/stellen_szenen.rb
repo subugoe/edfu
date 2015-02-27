@@ -3,7 +3,6 @@ class StellenSzenen < ActiveRecord::Base
   belongs_to :stelle
   belongs_to :szene
 
-
   @@stellenszenen = Hash.new
 
 
@@ -12,16 +11,7 @@ class StellenSzenen < ActiveRecord::Base
   end
 
 
-  def self.fetch(
-      stelle,
-          szene
-  )
-
-
-    # todo: remove this
-    #puts "stellenszenen.size: #{@@stellenszenen.size}"
-
-    #Rails.cache.fetch("stelle-szene_#{stelle.id}_#{szene.id}") {
+  def self.fetch(stelle, szene)
 
     stelleszene = @@stellenszenen["stelle-szene_#{stelle.id}_#{szene.id}"]
 
@@ -29,25 +19,15 @@ class StellenSzenen < ActiveRecord::Base
       return stelleszene
     else
 
-      sz                                                       = StellenSzenen.new(
-          stelle: stelle,
-          szene:  szene
-      )
-
-      #Rails.cache.write("stelle-szene_#{stelle.id}_#{szene.id}", sz)
+      sz = StellenSzenen.new(stelle: stelle, szene: szene)
 
       @@stellenszenen["stelle-szene_#{stelle.id}_#{szene.id}"] = sz
 
       return [sz]
 
-      # }
     end
 
   end
 
-
-  # def to_s
-  #   return "Stelle_Id: #{stelle.id}, Szene_Id: #{szene.id}"
-  # end
 
 end

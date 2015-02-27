@@ -1,9 +1,6 @@
 # encoding: utf-8 
 
-require 'edfu_model_helper'
-require 'edfu_solr_helper'
 require 'rsolr'
-#require 'celluloid/autostart'
 
 class Wort < ActiveRecord::Base
   include EdfuSolrHelper
@@ -22,18 +19,18 @@ class Wort < ActiveRecord::Base
     h = {
         :sql_uid                  => self[:uid],
         :transliteration          => self[:transliteration],
-        :transliteration_nosuffix => self[:transliteration], # ---
-        :uebersetzung             => self[:uebersetzung], # ---
-        :hieroglyph               => self[:hieroglyph], # ---
-        :weiteres                 => self[:weiteres], # ---
-        :anmerkung                => self[:anmerkung], # --- aus self, kein Array
+        :transliteration_nosuffix => self[:transliteration],
+        :uebersetzung             => self[:uebersetzung],
+        :hieroglyph               => self[:hieroglyph],
+        :weiteres                 => self[:weiteres],
+        :anmerkung                => self[:anmerkung],
 
-        :berlin_display           => self.wbberlin.berlin_display, # ---
-        :berlin_band              => self.wbberlin.band.to_i, # ---
-        :berlin_seite_start       => self.wbberlin.seite_start.to_i, # ---
-        :berlin_seite_stop        => self.wbberlin.seite_stop.to_i, # ---
-        :berlin_zeile_start       => self.wbberlin.zeile_start.to_i, # ---
-        :berlin_zeile_stop        => self.wbberlin.zeile_stop.to_i, # ---
+        :berlin_display           => self.wbberlin.berlin_display,
+        :berlin_band              => self.wbberlin.band.to_i,
+        :berlin_seite_start       => self.wbberlin.seite_start.to_i,
+        :berlin_seite_stop        => self.wbberlin.seite_stop.to_i,
+        :berlin_zeile_start       => self.wbberlin.zeile_start.to_i,
+        :berlin_zeile_stop        => self.wbberlin.zeile_stop.to_i,
         :stelle_berlin_id         => self.wbberlin.id,
 
         :typ                      => 'wort',
@@ -54,7 +51,6 @@ class Wort < ActiveRecord::Base
     return h
 
   end
-
 
   private
 

@@ -5,10 +5,6 @@ class Szene < ActiveRecord::Base
 
   has_and_belongs_to_many :stellen, :dependent => :delete_all
 
-  #after_commit :add_to_solr
-  #before_validation :check_data
-
-
   @@szenen = Hash.new()
 
   def self.szenen
@@ -43,7 +39,6 @@ class Szene < ActiveRecord::Base
 
   )
 
-
     sz = Szene.new(
         nummer:          nummer,
         beschreibung:    checkValue(beschreibung),
@@ -71,7 +66,6 @@ class Szene < ActiveRecord::Base
 
     )
 
-
     sz.id                             = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
 
 
@@ -89,8 +83,6 @@ class Szene < ActiveRecord::Base
 
     return {
 
-        #:sql_uid                  => self[:id],
-        # from szenebild
         :szene_bild_name      => self.name, # --
         :szene_bild_dateiname => self.dateiname, # --
 
@@ -99,12 +91,6 @@ class Szene < ActiveRecord::Base
 
         :szene_bild_offset_x  => self.offset_x, # --
         :szene_bild_offset_y  => self.offset_y, # --
-
-        #:imagemap             => self.imagemap,
-        #:breite_original      => self.breite_original,
-        #:hoehe_original       => self.hoehe_original,
-
-        # from szene
 
         :typ                  => 'szene', # --
         :id                   => "szene-#{self[:id]}", # --
@@ -147,14 +133,5 @@ class Szene < ActiveRecord::Base
   end
 
   private
-
-  # def add_to_solr
-  #
-  #   solr = RSolr.connect :url => 'http://localhost:8983/solr/collection1'
-  #   solr.add (to_solr_string)
-  #   solr.commit
-  #
-  # end
-
 
 end

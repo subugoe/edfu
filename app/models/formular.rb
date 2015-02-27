@@ -1,9 +1,7 @@
 # encoding: utf-8
 
-require 'edfu_model_helper'
-require 'edfu_solr_helper'
 require 'rsolr'
-#require 'celluloid/autostart'
+
 
 class Formular < ActiveRecord::Base
   include EdfuSolrHelper
@@ -26,18 +24,18 @@ class Formular < ActiveRecord::Base
 
 
     h = {
-        :sql_uid                  => self[:uid], # ---
-        :transliteration          => self[:transliteration], # ---
-        :transliteration_nosuffix => self[:transliteration_nosuffix], #
-        :uebersetzung             => self[:uebersetzung], # ---
-        :texttyp                  => self[:texttyp], # ---
-        :szene_nummer             => self[:szeneID], #
+        :sql_uid                  => self[:uid],
+        :transliteration          => self[:transliteration],
+        :transliteration_nosuffix => self[:transliteration_nosuffix],
+        :uebersetzung             => self[:uebersetzung],
+        :texttyp                  => self[:texttyp],
+        :szene_nummer             => self[:szeneID],
 
-        :photo                    => self.photos.collect { |photo| photo.name }, # ---
-        :photo_kommentar          => self.photos.collect { |photo| photo.kommentar.to_s }, # ---
-        :photo_pfad               => self.photos.collect { |photo| photo.pfad }, # ---
+        :photo                    => self.photos.collect { |photo| photo.name },
+        :photo_kommentar          => self.photos.collect { |photo| photo.kommentar.to_s },
+        :photo_pfad               => self.photos.collect { |photo| photo.pfad },
 
-        :literatur                => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" }, # ---
+        :literatur                => self.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" },
 
         :typ                      => 'formular',
         :id                       => "formular-#{self[:uid]}",
@@ -56,7 +54,6 @@ class Formular < ActiveRecord::Base
     return h
 
   end
-
 
   private
 
