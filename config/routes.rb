@@ -24,10 +24,13 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
 
+  #root 'uploads#new'
+
   authenticate do
     root 'uploads#new'
   end
-  #root 'devise/sessions#new'
+
+
   get 'uploads/', to: 'uploads#new'
   post 'uploads/', to: 'uploads#create'
 

@@ -3,17 +3,11 @@
 require 'roo'
 require 'securerandom'
 require 'benchmark'
-require 'verify_formular_helper'
-require 'verify_ort_helper'
-require 'verify_gott_helper'
-require 'verify_wort_helper'
 require 'csv'
-# require 'scrape'
-require 'stellen_helper'
 
 
 class UploadsController < ApplicationController
-  include VerifyFormularHelper, VerifyOrtHelper, VerifyGottHelper, VerifyWortHelper, Celluloid
+  include VerifyFormularHelper, VerifyOrtHelper, VerifyGottHelper, VerifyWortHelper, EdfuDataMappings, Celluloid
 
   before_action :set_upload, only: [:show, :edit, :update, :destroy]
   before_filter :authenticate_user!
@@ -70,7 +64,8 @@ class UploadsController < ApplicationController
     end
 
 
-    self.async.process_files
+    async.process_files
+    #process_files
 
     respond_to do |format|
       format.html { redirect_to uploads_path, notice: "File(s) staged." }
