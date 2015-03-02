@@ -66,10 +66,9 @@ class UploadsController < ApplicationController
 
     if (@formular_exist && @ort_exist && @gott_exist && @wort_exist &&
         !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
-      #async.process_files
+      async.process_files
       # #process_files
       correct_upload = true
-      puts "correct_upload = true"
     else
       if !@formular_exist
         @upload.errors[:base] << "Keine (korrekte) Formularetabelle vorhanden"
@@ -88,7 +87,7 @@ class UploadsController < ApplicationController
       end
 
       correct_upload = false
-      puts "correct_upload = false"
+
     end
 
     respond_to do |format|
@@ -588,8 +587,6 @@ class UploadsController < ApplicationController
       iStelle = row[0] ||= ''
 
       uid  = Integer(row[5]) || ''
-
-      #puts uid
 
       o    = Ort.new
       o.id = ActiveRecord::Base.connection.execute("select nextval('orte_id_seq')").first['nextval']
