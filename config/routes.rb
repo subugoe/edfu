@@ -6,19 +6,19 @@ Rails.application.routes.draw do
 
   #resources :uploads
 
-  resources :stellen
+  resources :stellen, only: [:index, :show]
 
-  resources :wbsberlin
+  resources :wbsberlin, only: [:index, :show]
 
-  resources :worte
+  resources :worte, only: [:index, :show]
 
-  resources :goetter
+  resources :goetter, only: [:index, :show]
 
-  resources :orte
+  resources :orte, only: [:index, :show]
 
-  resources :formulare
+  resources :formulare, only: [:index, :show]
 
-  resources :edfulogs
+  resources :edfulogs, only: [:index, :show]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

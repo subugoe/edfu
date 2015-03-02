@@ -31,46 +31,206 @@ class UploadsController < ApplicationController
 
     @upload = Upload.new(upload_params)
 
+    if (params[:upload] != nil)
 
-    @uploaded_formular = params[:upload][:formular]
-    @uploaded_ort      = params[:upload][:ort]
-    @uploaded_gott     = params[:upload][:gott]
-    @uploaded_wort     = params[:upload][:wort]
-    # @email             = params[:upload][:email]
+      if  params[:upload][:formular] != nil
+        @uploaded_formular = params[:upload][:formular]
+        check_uploaded_formular
+      end
+
+      if params[:upload][:ort] != nil
+        @uploaded_ort = params[:upload][:ort]
+        check_uploaded_ort
+      end
+
+      if params[:upload][:gott] != nil
+        @uploaded_gott = params[:upload][:gott]
+        check_uploaded_gott
+      end
+
+      if params[:upload][:wort] != nil
+        @uploaded_wort = params[:upload][:wort]
+        check_uploaded_wort
+      end
+    else
+      @upload.errors[:base] << "Keine Dateien übergeben"
+    end
 
 
     # logging format
     # betrifft,   text,       spalte, original, neu,  uid
     # [FL],       ändere...,  ...,    ...,      ...,  ...
 
-    n                  = 50000
+    n = 50000
 
-    # todo valdate tables (all columns?)
 
-    File.open(Rails.root.join('public', 'uploads', @uploaded_formular.original_filename), 'wb') do |file|
-      file.write(@uploaded_formular.read)
+    if (@formular_exist && @ort_exist && @gott_exist && @wort_exist &&
+        !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
+      #async.process_files
+      # #process_files
+      correct_upload = true
+      puts "correct_upload = true"
+    else
+      if !@formular_exist
+        @upload.errors[:base] << "Keine (korrekte) Formularetabelle vorhanden"
+      end
+
+      if !@ort_exist
+        @upload.errors[:base] << "Keine (korrekte) Ortetabelle vorhanden"
+      end
+
+      if !@gott_exist
+        @upload.errors[:base] << "Keine (korrekte) Göttertabelle vorhanden"
+      end
+
+      if !@wort_exist
+        @upload.errors[:base] << "Keine (korrekte) Wortetabelle vorhanden"
+      end
+
+      correct_upload = false
+      puts "correct_upload = false"
     end
-
-    File.open(Rails.root.join('public', 'uploads', @uploaded_ort.original_filename), 'wb') do |file|
-      file.write(@uploaded_ort.read)
-    end
-
-    File.open(Rails.root.join('public', 'uploads', @uploaded_gott.original_filename), 'wb') do |file|
-      file.write(@uploaded_gott.read)
-    end
-
-    File.open(Rails.root.join('public', 'uploads', @uploaded_wort.original_filename), 'wb') do |file|
-      file.write(@uploaded_wort.read)
-    end
-
-
-    async.process_files
-    #process_files
 
     respond_to do |format|
-      format.html { redirect_to uploads_path, notice: "File(s) staged." }
+      if correct_upload
+        format.html { redirect_to uploads_path, notice: "Datei(en) hochgeladen." }
+      else
+        format.html { render action: "new", alert: "Datei(en) fehlerhaft!" }
+      end
     end
+  end
 
+  def check_uploaded_formular
+    unless @uploaded_formular == nil
+
+      @formular_file    = "public/uploads/#{@uploaded_formular.original_filename}"
+      tmp_formular_file = "public/uploads/tmp_#{@uploaded_formular.original_filename}"
+
+      File.delete(tmp_formular_file) if  File.exist?(tmp_formular_file)
+
+      File.open(tmp_formular_file, 'wb') do |file|
+        file.write(@uploaded_formular.read)
+      end
+
+      excel               = Roo::Excel.new(tmp_formular_file)
+      excel.default_sheet = excel.sheets.first
+
+      @upload.errors.add(:formular, "1. Überschrift in Formulartabelle sollte 'TEXTMITSUF' sein") if excel.cell(1, 1) != "TEXTMITSUF"
+      @upload.errors.add(:formular, "2. Überschrift in Formulartabelle sollte 'BAND' sein") if excel.cell(1, 2) != "BAND"
+      @upload.errors.add(:formular, "3. Überschrift in Formulartabelle sollte 'SEITEZEILE' sein") if excel.cell(1, 3) != "SEITEZEILE"
+      @upload.errors.add(:formular, "4. Überschrift in Formulartabelle sollte 'TEXTOHNESU' sein") if excel.cell(1, 4) != "TEXTOHNESU"
+      @upload.errors.add(:formular, "5. Überschrift in Formulartabelle sollte 'TEXTDEUTSC' sein") if excel.cell(1, 5) != "TEXTDEUTSC"
+      @upload.errors.add(:formular, "6. Überschrift in Formulartabelle sollte 'TEXTTYP' sein") if excel.cell(1, 6) != "TEXTTYP"
+      @upload.errors.add(:formular, "7. Überschrift in Formulartabelle sollte 'Photo' sein") if excel.cell(1, 7) != "Photo"
+      @upload.errors.add(:formular, "8. Überschrift in Formulartabelle sollte 'SzenenID' sein") if excel.cell(1, 8) != "SzenenID"
+      @upload.errors.add(:formular, "9. Überschrift in Formulartabelle sollte 'SekLit' sein") if excel.cell(1, 9) != "SekLit"
+      @upload.errors.add(:formular, "10. Überschrift in Formulartabelle sollte 'UniqueID' sein") if excel.cell(1, 10) != "UniqueID"
+
+      if @upload.errors[:formular].size > 0
+        @formular_errors = true
+        File.delete(tmp_formular_file)
+      else
+        File.rename(tmp_formular_file, @formular_file)
+      end
+
+    end
+    @formular_exist = File.exist?(@formular_file)
+  end
+
+  def check_uploaded_ort
+    unless @uploaded_ort == nil
+
+      @ort_file    = "public/uploads/#{@uploaded_ort.original_filename}"
+      tmp_ort_file = "public/uploads/tmp_#{@uploaded_ort.original_filename}"
+
+      File.open(tmp_ort_file, 'wb') do |file|
+        file.write(@uploaded_ort.read)
+      end
+
+      excel               = Roo::Excel.new(tmp_ort_file)
+      excel.default_sheet = excel.sheets.first
+
+      @upload.errors.add(:ort, "1. Überschrift in Orttabelle sollte 'STELLE' sein") if excel.cell(1, 1) != "STELLE"
+      @upload.errors.add(:ort, "2. Überschrift in Orttabelle sollte 'TRANS' sein") if excel.cell(1, 2) != "TRANS"
+      @upload.errors.add(:ort, "3. Überschrift in Orttabelle sollte 'ORT' sein") if excel.cell(1, 3) != "ORT"
+      @upload.errors.add(:ort, "4. Überschrift in Orttabelle sollte 'LOK' sein") if excel.cell(1, 4) != "LOK"
+      @upload.errors.add(:ort, "5. Überschrift in Orttabelle sollte 'ANM' sein") if excel.cell(1, 5) != "ANM"
+      @upload.errors.add(:ort, "6. Überschrift in Orttabelle sollte 'UniqueID' sein") if excel.cell(1, 6) != "UniqueID"
+
+      if @upload.errors[:ort].size > 0
+        @ort_errors = true
+        File.delete(tmp_ort_file)
+      else
+        File.rename(tmp_ort_file, @ort_file)
+      end
+    end
+    @ort_exist = File.exist?(@ort_file)
+  end
+
+  def check_uploaded_gott
+    unless @uploaded_gott == nil
+
+      @gott_file    = "public/uploads/#{@uploaded_gott.original_filename}"
+      tmp_gott_file = "public/uploads/tmp_#{@uploaded_gott.original_filename}"
+
+
+      File.open(tmp_gott_file, 'wb') do |file|
+        file.write(@uploaded_gott.read)
+      end
+
+      excel               = Roo::Excel.new(tmp_gott_file)
+      excel.default_sheet = excel.sheets.first
+
+      @upload.errors.add(:gott, "1. Überschrift in Gotttabelle sollte 'PRIMARY' sein") if excel.cell(1, 1) != "PRIMARY"
+      @upload.errors.add(:gott, "2. Überschrift in Gotttabelle sollte 'NAME' sein") if excel.cell(1, 2) != "NAME"
+      @upload.errors.add(:gott, "3. Überschrift in Gotttabelle sollte 'ORT' sein") if excel.cell(1, 3) != "ORT"
+      @upload.errors.add(:gott, "4. Überschrift in Gotttabelle sollte 'EPON' sein") if excel.cell(1, 4) != "EPON"
+      @upload.errors.add(:gott, "5. Überschrift in Gotttabelle sollte 'BEZ' sein") if excel.cell(1, 5) != "BEZ"
+      @upload.errors.add(:gott, "6. Überschrift in Gotttabelle sollte 'FKT' sein") if excel.cell(1, 6) != "FKT"
+      @upload.errors.add(:gott, "7. Überschrift in Gotttabelle sollte 'BND' sein") if excel.cell(1, 7) != "BND"
+      @upload.errors.add(:gott, "8. Überschrift in Gotttabelle sollte 'SEITEZEILE' sein") if excel.cell(1, 8) != "SEITEZEILE"
+      @upload.errors.add(:gott, "9. Überschrift in Gotttabelle sollte 'ANM' sein") if excel.cell(1, 9) != "ANM"
+      @upload.errors.add(:gott, "10. Überschrift in Gotttabelle sollte 'UniqueID' sein") if excel.cell(1, 10) != "UniqueID"
+
+      if @upload.errors[:gott].size > 0
+        @gott_errors = true
+        File.delete(tmp_gott_file)
+      else
+        File.rename(tmp_gott_file, @gott_file)
+      end
+    end
+    @gott_exist = File.exist?(@gott_file)
+  end
+
+  def check_uploaded_wort
+    unless @uploaded_wort == nil
+
+      @wort_file    = "public/uploads/#{@uploaded_wort.original_filename}"
+      tmp_wort_file = "public/uploads/tmp_#{@uploaded_wort.original_filename}"
+
+      File.open(tmp_wort_file, 'wb') do |file|
+        file.write(@uploaded_wort.read)
+      end
+
+      excel               = Roo::Excel.new(tmp_wort_file)
+      excel.default_sheet = excel.sheets.second
+
+      @upload.errors.add(:wort, "1. Überschrift in Worttabelle sollte 'Lemma' sein") if excel.cell(1, 1) != "Lemma"
+      @upload.errors.add(:wort, "2. Überschrift in Worttabelle sollte 'deutsch' sein") if excel.cell(1, 2) != "deutsch"
+      @upload.errors.add(:wort, "3. Überschrift in Worttabelle sollte 'IDS' sein") if excel.cell(1, 3) != "IDS"
+      @upload.errors.add(:wort, "4. Überschrift in Worttabelle sollte 'Weiteres' sein") if excel.cell(1, 4) != "Weiteres"
+      @upload.errors.add(:wort, "5. Überschrift in Worttabelle sollte 'BelegstellenEdfu' sein") if excel.cell(1, 5) != "BelegstellenEdfu"
+      @upload.errors.add(:wort, "6. Überschrift in Worttabelle sollte 'BelegstellenWb' sein") if excel.cell(1, 6) != "BelegstellenWb"
+      @upload.errors.add(:wort, "7. Überschrift in Worttabelle sollte 'Anmerkungen' sein") if excel.cell(1, 7) != "Anmerkungen"
+
+      if @upload.errors[:wort].size > 0
+        @wort_errors = true
+        File.delete(tmp_wort_file)
+      else
+        File.rename(tmp_wort_file, @wort_file)
+      end
+    end
+    @wort_exist = File.exist?(@wort_file)
   end
 
 
@@ -94,6 +254,7 @@ class UploadsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def upload_params
     #params.require(:upload).permit(:formular, :ort, :gott, :wort)
+    params.permit(:formular, :ort, :gott, :wort)
   end
 
   def process_files

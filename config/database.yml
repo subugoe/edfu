@@ -25,7 +25,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: 5
+  pool: 15
   username: postgres
   password: postgres
   #host: localhost   # for local execution
@@ -36,13 +36,13 @@ development:
   <<: *default
   encoding: unicode
   database: edfudb_dev
-  pool: 5
+  pool: 15
 
 test:
   <<: *default
   encoding: unicode
   database: edfudb_test
-  pool: 5
+  pool: 15
 
 production:
   <<: *default

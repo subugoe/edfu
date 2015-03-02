@@ -28,4 +28,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'Szene', 'Szenen'
   inflect.irregular 'Szenebild', 'Szenebilder'
   inflect.irregular 'Edfulog', 'Edfulogs'
+  inflect.irregular 'Fehler', 'Fehler'
 end
