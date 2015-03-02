@@ -30,6 +30,9 @@ class UploadsController < ApplicationController
   def create
 
     @upload = Upload.new(upload_params)
+    empty   = false
+
+    @status = EdfuStatus.create(email: current_user.email, status: "(letzter Import ist noch in Arbeit.)")
 
     if (params[:upload] != nil)
 
@@ -54,6 +57,7 @@ class UploadsController < ApplicationController
       end
     else
       @upload.errors[:base] << "Keine Dateien übergeben"
+      empty = true
     end
 
 
@@ -64,30 +68,31 @@ class UploadsController < ApplicationController
     n = 50000
 
 
-    if (@formular_exist && @ort_exist && @gott_exist && @wort_exist &&
-        !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
-      async.process_files
-      # #process_files
-      correct_upload = true
-    else
-      if !@formular_exist
-        @upload.errors[:base] << "Keine (korrekte) Formularetabelle vorhanden"
+    if !empty
+      if (@formular_exist && @ort_exist && @gott_exist && @wort_exist &&
+          !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
+        async.process_files
+        # #process_files
+        correct_upload = true
+      else
+        if !@formular_exist
+          @upload.errors[:base] << "Keine (korrekte) Formularetabelle vorhanden"
+        end
+
+        if !@ort_exist
+          @upload.errors[:base] << "Keine (korrekte) Ortetabelle vorhanden"
+        end
+
+        if !@gott_exist
+          @upload.errors[:base] << "Keine (korrekte) Göttertabelle vorhanden"
+        end
+
+        if !@wort_exist
+          @upload.errors[:base] << "Keine (korrekte) Wortetabelle vorhanden"
+        end
+
+        correct_upload = false
       end
-
-      if !@ort_exist
-        @upload.errors[:base] << "Keine (korrekte) Ortetabelle vorhanden"
-      end
-
-      if !@gott_exist
-        @upload.errors[:base] << "Keine (korrekte) Göttertabelle vorhanden"
-      end
-
-      if !@wort_exist
-        @upload.errors[:base] << "Keine (korrekte) Wortetabelle vorhanden"
-      end
-
-      correct_upload = false
-
     end
 
     respond_to do |format|
@@ -298,6 +303,8 @@ class UploadsController < ApplicationController
 
       }
     end
+
+    @status.delete
 
   end
 
@@ -586,7 +593,7 @@ class UploadsController < ApplicationController
 
       iStelle = row[0] ||= ''
 
-      uid  = Integer(row[5]) || ''
+      uid = Integer(row[5]) || ''
 
       o    = Ort.new
       o.id = ActiveRecord::Base.connection.execute("select nextval('orte_id_seq')").first['nextval']
