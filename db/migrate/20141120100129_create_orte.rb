@@ -4,7 +4,7 @@ class CreateOrte < ActiveRecord::Migration
       t.string :uid
       #t.string :bandseitezeile
       t.string :transliteration
-      #t.string :transliteration_nosuffix
+      t.string :transliteration_nosuffix
       t.string :ort
       t.string :lokalisation
       t.string :anmerkung

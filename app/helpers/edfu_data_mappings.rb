@@ -142,4 +142,11 @@ module EdfuDataMappings
   #   ]
   # end
 
+
+  def removeSuffix(transliteration)
+    #nosuffix = transliteration.gsub(/(\.[^aeiou][^ ]*)/, '')
+    nosuffix = transliteration.gsub(/(\.[^aeiou][^ -]*)/, '')
+    return nosuffix
+  end
+
 end

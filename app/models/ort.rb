@@ -10,13 +10,13 @@ class Ort < ActiveRecord::Base
 
   attr_accessor :szenen
 
-  def transliteration_nosuffix
-    return self.transliteration
-  end
-
-  def transliteration_nosuffix= tn
-    self.transliteration= tn
-  end
+  # def transliteration_nosuffix
+  #   return self.transliteration
+  # end
+  #
+  # def transliteration_nosuffix= tn
+  #   self.transliteration= tn
+  # end
 
   def to_solr_string
 
@@ -26,7 +26,7 @@ class Ort < ActiveRecord::Base
     h = {
         :sql_uid                  => self[:uid],
         :transliteration          => self[:transliteration],
-        :transliteration_nosuffix => self[:transliteration],
+        :transliteration_nosuffix => self[:transliteration_nosuffix],
         :ort                      => self[:ort],
         :lokalisation             => self[:lokalisation],
         :anmerkung                => self[:anmerkung],
@@ -37,7 +37,7 @@ class Ort < ActiveRecord::Base
 
     # --- add stellen
 
-    h.merge!(stellenHash(model, spalte, :transliteration))
+    h.merge!(stellenHash(model, spalte, self[:transliteration]))
 
     # --- add szene
 

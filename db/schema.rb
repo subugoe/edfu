@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 20150302231551) do
   create_table "goetter", force: :cascade do |t|
     t.string "uid"
     t.string "transliteration"
+    t.string "transliteration_nosuffix"
     t.string "ort"
     t.string "eponym"
     t.string "beziehung"
@@ -84,6 +85,7 @@ ActiveRecord::Schema.define(version: 20150302231551) do
   create_table "orte", force: :cascade do |t|
     t.string "uid"
     t.string "transliteration"
+    t.string "transliteration_nosuffix"
     t.string "ort"
     t.string "lokalisation"
     t.string "anmerkung"

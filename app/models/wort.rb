@@ -19,7 +19,7 @@ class Wort < ActiveRecord::Base
     h = {
         :sql_uid                  => self[:uid],
         :transliteration          => self[:transliteration],
-        :transliteration_nosuffix => self[:transliteration],
+        :transliteration_nosuffix => self[:transliteration_nosuffix],
         :uebersetzung             => self[:uebersetzung],
         :hieroglyph               => self[:hieroglyph],
         :weiteres                 => self[:weiteres],

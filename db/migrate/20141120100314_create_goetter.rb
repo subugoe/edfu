@@ -3,7 +3,7 @@ class CreateGoetter < ActiveRecord::Migration
     create_table :goetter do |t|
       t.string :uid
       t.string :transliteration
-      # t.string :transliteration_nosuffix
+      t.string :transliteration_nosuffix
       t.string :ort
       t.string :eponym
       t.string :beziehung

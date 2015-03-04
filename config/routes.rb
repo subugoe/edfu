@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  get 'edfu_status/status'
+
+  get 'edfu_log/status'
+
   devise_for :users
   # devise_for :admin_users, ActiveAdmin::Devise.config
   # ActiveAdmin.routes(self)
@@ -30,10 +34,16 @@ Rails.application.routes.draw do
     root 'uploads#new'
   end
 
+  # get "404", :to => "uploads#new"
+  # get "/422", :to => "uploads#new"
+  # get "/500", :to => "uploads#new"
+  # get "/505", :to => "uploads#new"
+
+  #resources :uploads, only: [:new, :create]
 
   get 'uploads/', to: 'uploads#new'
   post 'uploads/', to: 'uploads#create'
-
+  #
   get 'uploads/new/', to: 'uploads#new'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)

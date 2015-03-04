@@ -29,10 +29,10 @@ class UploadsController < ApplicationController
   # POST /uploads.json
   def create
 
+
     @upload = Upload.new(upload_params)
     empty   = false
 
-    @status = EdfuStatus.create(email: current_user.email, status: "(letzter Import ist noch in Arbeit.)")
 
     if (params[:upload] != nil)
 
@@ -71,6 +71,7 @@ class UploadsController < ApplicationController
     if !empty
       if (@formular_exist && @ort_exist && @gott_exist && @wort_exist &&
           !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
+
         async.process_files
         # #process_files
         correct_upload = true
@@ -263,6 +264,8 @@ class UploadsController < ApplicationController
 
   def process_files
 
+    @status = EdfuStatus.create(email: current_user.email, status: "(letzter Import ist noch in Arbeit.)")
+
     Benchmark.bm(7) do |x|
       x.report("processing:") {
 
@@ -403,7 +406,7 @@ class UploadsController < ApplicationController
 
       i += 1
 
-      # not process the header
+      # do not process the header
       if i==1
         next
       end
@@ -434,7 +437,6 @@ class UploadsController < ApplicationController
 
         Edfulog.new("ERROR", "UploadController-FL", "Keine UniqueId in Formular Tabelle vorhanden (Zeile #{i})", '', '', '', '')
       end
-
 
       f    = Formular.new
       f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
@@ -600,6 +602,7 @@ class UploadsController < ApplicationController
 
       o.uid             = uid
       o.transliteration = row[1] || ''
+      o.transliteration_nosuffix = removeSuffix(row[1]) || ''
       o.ort             = row[2] || ''
       o.lokalisation    = row[3] || ''
       o.anmerkung       = row[4] || ''
@@ -677,7 +680,7 @@ class UploadsController < ApplicationController
 
       g.uid                      = uid
       g.transliteration          = row[1] || ''
-      g.transliteration_nosuffix = row[1] || ''
+      g.transliteration_nosuffix = removeSuffix(row[1]) || ''
       g.ort                      = row[2] || ''
       g.eponym                   = row[3] || ''
       g.beziehung                = row[4] || ''
@@ -817,7 +820,7 @@ class UploadsController < ApplicationController
 
       w.uid                      = uid
       w.transliteration          = row[0] || ''
-      w.transliteration_nosuffix = row[0] || ''
+      w.transliteration_nosuffix = removeSuffix(row[0]) || ''
       w.uebersetzung             = row[1] || ''
       w.hieroglyph               = hierogl || ''
       w.weiteres                 = row[3] || ''
@@ -1133,5 +1136,6 @@ class UploadsController < ApplicationController
     end
 
   end
+
 
 end

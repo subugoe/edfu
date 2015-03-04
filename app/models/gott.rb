@@ -9,7 +9,7 @@ class Gott < ActiveRecord::Base
 
   has_many :stellen, as: :zugehoerigZu, :dependent => :delete_all
 
-  attr_accessor :transliteration_nosuffix, :szenen
+  attr_accessor :szenen
 
 
   def to_solr_string
@@ -20,7 +20,7 @@ class Gott < ActiveRecord::Base
     h = {
         :sql_uid                  => self[:uid],
         :transliteration          => self[:transliteration],
-        :transliteration_nosuffix => self[:transliteration],
+        :transliteration_nosuffix => self[:transliteration_nosuffix],
         :ort                      => self[:ort],
         :eponym                   => self[:eponym],
         :beziehung                => self[:beziehung],
