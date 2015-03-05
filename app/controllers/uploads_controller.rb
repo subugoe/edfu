@@ -264,7 +264,7 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    @status = EdfuStatus.create(email: current_user.email, status: "(letzter Import ist noch in Arbeit.)")
+    @status = EdfuStatus.create(email: current_user.email, status: "running",  message: "Aktueller Import ist in Arbeit.*")
 
     Benchmark.bm(7) do |x|
       x.report("processing:") {
@@ -307,7 +307,9 @@ class UploadsController < ApplicationController
       }
     end
 
-    @status.delete
+    @status.status = "finished"
+    @status.message = "Import beendet"
+    @status.save
 
   end
 
