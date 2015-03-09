@@ -12,6 +12,10 @@ defaults: &defaults
     -
       user_name: beucke@edfu.de
       user_password: b_edfu_import
+  edfu_formular_sheet: Tabelle1
+  edfu_topo_sheet: Tabelle1
+  edfu_god_sheet: Tabelle1
+  edfu_word_sheet: Tabelle1
 
 development:
   <<: *defaults

@@ -6,4 +6,5 @@
 
 <%= render 'form' %>
 
-<p id="edfustatus"><%= EdfuStatus.last.status if EdfuStatus.last %></p>
+<p id="edfustatus"></p>
+<%= EdfuStatus.last.status if EdfuStatus.last %></p>

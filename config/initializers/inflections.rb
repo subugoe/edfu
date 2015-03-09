@@ -31,4 +31,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular 'Fehler', 'Fehler'
   #inflect.irregular 'Status', 'Status'
   inflect.irregular 'EdfuStatus', 'EdfuStatus'
+  inflect.irregular 'Bild', 'Bilder'
 end

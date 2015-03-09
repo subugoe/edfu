@@ -19,6 +19,8 @@ class UploadsController < ApplicationController
   SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
   SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT']
 
+
+
   # GET /uploads/new
   def new
     @upload = Upload.new
@@ -29,6 +31,7 @@ class UploadsController < ApplicationController
   # POST /uploads.json
   def create
 
+    @config = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
 
     @upload = Upload.new(upload_params)
     empty   = false
@@ -117,19 +120,29 @@ class UploadsController < ApplicationController
         file.write(@uploaded_formular.read)
       end
 
-      excel               = Roo::Excel.new(tmp_formular_file)
-      excel.default_sheet = excel.sheets.first
+      ext = File.extname(tmp_formular_file)
 
-      @upload.errors.add(:formular, "1. Überschrift in Formulartabelle sollte 'TEXTMITSUF' sein") if excel.cell(1, 1) != "TEXTMITSUF"
-      @upload.errors.add(:formular, "2. Überschrift in Formulartabelle sollte 'BAND' sein") if excel.cell(1, 2) != "BAND"
-      @upload.errors.add(:formular, "3. Überschrift in Formulartabelle sollte 'SEITEZEILE' sein") if excel.cell(1, 3) != "SEITEZEILE"
-      @upload.errors.add(:formular, "4. Überschrift in Formulartabelle sollte 'TEXTOHNESU' sein") if excel.cell(1, 4) != "TEXTOHNESU"
-      @upload.errors.add(:formular, "5. Überschrift in Formulartabelle sollte 'TEXTDEUTSC' sein") if excel.cell(1, 5) != "TEXTDEUTSC"
-      @upload.errors.add(:formular, "6. Überschrift in Formulartabelle sollte 'TEXTTYP' sein") if excel.cell(1, 6) != "TEXTTYP"
-      @upload.errors.add(:formular, "7. Überschrift in Formulartabelle sollte 'Photo' sein") if excel.cell(1, 7) != "Photo"
-      @upload.errors.add(:formular, "8. Überschrift in Formulartabelle sollte 'SzenenID' sein") if excel.cell(1, 8) != "SzenenID"
-      @upload.errors.add(:formular, "9. Überschrift in Formulartabelle sollte 'SekLit' sein") if excel.cell(1, 9) != "SekLit"
-      @upload.errors.add(:formular, "10. Überschrift in Formulartabelle sollte 'UniqueID' sein") if excel.cell(1, 10) != "UniqueID"
+      if ext == ".xls"
+        @formular_excel = Roo::Excel.new(tmp_formular_file)
+      elsif ext == ".xlsx"
+        @formular_excel = Roo::Excelx.new(tmp_formular_file)
+      else
+        @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
+      end
+
+      sheet = @config['edfu_formular_sheet']
+      @formular_excel.default_sheet = sheet
+
+      @upload.errors.add(:formular, "1. Überschrift in Formulartabelle sollte 'TEXTMITSUF' sein") if @formular_excel.cell(1, 1) != "TEXTMITSUF"
+      @upload.errors.add(:formular, "2. Überschrift in Formulartabelle sollte 'BAND' sein") if @formular_excel.cell(1, 2) != "BAND"
+      @upload.errors.add(:formular, "3. Überschrift in Formulartabelle sollte 'SEITEZEILE' sein") if @formular_excel.cell(1, 3) != "SEITEZEILE"
+      @upload.errors.add(:formular, "4. Überschrift in Formulartabelle sollte 'TEXTOHNESU' sein") if @formular_excel.cell(1, 4) != "TEXTOHNESU"
+      @upload.errors.add(:formular, "5. Überschrift in Formulartabelle sollte 'TEXTDEUTSC' sein") if @formular_excel.cell(1, 5) != "TEXTDEUTSC"
+      @upload.errors.add(:formular, "6. Überschrift in Formulartabelle sollte 'TEXTTYP' sein") if @formular_excel.cell(1, 6) != "TEXTTYP"
+      @upload.errors.add(:formular, "7. Überschrift in Formulartabelle sollte 'Photo' sein") if @formular_excel.cell(1, 7) != "Photo"
+      @upload.errors.add(:formular, "8. Überschrift in Formulartabelle sollte 'SzenenID' sein") if @formular_excel.cell(1, 8) != "SzenenID"
+      @upload.errors.add(:formular, "9. Überschrift in Formulartabelle sollte 'SekLit' sein") if @formular_excel.cell(1, 9) != "SekLit"
+      @upload.errors.add(:formular, "10. Überschrift in Formulartabelle sollte 'UniqueID' sein") if @formular_excel.cell(1, 10) != "UniqueID"
 
       if @upload.errors[:formular].size > 0
         @formular_errors = true
@@ -152,15 +165,25 @@ class UploadsController < ApplicationController
         file.write(@uploaded_ort.read)
       end
 
-      excel               = Roo::Excel.new(tmp_ort_file)
-      excel.default_sheet = excel.sheets.first
+      ext = File.extname(tmp_ort_file)
 
-      @upload.errors.add(:ort, "1. Überschrift in Orttabelle sollte 'STELLE' sein") if excel.cell(1, 1) != "STELLE"
-      @upload.errors.add(:ort, "2. Überschrift in Orttabelle sollte 'TRANS' sein") if excel.cell(1, 2) != "TRANS"
-      @upload.errors.add(:ort, "3. Überschrift in Orttabelle sollte 'ORT' sein") if excel.cell(1, 3) != "ORT"
-      @upload.errors.add(:ort, "4. Überschrift in Orttabelle sollte 'LOK' sein") if excel.cell(1, 4) != "LOK"
-      @upload.errors.add(:ort, "5. Überschrift in Orttabelle sollte 'ANM' sein") if excel.cell(1, 5) != "ANM"
-      @upload.errors.add(:ort, "6. Überschrift in Orttabelle sollte 'UniqueID' sein") if excel.cell(1, 6) != "UniqueID"
+      if ext == ".xls"
+        @ort_excel = Roo::Excel.new(tmp_ort_file)
+      elsif ext == ".xlsx"
+        @ort_excel = Roo::Excelx.new(tmp_ort_file)
+      else
+        @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
+      end
+
+      sheet = @config['edfu_topo_sheet']
+      @ort_excel.default_sheet = sheet
+
+      @upload.errors.add(:ort, "1. Überschrift in Orttabelle sollte 'STELLE' sein") if @ort_excel.cell(1, 1) != "STELLE"
+      @upload.errors.add(:ort, "2. Überschrift in Orttabelle sollte 'TRANS' sein") if @ort_excel.cell(1, 2) != "TRANS"
+      @upload.errors.add(:ort, "3. Überschrift in Orttabelle sollte 'ORT' sein") if @ort_excel.cell(1, 3) != "ORT"
+      @upload.errors.add(:ort, "4. Überschrift in Orttabelle sollte 'LOK' sein") if @ort_excel.cell(1, 4) != "LOK"
+      @upload.errors.add(:ort, "5. Überschrift in Orttabelle sollte 'ANM' sein") if @ort_excel.cell(1, 5) != "ANM"
+      @upload.errors.add(:ort, "6. Überschrift in Orttabelle sollte 'UniqueID' sein") if @ort_excel.cell(1, 6) != "UniqueID"
 
       if @upload.errors[:ort].size > 0
         @ort_errors = true
@@ -183,19 +206,29 @@ class UploadsController < ApplicationController
         file.write(@uploaded_gott.read)
       end
 
-      excel               = Roo::Excel.new(tmp_gott_file)
-      excel.default_sheet = excel.sheets.first
+      ext = File.extname(tmp_gott_file)
 
-      @upload.errors.add(:gott, "1. Überschrift in Gotttabelle sollte 'PRIMARY' sein") if excel.cell(1, 1) != "PRIMARY"
-      @upload.errors.add(:gott, "2. Überschrift in Gotttabelle sollte 'NAME' sein") if excel.cell(1, 2) != "NAME"
-      @upload.errors.add(:gott, "3. Überschrift in Gotttabelle sollte 'ORT' sein") if excel.cell(1, 3) != "ORT"
-      @upload.errors.add(:gott, "4. Überschrift in Gotttabelle sollte 'EPON' sein") if excel.cell(1, 4) != "EPON"
-      @upload.errors.add(:gott, "5. Überschrift in Gotttabelle sollte 'BEZ' sein") if excel.cell(1, 5) != "BEZ"
-      @upload.errors.add(:gott, "6. Überschrift in Gotttabelle sollte 'FKT' sein") if excel.cell(1, 6) != "FKT"
-      @upload.errors.add(:gott, "7. Überschrift in Gotttabelle sollte 'BND' sein") if excel.cell(1, 7) != "BND"
-      @upload.errors.add(:gott, "8. Überschrift in Gotttabelle sollte 'SEITEZEILE' sein") if excel.cell(1, 8) != "SEITEZEILE"
-      @upload.errors.add(:gott, "9. Überschrift in Gotttabelle sollte 'ANM' sein") if excel.cell(1, 9) != "ANM"
-      @upload.errors.add(:gott, "10. Überschrift in Gotttabelle sollte 'UniqueID' sein") if excel.cell(1, 10) != "UniqueID"
+      if ext == ".xls"
+        @gott_excel = Roo::Excel.new(tmp_gott_file)
+      elsif ext == ".xlsx"
+        @gott_excel = Roo::Excelx.new(tmp_gott_file)
+      else
+        @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
+      end
+
+      sheet = @config['edfu_god_sheet']
+      @gott_excel.default_sheet = sheet
+
+      @upload.errors.add(:gott, "1. Überschrift in Gotttabelle sollte 'PRIMARY' sein") if @gott_excel.cell(1, 1) != "PRIMARY"
+      @upload.errors.add(:gott, "2. Überschrift in Gotttabelle sollte 'NAME' sein") if @gott_excel.cell(1, 2) != "NAME"
+      @upload.errors.add(:gott, "3. Überschrift in Gotttabelle sollte 'ORT' sein") if @gott_excel.cell(1, 3) != "ORT"
+      @upload.errors.add(:gott, "4. Überschrift in Gotttabelle sollte 'EPON' sein") if @gott_excel.cell(1, 4) != "EPON"
+      @upload.errors.add(:gott, "5. Überschrift in Gotttabelle sollte 'BEZ' sein") if @gott_excel.cell(1, 5) != "BEZ"
+      @upload.errors.add(:gott, "6. Überschrift in Gotttabelle sollte 'FKT' sein") if @gott_excel.cell(1, 6) != "FKT"
+      @upload.errors.add(:gott, "7. Überschrift in Gotttabelle sollte 'BND' sein") if @gott_excel.cell(1, 7) != "BND"
+      @upload.errors.add(:gott, "8. Überschrift in Gotttabelle sollte 'SEITEZEILE' sein") if @gott_excel.cell(1, 8) != "SEITEZEILE"
+      @upload.errors.add(:gott, "9. Überschrift in Gotttabelle sollte 'ANM' sein") if @gott_excel.cell(1, 9) != "ANM"
+      @upload.errors.add(:gott, "10. Überschrift in Gotttabelle sollte 'UniqueID' sein") if @gott_excel.cell(1, 10) != "UniqueID"
 
       if @upload.errors[:gott].size > 0
         @gott_errors = true
@@ -217,16 +250,27 @@ class UploadsController < ApplicationController
         file.write(@uploaded_wort.read)
       end
 
-      excel               = Roo::Excel.new(tmp_wort_file)
-      excel.default_sheet = excel.sheets.second
 
-      @upload.errors.add(:wort, "1. Überschrift in Worttabelle sollte 'Lemma' sein") if excel.cell(1, 1) != "Lemma"
-      @upload.errors.add(:wort, "2. Überschrift in Worttabelle sollte 'deutsch' sein") if excel.cell(1, 2) != "deutsch"
-      @upload.errors.add(:wort, "3. Überschrift in Worttabelle sollte 'IDS' sein") if excel.cell(1, 3) != "IDS"
-      @upload.errors.add(:wort, "4. Überschrift in Worttabelle sollte 'Weiteres' sein") if excel.cell(1, 4) != "Weiteres"
-      @upload.errors.add(:wort, "5. Überschrift in Worttabelle sollte 'BelegstellenEdfu' sein") if excel.cell(1, 5) != "BelegstellenEdfu"
-      @upload.errors.add(:wort, "6. Überschrift in Worttabelle sollte 'BelegstellenWb' sein") if excel.cell(1, 6) != "BelegstellenWb"
-      @upload.errors.add(:wort, "7. Überschrift in Worttabelle sollte 'Anmerkungen' sein") if excel.cell(1, 7) != "Anmerkungen"
+      ext = File.extname(tmp_wort_file)
+
+      if ext == ".xls"
+        @wort_excel = Roo::Excel.new(tmp_wort_file)
+      elsif ext == ".xlsx"
+        @wort_excel = Roo::Excelx.new(tmp_wort_file)
+      else
+        @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
+      end
+
+      sheet = @config['edfu_word_sheet']
+      @wort_excel.default_sheet = sheet
+
+      @upload.errors.add(:wort, "1. Überschrift in Worttabelle sollte 'Lemma' sein") if @wort_excel.cell(1, 1) != "Lemma"
+      @upload.errors.add(:wort, "2. Überschrift in Worttabelle sollte 'deutsch' sein") if @wort_excel.cell(1, 2) != "deutsch"
+      @upload.errors.add(:wort, "3. Überschrift in Worttabelle sollte 'IDS' sein") if @wort_excel.cell(1, 3) != "IDS"
+      @upload.errors.add(:wort, "4. Überschrift in Worttabelle sollte 'Weiteres' sein") if @wort_excel.cell(1, 4) != "Weiteres"
+      @upload.errors.add(:wort, "5. Überschrift in Worttabelle sollte 'BelegstellenEdfu' sein") if @wort_excel.cell(1, 5) != "BelegstellenEdfu"
+      @upload.errors.add(:wort, "6. Überschrift in Worttabelle sollte 'BelegstellenWb' sein") if @wort_excel.cell(1, 6) != "BelegstellenWb"
+      @upload.errors.add(:wort, "7. Überschrift in Worttabelle sollte 'Anmerkungen' sein") if @wort_excel.cell(1, 7) != "Anmerkungen"
 
       if @upload.errors[:wort].size > 0
         @wort_errors = true
@@ -264,7 +308,7 @@ class UploadsController < ApplicationController
 
   def process_files
 
-    @status = EdfuStatus.create(email: current_user.email, status: "running",  message: "Aktueller Import ist in Arbeit.*")
+    @status = EdfuStatus.create(email: current_user.email, status: "running", message: "Aktueller Import in Arbeit.")
 
     Benchmark.bm(7) do |x|
       x.report("processing:") {
@@ -307,8 +351,8 @@ class UploadsController < ApplicationController
       }
     end
 
-    @status.status = "finished"
-    @status.message = "Import beendet"
+    @status.status  = "finished"
+    @status.message = "Kein Import im Bearbeitung."
     @status.save
 
   end
@@ -401,10 +445,11 @@ class UploadsController < ApplicationController
     @stelle_szene_batch       = Array.new if @stelle_szene_batch == nil
 
     # excel               = Roo::Excel.new("public/uploads/Formular.xls")
-    excel                     = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
-    excel.default_sheet       = excel.sheets.first
+    #excel                     = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
+    #excel.default_sheet       = excel.sheets.first
 
-    excel.each do |row|
+
+    @formular_excel.each do |row|
 
       i += 1
 
@@ -428,7 +473,7 @@ class UploadsController < ApplicationController
         szID = ''
       end
 
-      #break if i==30
+      #break if i==1000
 
       # if uid doesn't exist
       if row[9] != nil and row[9] != ''
@@ -573,17 +618,17 @@ class UploadsController < ApplicationController
 
 
     # excel               = Roo::Excel.new("public/uploads/Topo.xls")
-    excel               = Roo::Excel.new("public/uploads/#{@uploaded_ort.original_filename}")
-    excel.default_sheet = excel.sheets.first
-    i                   = 0
+    # excel               = Roo::Excel.new("public/uploads/#{@uploaded_ort.original_filename}")
+    # excel.default_sheet = excel.sheets.first
 
+    i                   = 0
     max_batch_size      = 500
     @ort_batch          = Array.new
     @ort_solr_batch     = Array.new
     # @stelle_batch             = Array.new if @stelle_batch == nil
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
-    excel.each do |row|
+    @ort_excel.each do |row|
 
       i += 1
 
@@ -602,12 +647,12 @@ class UploadsController < ApplicationController
       o    = Ort.new
       o.id = ActiveRecord::Base.connection.execute("select nextval('orte_id_seq')").first['nextval']
 
-      o.uid             = uid
-      o.transliteration = row[1] || ''
+      o.uid                      = uid
+      o.transliteration          = row[1] || ''
       o.transliteration_nosuffix = removeSuffix(row[1]) || ''
-      o.ort             = row[2] || ''
-      o.lokalisation    = row[3] || ''
-      o.anmerkung       = row[4] || ''
+      o.ort                      = row[2] || ''
+      o.lokalisation             = row[3] || ''
+      o.anmerkung                = row[4] || ''
 
 
       if (iStelle == '')
@@ -643,10 +688,10 @@ class UploadsController < ApplicationController
 
 
     # excel               = Roo::Excel.new("public/uploads/Gods.xls")
-    excel               = Roo::Excel.new("public/uploads/#{@uploaded_gott.original_filename}")
-    excel.default_sheet = excel.sheets.first
-    i                   = 0
+    # excel               = Roo::Excel.new("public/uploads/#{@uploaded_gott.original_filename}")
+    # excel.default_sheet = excel.sheets.first
 
+    i                   = 0
     max_batch_size      = 500
     @gott_batch         = Array.new
     @gott_solr_batch    = Array.new
@@ -654,7 +699,7 @@ class UploadsController < ApplicationController
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
 
-    excel.each do |row|
+    @gott_excel.each do |row|
 
       i += 1
 
@@ -762,11 +807,12 @@ class UploadsController < ApplicationController
   def process_wort
 
     #excel               = Roo::Excel.new("public/uploads/Woerterliste.xls")
-    excel               = Roo::Excel.new("public/uploads/#{@uploaded_wort.original_filename}")
+    #excel               = Roo::Excel.new("public/uploads/#{@uploaded_wort.original_filename}")
 
     # todo: nun mal die zweite Tabelle !!!
     #excel.default_sheet = excel.sheets.first
-    excel.default_sheet = excel.sheets.second
+    #excel.default_sheet = excel.sheets.second
+
     i                   = 0
     uniqueId            = false
 
@@ -778,7 +824,7 @@ class UploadsController < ApplicationController
     # @stelle_batch             = Array.new if @stelle_batch == nil
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
-    excel.each do |row|
+    @wort_excel.each do |row|
 
       i += 1
 
