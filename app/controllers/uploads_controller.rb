@@ -4,7 +4,7 @@ require 'roo'
 require 'securerandom'
 require 'benchmark'
 require 'csv'
-
+require 'fileutils'
 
 class UploadsController < ApplicationController
   include VerifyFormularHelper, VerifyOrtHelper, VerifyGottHelper, VerifyWortHelper, EdfuDataMappings, Celluloid
@@ -30,6 +30,14 @@ class UploadsController < ApplicationController
   # POST /uploads
   # POST /uploads.json
   def create
+
+    @status = EdfuStatus.create(email: current_user.email, status: "running", message: "Aktueller Import in Arbeit, bitte warten Sie.")
+
+    @uploaddir = "data/upload"
+    @uploadversiondir = "data/upload/versions/#{@status.id}"
+
+    FileUtils.mkdir_p(@uploaddir)
+    FileUtils.mkdir_p(@uploadversiondir)
 
     @config = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
 
@@ -76,8 +84,8 @@ class UploadsController < ApplicationController
           !(@formular_errors && @ort_errors && @gott_errors && @wort_errors))
 
         async.process_files
-        # #process_files
         correct_upload = true
+
       else
         if !@formular_exist
           @upload.errors[:base] << "Keine (korrekte) Formularetabelle vorhanden"
@@ -111,10 +119,10 @@ class UploadsController < ApplicationController
   def check_uploaded_formular
     unless @uploaded_formular == nil
 
-      @formular_file    = "public/uploads/#{@uploaded_formular.original_filename}"
-      tmp_formular_file = "public/uploads/tmp_#{@uploaded_formular.original_filename}"
+      @formular_file    = "#{@uploaddir}/#{@uploaded_formular.original_filename}"
+      tmp_formular_file = "#{@uploadversiondir}/#{@uploaded_formular.original_filename}"
 
-      File.delete(tmp_formular_file) if  File.exist?(tmp_formular_file)
+      #File.delete(tmp_formular_file) if  File.exist?(tmp_formular_file)
 
       File.open(tmp_formular_file, 'wb') do |file|
         file.write(@uploaded_formular.read)
@@ -146,9 +154,9 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:formular].size > 0
         @formular_errors = true
-        File.delete(tmp_formular_file)
+        #File.delete(tmp_formular_file)
       else
-        File.rename(tmp_formular_file, @formular_file)
+        FileUtils.cp(tmp_formular_file, @formular_file)
       end
 
     end
@@ -158,8 +166,8 @@ class UploadsController < ApplicationController
   def check_uploaded_ort
     unless @uploaded_ort == nil
 
-      @ort_file    = "public/uploads/#{@uploaded_ort.original_filename}"
-      tmp_ort_file = "public/uploads/tmp_#{@uploaded_ort.original_filename}"
+      @ort_file    = "#{@uploaddir}/#{@uploaded_ort.original_filename}"
+      tmp_ort_file = "#{@uploadversiondir}/#{@uploaded_ort.original_filename}"
 
       File.open(tmp_ort_file, 'wb') do |file|
         file.write(@uploaded_ort.read)
@@ -187,9 +195,9 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:ort].size > 0
         @ort_errors = true
-        File.delete(tmp_ort_file)
+        #File.delete(tmp_ort_file)
       else
-        File.rename(tmp_ort_file, @ort_file)
+        FileUtils.cp(tmp_ort_file, @ort_file)
       end
     end
     @ort_exist = File.exist?(@ort_file)
@@ -198,9 +206,8 @@ class UploadsController < ApplicationController
   def check_uploaded_gott
     unless @uploaded_gott == nil
 
-      @gott_file    = "public/uploads/#{@uploaded_gott.original_filename}"
-      tmp_gott_file = "public/uploads/tmp_#{@uploaded_gott.original_filename}"
-
+      @gott_file    = "#{@uploaddir}/#{@uploaded_gott.original_filename}"
+      tmp_gott_file = "#{@uploadversiondir}/#{@uploaded_gott.original_filename}"
 
       File.open(tmp_gott_file, 'wb') do |file|
         file.write(@uploaded_gott.read)
@@ -232,9 +239,9 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:gott].size > 0
         @gott_errors = true
-        File.delete(tmp_gott_file)
+        #File.delete(tmp_gott_file)
       else
-        File.rename(tmp_gott_file, @gott_file)
+        FileUtils.cp(tmp_gott_file, @gott_file)
       end
     end
     @gott_exist = File.exist?(@gott_file)
@@ -243,8 +250,8 @@ class UploadsController < ApplicationController
   def check_uploaded_wort
     unless @uploaded_wort == nil
 
-      @wort_file    = "public/uploads/#{@uploaded_wort.original_filename}"
-      tmp_wort_file = "public/uploads/tmp_#{@uploaded_wort.original_filename}"
+      @wort_file    = "#{@uploaddir}/#{@uploaded_wort.original_filename}"
+      tmp_wort_file = "#{@uploadversiondir}/#{@uploaded_wort.original_filename}"
 
       File.open(tmp_wort_file, 'wb') do |file|
         file.write(@uploaded_wort.read)
@@ -274,9 +281,9 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:wort].size > 0
         @wort_errors = true
-        File.delete(tmp_wort_file)
+        #File.delete(tmp_wort_file)
       else
-        File.rename(tmp_wort_file, @wort_file)
+        FileUtils.cp(tmp_wort_file, @wort_file)
       end
     end
     @wort_exist = File.exist?(@wort_file)
@@ -307,8 +314,6 @@ class UploadsController < ApplicationController
   end
 
   def process_files
-
-    @status = EdfuStatus.create(email: current_user.email, status: "running", message: "Aktueller Import in Arbeit.")
 
     Benchmark.bm(7) do |x|
       x.report("processing:") {
@@ -352,7 +357,7 @@ class UploadsController < ApplicationController
     end
 
     @status.status  = "finished"
-    @status.message = "Kein Import im Bearbeitung."
+    @status.message = "Letzter Import Abgeschlossen."
     @status.save
 
   end

@@ -16,5 +16,6 @@ task :create_default_user do
         email: user['user_name'],
         password: user['user_password'],
         password_confirmation: user['user_password'])
+
   end
 end

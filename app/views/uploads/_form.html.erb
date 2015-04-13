@@ -11,18 +11,19 @@
         </div>
     <% end %>
 
-    <%= f.file_field(:formular, label: "Formular:") %>
+    <%= f.file_field(:formular) %>
 
-    <%= f.file_field(:ort, label: "Ort:") %>
+    <%= f.file_field(:ort) %>
 
-    <%= f.file_field(:gott, label: "Gott:") %>
+    <%= f.file_field(:gott) %>
 
-    <%= f.file_field(:wort, label: "Wort:") %>
+    <%= f.file_field(:wort) %>
 
-    <!-- <%= f.email_field(:email, label: "E-Mail:") %> -->
+    <!-- <%= f.email_field(:email) %> -->
 
     <div class="actions form-group">
-        <%= f.submit "Import" %>
+        <%= f.submit("Import", id: "button_id")%>
     </div>
+    <span id="edfustatus"></span>
 
 <% end %>
