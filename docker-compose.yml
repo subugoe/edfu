@@ -1,0 +1,60 @@
+db:
+  image: postgres:9.4
+  # build: ./postgres
+  environment:
+    - POSTGRESQL_USER=postgres
+    - POSTGRESQL_PASS=postgres
+  ports:
+    - "5432:5432"
+
+redis:
+   image: redis:2.8.19
+   ports:
+     - "6379:6379"
+
+solr:   # change this an create your own solr image
+  image: makuk66/docker-solr
+  #command: /bin/bash -c '/opt/solr/bin/solr -e cloud; echo hit return to quit; read'
+  #hostname: solr
+  #domainname: localdomain
+  ports:
+    - "8983:8983"
+  volumes:
+    - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
+
+#nginx:
+#  image: nginx
+#  ports: 80:80
+
+web:
+  build: .
+  command: bundle exec puma  -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-production}
+  #command: bundle exec rails server -p 3000 -b 0.0.0.0
+  hostname: edfu
+  volumes:
+    - .:/edfu
+    - /opt/edfu/data/upload:edfu/data/upload
+  ports:
+    - "3000:3000"
+  links:
+    - db:db
+    - redis:redis
+    - solr:solr
+
+#haproxy:
+#  build: .
+#  command: .
+#  hostname: active-proxy
+#  volumes:
+#    - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+#  ports:
+#    - "80:80"
+
+
+
+#mongo:
+#  image: mongodb
+#  ports:
+#    - "28017:28017"
+#    - "27018:27018"
+#    - "27017:27017"
