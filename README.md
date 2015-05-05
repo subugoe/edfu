@@ -2,7 +2,7 @@
 
 * Install docker, fig, (boot2docker)
 * start the environment
-	* with boot2docker 
+	* with boot2docker (Windows, Moc OS)
 		* boot2docker init
 		* boot2docker start
 		* $(boot2docker shellinit) 

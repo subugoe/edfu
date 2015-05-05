@@ -1,12 +1,14 @@
 ## ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.17'
 
 source 'https://rubygems.org'
+ruby "2.2.1"
+
 
 # for spreadsheet processing
 gem 'roo', '~> 1.13.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 4.2.0'
+gem 'rails', '~> 4.2.1'
 
 # Use jdbcsqlite3 as the database for Active Record
 # gem 'activerecord-jdbcsqlite3-adapter',  group: :development
@@ -19,7 +21,7 @@ gem 'rails', '~> 4.2.0'
 gem 'pg', '~> 0.18.1'
 
 # gem 'puma'
-gem 'puma', '~> 2.11.0'
+gem 'puma', '~> 2.11.2' #, group: :production
 
 # supports batchimport
 gem 'activerecord-import', '~> 0.7.0'
