@@ -1,19 +1,5 @@
 #!/usr/bin/env ruby
 
-# Dir.chdir("/var/local/docker/edfu/")
-#Dir.chdir("/home/jenkins/edfu")
-#Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
-
-
-#puts "\nstop web container"
-#container = `docker ps`
-#container.lines { |container|
-#
-#  if container.include? "web"
-#    container_id = container.split[0]
-#    `docker stop #{container_id}`
-#  end
-#}
 
 puts "\ndocker-compose stop web"
 `docker-compose stop web`

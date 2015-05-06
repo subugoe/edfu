@@ -5,14 +5,6 @@
 require 'fileutils'
 
 
-#Dir.chdir("/var/local/docker/edfu/")
-#Dir.chdir("/home/jenkins/edfu")
-
-#FileUtils.mkdir_p("/opt/edfu/data")
-#Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
-
-puts Dir.getwd
-
 if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
