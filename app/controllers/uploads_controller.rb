@@ -72,10 +72,6 @@ class UploadsController < ApplicationController
     end
 
 
-    # logging format
-    # betrifft,   text,       spalte, original, neu,  uid
-    # [FL],       ändere...,  ...,    ...,      ...,  ...
-
     n = 50000
 
 
@@ -122,7 +118,6 @@ class UploadsController < ApplicationController
       @formular_file    = "#{@uploaddir}/#{@uploaded_formular.original_filename}"
       tmp_formular_file = "#{@uploadversiondir}/#{@uploaded_formular.original_filename}"
 
-      #File.delete(tmp_formular_file) if  File.exist?(tmp_formular_file)
 
       File.open(tmp_formular_file, 'wb') do |file|
         file.write(@uploaded_formular.read)
@@ -154,7 +149,6 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:formular].size > 0
         @formular_errors = true
-        #File.delete(tmp_formular_file)
       else
         FileUtils.cp(tmp_formular_file, @formular_file)
       end
@@ -195,7 +189,6 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:ort].size > 0
         @ort_errors = true
-        #File.delete(tmp_ort_file)
       else
         FileUtils.cp(tmp_ort_file, @ort_file)
       end
@@ -239,7 +232,6 @@ class UploadsController < ApplicationController
 
       if @upload.errors[:gott].size > 0
         @gott_errors = true
-        #File.delete(tmp_gott_file)
       else
         FileUtils.cp(tmp_gott_file, @gott_file)
       end
@@ -302,14 +294,13 @@ class UploadsController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
+
   def set_upload
     @upload = Upload.find(params[:id])
   end
 
-  # Never trust parameters from the scary internet, only allow the white list through.
+
   def upload_params
-    #params.require(:upload).permit(:formular, :ort, :gott, :wort)
     params.permit(:formular, :ort, :gott, :wort)
   end
 
@@ -363,9 +354,6 @@ class UploadsController < ApplicationController
   end
 
   def deleteDB
-
-
-    # Rails.cache.clear
 
     Edfulog.delete_all
     Formular.delete_all
@@ -442,23 +430,18 @@ class UploadsController < ApplicationController
     @formular_solr_batch = Array.new
 
     @formular_batch           = Array.new
-    #@stelle_batch             = Array.new
     @photo_batch              = Array.new
     @literatur_batch          = Array.new
     @formular_photo_batch     = Array.new
     @formular_literatur_batch = Array.new
     @stelle_szene_batch       = Array.new if @stelle_szene_batch == nil
 
-    # excel               = Roo::Excel.new("public/uploads/Formular.xls")
-    #excel                     = Roo::Excel.new("public/uploads/#{@uploaded_formular.original_filename}")
-    #excel.default_sheet       = excel.sheets.first
 
 
     @formular_excel.each do |row|
 
       i += 1
 
-      # do not process the header
       if i==1
         next
       end
@@ -471,16 +454,12 @@ class UploadsController < ApplicationController
       band         = Integer(row[1]) || -1
 
 
-      # if SzeneID doesn't exist
       if row[7] != nil and row[7] != ''
         szID = Integer(row[7])
       else
         szID = ''
       end
 
-      #break if i==1000
-
-      # if uid doesn't exist
       if row[9] != nil and row[9] != ''
         uID = Integer(row[9])
       else
@@ -495,7 +474,6 @@ class UploadsController < ApplicationController
 
       f.uid                      = uID
       f.transliteration          = row[0] || ''
-      #f.band            = band
 
       f.transliteration_nosuffix = row[3] || ''
       f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
@@ -503,10 +481,7 @@ class UploadsController < ApplicationController
       f.szeneID                  = szID
 
       # --- Stellen
-
       s                          = create_stellen(seitezeile, band, uID)
-      # if s.class == Array
-      #   s = s[0]
 
       seiteStart                 = s.seite_start
       band                       = s.band
@@ -538,10 +513,6 @@ class UploadsController < ApplicationController
         }
 
       end
-
-      # @stelle_batch << s
-
-      #end
 
       s.zugehoerigZu = f
       f.stellen << s
@@ -592,8 +563,6 @@ class UploadsController < ApplicationController
         FormulareLiteraturen.import @formular_literatur_batch
         @formular_literatur_batch.clear
 
-        #Stelle.import @stelle_batch
-        #@stelle_batch.clear
 
         Photo.import @photo_batch
         @photo_batch.clear
@@ -607,7 +576,6 @@ class UploadsController < ApplicationController
 
     # --- write batches to db
 
-    # Stelle.import @stelle_batch if @stelle_batch.size > 0
     Photo.import @photo_batch if @photo_batch.size > 0
     Literatur.import @literatur_batch if @literatur_batch.size > 0
     FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
@@ -621,16 +589,11 @@ class UploadsController < ApplicationController
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
 
-
-    # excel               = Roo::Excel.new("public/uploads/Topo.xls")
-    # excel               = Roo::Excel.new("public/uploads/#{@uploaded_ort.original_filename}")
-    # excel.default_sheet = excel.sheets.first
-
     i                   = 0
     max_batch_size      = 500
     @ort_batch          = Array.new
     @ort_solr_batch     = Array.new
-    # @stelle_batch             = Array.new if @stelle_batch == nil
+
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
     @ort_excel.each do |row|
@@ -691,16 +654,10 @@ class UploadsController < ApplicationController
   # todo move to Gott-Model/Helper (Gods.xls)
   def process_gott
 
-
-    # excel               = Roo::Excel.new("public/uploads/Gods.xls")
-    # excel               = Roo::Excel.new("public/uploads/#{@uploaded_gott.original_filename}")
-    # excel.default_sheet = excel.sheets.first
-
     i                   = 0
     max_batch_size      = 500
     @gott_batch         = Array.new
     @gott_solr_batch    = Array.new
-    # @stelle_batch             = Array.new if @stelle_batch == nil
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
 
@@ -714,9 +671,7 @@ class UploadsController < ApplicationController
         next
       end
 
-
       #break if i==100
-
 
       uid        = Integer(row[9]) || ''
       seitezeile = row[7] || ''
@@ -747,8 +702,6 @@ class UploadsController < ApplicationController
         stelle.zugehoerigZu = g
         g.stellen << stelle
 
-
-        #---
 
 
         seiteStart = stelle.seite_start
@@ -781,12 +734,6 @@ class UploadsController < ApplicationController
 
         end
 
-        #@stelle_batch << stelle
-
-
-        #---
-
-
       }
 
       @gott_batch << g
@@ -811,12 +758,6 @@ class UploadsController < ApplicationController
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
 
-    #excel               = Roo::Excel.new("public/uploads/Woerterliste.xls")
-    #excel               = Roo::Excel.new("public/uploads/#{@uploaded_wort.original_filename}")
-
-    # todo: nun mal die zweite Tabelle !!!
-    #excel.default_sheet = excel.sheets.first
-    #excel.default_sheet = excel.sheets.second
 
     i                   = 0
     uniqueId            = false
@@ -918,11 +859,6 @@ class UploadsController < ApplicationController
 
         end
 
-        # todo: find a better place for initialization
-        # @stelle_batch = Array.new if @stelle_batch == nil
-        #@stelle_batch << stelle
-
-        #---
 
       }
 
@@ -975,21 +911,19 @@ class UploadsController < ApplicationController
       sz_arr << value_array
     }
 
-
     StellenSzenen.import sz_arr if sz_arr.size > 0
-    #@stelle_szene_batch.clear
+
 
   end
 
   def save_stellen
 
     @stelle_batch = Array.new
-    #@stelle_solr_batch = Array.new
+
 
     Stelle.stellen.each { |stelle|
 
       @stelle_batch << stelle
-      #@stelle_solr_batch << stelle.to_solr_string
 
     }
 
@@ -1004,15 +938,7 @@ class UploadsController < ApplicationController
 
     # Szeneninformation aus CSV Dateien (aus Imagemap)
 
-    #max_batch_size    = 1500
-    #szene_bildDict    = Hash.new
     bilderColumnDict = Hash.new
-    #@szene_solr_batch = Array.new
-
-    #@szenebilder_batch = Array.new
-    #@szene_batch       = Array.new
-    #@stelle_batch      = Array.new
-
 
     CSV.foreach("Daten/tempelplan.csv", :col_sep => ';') do |bildRow|
 
@@ -1069,8 +995,6 @@ class UploadsController < ApplicationController
 
           # --- stellen
 
-
-          # stellen    = nil
           band       = 0
           seiteStart = 0
 
@@ -1089,11 +1013,6 @@ class UploadsController < ApplicationController
               seiteStart = 0
             end
 
-            # stellen = Stelle.where(
-            #     band:        band,
-            #     seite_start: seiteStart
-            # )
-
           end
 
           # -- szenen
@@ -1102,13 +1021,6 @@ class UploadsController < ApplicationController
           unless nummer = row[columnDict['plate']]
             nummer = 0
           end
-
-          # if nummer.to_s.match(/[,\/\s]+/)
-          #   temp = nummer.to_i
-          #
-          #   Edfulog.new("ERROR", filePath, "Fehlerhafte Plate (Position #{columnDict['plate']+1}, Szenennummer='#{nummer}')", '', row, '', '')
-          #   nummer = temp
-          # end
 
 
           unless beschreibung = row[columnDict['description']]
@@ -1131,7 +1043,6 @@ class UploadsController < ApplicationController
           else
             polygon = ''
           end
-
 
           sz = Szene.fetch(
               nummer,
@@ -1160,35 +1071,14 @@ class UploadsController < ApplicationController
           )
 
 
-          # todo: szenen und stellen über stellen verbinden
-          # todo: szenen_stellen Tabelle mit anpassen
-          #sz.stellen << stellen unless stellen == nil
-
-          #sz.id = ActiveRecord::Base.connection.execute("select nextval('szenen_id_seq')").first['nextval']
-
-          # todo: per batch speichern
-          #sz.save
-
-          # todo: solr-batch erst nach verbindung mit stellen aufbauen (also ganz zum schluss)
-          #@szene_solr_batch << sz.to_solr_string
-
-
-          # if @szene_batch.size == max_batch_size
-          #   Szene.import @szene_batch if @szene_batch.size > 0
-          #   @szene_batch.clear
-          # end
-
         else
           # [betrifft],  text,       spalte, original, neu, uid
           Edfulog.new("ERROR", filePath, "Weniger als 12 Spalten", '', row, '', '')
         end
       end
 
-      #Szene.import @szene_batch if @szene_batch.size > 0
-
     end
 
   end
-
 
 end
