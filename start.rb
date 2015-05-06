@@ -6,10 +6,10 @@ require 'fileutils'
 
 
 #Dir.chdir("/var/local/docker/edfu/")
-Dir.chdir("/home/jenkins/edfu")
+#Dir.chdir("/home/jenkins/edfu")
 
 #FileUtils.mkdir_p("/opt/edfu/data")
-#Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
+Dir.chdir(File.expand_path(File.dirname(File.dirname(__FILE__))))
 
 
 
