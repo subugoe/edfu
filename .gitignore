@@ -33,7 +33,7 @@ lib/assets
 lib/tasks
 
 
-log/
+#log/
 *.log
 *log*
 
@@ -43,7 +43,7 @@ log/
 *.rbc
 capybara-*.html
 .rspec
-/log
+#/log
 /tmp
 /db/*.sqlite3
 /public/system
