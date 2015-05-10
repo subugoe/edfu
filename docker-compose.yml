@@ -6,21 +6,26 @@ db:
     - POSTGRESQL_PASS=postgres
   ports:
     - "5432:5432"
+  #volumes_from:
+  #  - storage
 
-redis:
-   image: redis:2.8.19
-   ports:
-     - "6379:6379"
 
-solr:   # change this an create your own solr image
-  image: makuk66/docker-solr
+solr:   # change this and create your own solr image
+  image: makuk66/docker-solr:4.10.4
   #command: /bin/bash -c '/opt/solr/bin/solr -e cloud; echo hit return to quit; read'
-  #hostname: solr
+  # hostname: solr
   #domainname: localdomain
   ports:
     - "8983:8983"
   volumes:
     - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
+  environment:
+    - JAVA_OPTS="-server -Xms512M -Xmx1792M -XX:MaxPermSize=768M"
+    #- RACK_ENV=development
+    #- PORT=3000
+    #- SESSION_SECRET=
+    #- DEBUG=true
+
 
 #nginx:
 #  image: nginx
