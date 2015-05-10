@@ -13,7 +13,7 @@ class Wort < ActiveRecord::Base
 
   def to_solr_string
 
-    model = "GL-Model"
+    model = "WL-Model"
     spalte = "BelegstelleEdfu"
 
     h = {
