@@ -619,7 +619,8 @@ class UploadsController < ApplicationController
 
       o.uid                      = uid
       o.transliteration          = row[1] || ''
-      o.transliteration_nosuffix = removeSuffix(row[1]) || ''
+      # o.transliteration_nosuffix = removeSuffix(row[1]) || ''
+      o.transliteration_nosuffix = ''
       o.ort                      = row[2] || ''
       o.lokalisation             = row[3] || ''
       o.anmerkung                = row[4] || ''
@@ -689,7 +690,8 @@ class UploadsController < ApplicationController
 
       g.uid                      = uid
       g.transliteration          = row[1] || ''
-      g.transliteration_nosuffix = removeSuffix(row[1]) || ''
+      #g.transliteration_nosuffix = removeSuffix(row[1]) || ''
+      g.transliteration_nosuffix = ''
       g.ort                      = row[2] || ''
       g.eponym                   = row[3] || ''
       g.beziehung                = row[4] || ''
@@ -816,7 +818,8 @@ class UploadsController < ApplicationController
 
       w.uid                      = uid
       w.transliteration          = row[0] || ''
-      w.transliteration_nosuffix = removeSuffix(row[0]) || ''
+      #w.transliteration_nosuffix = removeSuffix(row[0]) || ''
+      w.transliteration_nosuffix = ''
       w.uebersetzung             = row[1] || ''
       w.hieroglyph               = hierogl || ''
       w.weiteres                 = row[3] || ''
