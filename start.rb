@@ -16,5 +16,5 @@ puts "\ndocker-compose up -d"
 `docker-compose up -d`
 
 
-puts "\ndocker-compose run  web  rake db:drop db:create db:migrate create_default_user  RAILS_ENV='production'"
-`docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='production' `
+puts "\ndocker-compose run  web  rake db:drop db:create db:migrate create_default_user  RAILS_ENV='development'"
+`docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development' `
