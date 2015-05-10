@@ -98,7 +98,7 @@
 	* Komma separierte Auflistung einzelner Photos.
 	* Text
 	* Wenn vorhanden (z.B. Photo D03_225 = D03_225.jpg), dann Link erstellen.
-		* d.h. prüfen, ob Bild im Dateisystem vorhanden ist, nur Link erstellen, wenn Bild vorhanden<
+		* d.h. prüfen, ob Bild im Dateisystem vorhanden ist, nur Link erstellen, wenn Bild vorhanden
 		* Verzeichnisse vorhanden für:
 			* 2003
 			* 2005
