@@ -44,8 +44,14 @@ web:
     - "80:3000"
   links:
     - db:db
-    - redis:redis
     - solr:solr
+
+#storage:
+#  image: busybox
+#  volumes:
+#    - /var/lib/docker/storage
+#  command: true
+
 
 #haproxy:
 #  build: .
@@ -56,11 +62,3 @@ web:
 #  ports:
 #    - "80:80"
 
-
-
-#mongo:
-#  image: mongodb
-#  ports:
-#    - "28017:28017"
-#    - "27018:27018"
-#    - "27017:27017"
