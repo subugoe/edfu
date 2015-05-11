@@ -82,3 +82,6 @@ gem 'mini_magick', '~> 3.8.1'
 # use rmagick for ruby and rmagick4j for jruby
 # gem 'rmagick4j', '~> 0.3.8'
 # gem 'rmagick', '~> 2.13.4'
+
+# for background processing (queuing)
+gem 'sidekiq'
