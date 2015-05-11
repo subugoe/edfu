@@ -35,7 +35,7 @@ class UploadsController < ApplicationController
 
     @status = EdfuStatus.create(email: current_user.email, status: "running", message: "Aktueller Import in Arbeit, bitte warten Sie.")
 
-    @uploaddir = "data/upload"
+    @uploaddir        = "data/upload"
     @uploadversiondir = "data/upload/versions/#{@status.id}"
 
     FileUtils.mkdir_p(@uploaddir)
@@ -49,7 +49,7 @@ class UploadsController < ApplicationController
 
     if (params[:upload] != nil)
 
-      if  params[:upload][:formular] != nil
+      if params[:upload][:formular] != nil
         @uploaded_formular = params[:upload][:formular]
         check_uploaded_formular
       end
@@ -135,7 +135,7 @@ class UploadsController < ApplicationController
         @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
       end
 
-      sheet = @config['edfu_formular_sheet']
+      sheet                         = @config['edfu_formular_sheet']
       @formular_excel.default_sheet = sheet
 
       @upload.errors.add(:formular, "1. Überschrift in Formulartabelle sollte 'TEXTMITSUF' sein") if @formular_excel.cell(1, 1) != "TEXTMITSUF"
@@ -179,7 +179,7 @@ class UploadsController < ApplicationController
         @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
       end
 
-      sheet = @config['edfu_topo_sheet']
+      sheet                    = @config['edfu_topo_sheet']
       @ort_excel.default_sheet = sheet
 
       @upload.errors.add(:ort, "1. Überschrift in Orttabelle sollte 'STELLE' sein") if @ort_excel.cell(1, 1) != "STELLE"
@@ -218,7 +218,7 @@ class UploadsController < ApplicationController
         @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
       end
 
-      sheet = @config['edfu_god_sheet']
+      sheet                     = @config['edfu_god_sheet']
       @gott_excel.default_sheet = sheet
 
       @upload.errors.add(:gott, "1. Überschrift in Gotttabelle sollte 'PRIMARY' sein") if @gott_excel.cell(1, 1) != "PRIMARY"
@@ -262,7 +262,7 @@ class UploadsController < ApplicationController
         @upload.errors.add(:wort, "Falscher Dateityp - unterstützt werden '.xls' und ''.xlsx'")
       end
 
-      sheet = @config['edfu_word_sheet']
+      sheet                     = @config['edfu_word_sheet']
       @wort_excel.default_sheet = sheet
 
       @upload.errors.add(:wort, "1. Überschrift in Worttabelle sollte 'Lemma' sein") if @wort_excel.cell(1, 1) != "Lemma"
@@ -439,7 +439,6 @@ class UploadsController < ApplicationController
     @stelle_szene_batch       = Array.new if @stelle_szene_batch == nil
 
 
-
     @formular_excel.each do |row|
 
       i += 1
@@ -474,8 +473,8 @@ class UploadsController < ApplicationController
       f    = Formular.new
       f.id = ActiveRecord::Base.connection.execute("select nextval('formulare_id_seq')").first['nextval']
 
-      f.uid                      = uID
-      f.transliteration          = row[0] || ''
+      f.uid             = uID
+      f.transliteration = row[0] || ''
 
       f.transliteration_nosuffix = row[3] || ''
       f.uebersetzung             = check_uebersetzungs_string(uebersetzung, uID)
@@ -485,8 +484,8 @@ class UploadsController < ApplicationController
       # --- Stellen
       s                          = create_stellen(seitezeile, band, uID)
 
-      seiteStart                 = s.seite_start
-      band                       = s.band
+      seiteStart = s.seite_start
+      band       = s.band
 
       szenen = Szene.szenen["#{band}_#{seiteStart}"]
 
@@ -707,7 +706,6 @@ class UploadsController < ApplicationController
         g.stellen << stelle
 
 
-
         seiteStart = stelle.seite_start
         b          = stelle.band
 
@@ -763,8 +761,8 @@ class UploadsController < ApplicationController
   def process_wort
 
 
-    i                   = 0
-    uniqueId            = false
+    i        = 0
+    uniqueId = false
 
     max_batch_size      = 500
     @wort_batch         = Array.new
