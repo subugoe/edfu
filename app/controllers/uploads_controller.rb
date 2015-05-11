@@ -312,39 +312,58 @@ class UploadsController < ApplicationController
       x.report("processing:") {
 
         puts "deleteDB"
-        deleteDB
+        x.report("deleteDB:") {
+          deleteDB
+        }
 
         puts "process_szene"
-        process_szene
-
+        x.report("process_szene:") {
+          process_szene
+        }
 
         puts "process_formular"
-        process_formular
+        x.report("process_formular:") {
+          process_formular
+        }
 
 
         puts "process_ort"
-        process_ort
+        x.report("process_ort:") {
+          process_ort
+        }
 
         puts "process_gott"
-        process_gott
+        x.report("process_gott:") {
+          process_gott
+        }
 
 
         puts "process_wort"
-        process_wort
+        x.report("process_wort:") {
+          process_wort
+        }
 
 
         puts "save_Stellen"
-        save_stellen
+        x.report("save_Stellen:") {
+          save_stellen
+        }
 
         puts "save_Szenen"
-        save_szenen
+        x.report("save_Szenen:") {
+          save_szenen
+        }
 
 
         puts "cleanupSolr"
-        cleanupSolr
+        x.report("cleanupSolr:") {
+          cleanupSolr
+        }
 
         puts "updateSolr"
-        updateSolr
+        x.report("updateSolr:") {
+          updateSolr
+        }
 
       }
     end
