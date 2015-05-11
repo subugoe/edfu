@@ -442,11 +442,12 @@ class UploadsController < ApplicationController
   def process_formular
 
 
-    max_batch_size = 500
+    max_batch_size = 50
     n              = 50000
     i              = 0
 
     @formular_solr_batch = Array.new
+    @stellen_solr_batch  = Array.new
 
     @formular_batch           = Array.new
     @photo_batch              = Array.new
@@ -566,27 +567,14 @@ class UploadsController < ApplicationController
       @formular_batch << f
 
       @formular_solr_batch << f.to_solr_string
+
       @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
+
 
       # --- check batch size and write to db if max_size reached
 
       if @formular_batch.size == max_batch_size
-
-        Formular.import @formular_batch
-        @formular_batch.clear
-
-        FormularePhotos.import @formular_photo_batch
-        @formular_photo_batch.clear
-
-        FormulareLiteraturen.import @formular_literatur_batch
-        @formular_literatur_batch.clear
-
-
-        Photo.import @photo_batch
-        @photo_batch.clear
-
-        Literatur.import @literatur_batch
-        @literatur_batch.clear
+        saveFormular
       end
 
     end
@@ -594,15 +582,56 @@ class UploadsController < ApplicationController
 
     # --- write batches to db
 
-    Photo.import @photo_batch if @photo_batch.size > 0
-    Literatur.import @literatur_batch if @literatur_batch.size > 0
-    FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
-    FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
-    Formular.import @formular_batch if @formular_batch.size > 0
+    saveFormular
 
 
   end
 
+
+  def formulare_to_redis(ids)
+    if ids.size > 0
+      FormularSolrWorker.perform_async(ids)
+    end
+  end
+
+  def stellen_to_redis(ids)
+    if ids > 0
+      StellenSolrWorker.perform_async(ids)
+    end
+  end
+
+
+  def saveFormular
+
+    if @formular_batch.size > 0
+      Formular.import @formular_batch
+      formulare_to_redis(@formular_batch.collect { |formular| formular.id })
+      stellen_to_redis(@formular_batch.collect { |formular| formular.stellen.collect { |stelle| stelle.id } })
+      @formular_batch.clear
+    end
+
+    if @formular_photo_batch.size > 0
+      FormularePhotos.import @formular_photo_batch
+      @formular_photo_batch.clear
+    end
+
+
+    if @formular_literatur_batch.size > 0
+      FormulareLiteraturen.import @formular_literatur_batch
+      @formular_literatur_batch.clear
+    end
+
+    if @photo_batch.size > 0
+      Photo.import @photo_batch
+      @photo_batch.clear
+    end
+
+    if @literatur_batch.size > 0
+      Literatur.import @literatur_batch
+      @literatur_batch.clear
+    end
+
+  end
 
   # todo move to Ort-Model/Helper (Topo.xls)
   def process_ort
