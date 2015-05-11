@@ -9,12 +9,17 @@ if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
-puts "\ndocker-compose build"
-`docker-compose build`
+puts "\nStop running containers (docker-compose stop)"
+`docker-compose stop`
 
-puts "\ndocker-compose up -d"
+puts "\nRemove the containers (docker-compose rm ...)"
+`docker-compose rm --force`
+
+puts "\nBuild the containers (docker-compose build ...)"
+`docker-compose build  --no-cache`
+
+puts "\nStart the containers (docker-compose up -d)"
 `docker-compose up -d`
 
-
-puts "\ndocker-compose run  web  rake db:drop db:create db:migrate create_default_user  RAILS_ENV='development'"
+puts "\nRun database migrations (docker-compose run  web  rake ...'"
 `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development' `
