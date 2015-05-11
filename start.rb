@@ -16,7 +16,7 @@ puts "\nRemove the containers (docker-compose rm ...)"
 `docker-compose rm --force`
 
 puts "\nBuild the containers (docker-compose build ...)"
-`docker-compose build  --no-cache`
+`docker-compose build` # --no-cache`
 
 puts "\nStart the containers (docker-compose up -d)"
 `docker-compose up -d`
