@@ -9,6 +9,10 @@ db:
   #volumes_from:
   #  - storage
 
+redis:
+   image: redis:2.8.19
+   ports:
+     - "6379:6379"
 
 solr:   # change this and create your own solr image
   image: makuk66/docker-solr:4.10.4
@@ -44,6 +48,17 @@ web:
     - "80:3000"
   links:
     - db:db
+    - solr:solr
+    - redis:redis
+
+sidekiq:
+  build: .
+  command: bundle exec sidekiq #-p 3000 -e development
+  #volumes:
+  #    - .:/edfu
+  links:
+    - db:db
+    - redis:redis
     - solr:solr
 
 #storage:
