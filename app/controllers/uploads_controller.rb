@@ -406,26 +406,32 @@ class UploadsController < ApplicationController
 
     if (@word_solr_batch != nil && @word_solr_batch.size > 0)
       add_to_solr(@word_solr_batch)
+      @word_solr_batch.clear
     end
 
     if @gott_solr_batch != nil && @gott_solr_batch.size > 0
       add_to_solr(@gott_solr_batch)
+      @gott_solr_batch.clear
     end
 
     if @ort_solr_batch != nil && @ort_solr_batch.size > 0
       add_to_solr(@ort_solr_batch)
+      @ort_solr_batch.clear
     end
 
     if @formular_solr_batch != nil && @formular_solr_batch.size > 0
       add_to_solr(@formular_solr_batch)
+      @formular_solr_batch.clear
     end
 
     if @szene_solr_batch != nil && @szene_solr_batch.size > 0
       add_to_solr(@szene_solr_batch)
+      @szene_solr_batch.clear
     end
 
     if @stelle_solr_batch != nil && @stelle_solr_batch.size > 0
       add_to_solr(@stelle_solr_batch)
+      @stelle_solr_batch.clear
     end
 
   end
