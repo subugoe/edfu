@@ -5,7 +5,14 @@
 # gem 'activerecord-jdbcsqlite3-adapter'
 #
 default: &default
-  adapter: sqlite3
+  adapter: postgresql
+  encoding: unicode
+  pool: 15
+  username: postgres
+  password: postgres
+  #host: localhost   # for local execution
+  host: db            # if used in a container -> variable is defined in the docker-compose.yml
+  port: 5432
 
 development:
   <<: *default
