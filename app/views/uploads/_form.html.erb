@@ -1,27 +1,29 @@
-<%= bootstrap_form_for(@upload, layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-10") do |f| %>
+<%= bootstrap_form_for(@upload, layout: :horizontal, label_col: "col-sm-2", control_col: "col-sm-6") do |f| %>
     <% if @upload.errors.any? %>
         <div id="error_explanation">
-            <h2><%= pluralize(@upload.errors.count, "error") %> prohibited this upload from being saved:</h2>
+            <h3>Es sind <%= pluralize(@upload.errors.count, "Fehler") %> aufgetreten:</h3>
 
             <ul>
-                <% @upload.errors.full_messages.each do |message| %>
+                <% @upload.errors[:base].each do |message| %>
                     <li><%= message %></li>
                 <% end %>
             </ul>
         </div>
     <% end %>
 
-    <%= f.file_field(:formular, label: "Formular:") %>
+    <%= f.file_field(:formular) %>
 
-    <%= f.file_field(:ort, label: "Ort:") %>
+    <%= f.file_field(:ort) %>
 
-    <%= f.file_field(:gott, label: "Gott:") %>
+    <%= f.file_field(:gott) %>
 
-    <%= f.file_field(:wort, label: "Wort:") %>
+    <%= f.file_field(:wort) %>
 
-    <%= f.email_field(:email, label: "E-Mail:") %>
+    <!-- <%= f.email_field(:email) %> -->
 
     <div class="actions form-group">
-        <%= f.submit "Upload" %>
+        <%= f.submit("Import", id: "button_id")%>
     </div>
+    <span id="edfustatus"></span>
+
 <% end %>

@@ -14,6 +14,8 @@ tmp
 
 # Ignore IDE files
 .idea/
+._idea/
+
 *.iml
 atlassian-ide-plugin.xml
 
@@ -31,15 +33,17 @@ lib/assets
 lib/tasks
 
 
-log/
+#log/
 *.log
+*log*
+
 
 #*.lock
 
 *.rbc
 capybara-*.html
 .rspec
-/log
+#/log
 /tmp
 /db/*.sqlite3
 /public/system
@@ -49,9 +53,6 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 
-# TODO Comment out these rules if you are OK with secrets being uploaded to the repo
-config/initializers/secret_token.rb
-config/secrets.yml
 
 ## Environment normalisation:
 /.bundle
@@ -72,3 +73,9 @@ bower.json
 .idea
 edfu.war
 
+Daten/edfu.mwb
+typescript
+script
+
+config/initializers/secret_token.rb
+config/secrets.yml

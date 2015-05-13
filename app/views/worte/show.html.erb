@@ -1,3 +1,5 @@
+<h1>Wort</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -31,18 +33,24 @@
 </p>
 
 <p>
-  <strong>Belegstellenedfu:</strong>
-  <%= @wort.belegstellenEdfu %>
-</p>
-
-<p>
   <strong>Belegstellenwb:</strong>
   <%= @wort.belegstellenWb %>
 </p>
+
+<p>
+    <strong>Stellen:</strong>
+    <%= raw @wort.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
+</p>
+
+<p>
+    <strong>WB_Berlin:</strong>
+    <%= link_to "wb_berlin-#{@wort.wbberlin.id}", @wort.wbberlin %>
+</p>
+
 
 <p>
   <strong>Anmerkung:</strong>
   <%= @wort.anmerkung %>
 </p>
 
-<%= link_to 'Back', worte_path %>
+<%= link_to 'Zurück zur Liste', worte_path %>

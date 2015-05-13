@@ -1,0 +1,30 @@
+<h1>WB Berlin</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Band</th>
+      <th>Seite start</th>
+      <th>Seite stop</th>
+      <th>Zeile start</th>
+      <th>Zeile stop</th>
+      <th>Wort Id</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @wbsberlin.each do |wbberlin| %>
+      <tr>
+        <td><%= wbberlin.id %></td>
+        <td><%= wbberlin.band %></td>
+        <td><%= wbberlin.seite_start %></td>
+        <td><%= wbberlin.seite_stop %></td>
+        <td><%= wbberlin.zeile_start %></td>
+        <td><%= wbberlin.zeile_stop %></td>
+        <td><%= link_to "wort-#{wbberlin.wort.uid}", wbberlin.wort %></td>
+        <td><%= link_to 'Einzelsicht', wbberlin %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

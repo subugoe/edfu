@@ -10,9 +10,14 @@ class CreateWorte < ActiveRecord::Migration
       t.string :belegstellenEdfu
       t.string :belegstellenWb
       t.string :anmerkung
-      t.references :wb_berlin, index: true
+      #t.references :wbberlin, index: true
 
-      t.timestamps
+      #t.string :band             # bestandteil von stelle
+      #t.string :bandseite        # bestandteil von stelle
+      #t.string :bandseitezeile   # bestandteil von stelle
+
+      #t.timestamps
     end
+    #add_index :worte, :bandseitezeile # , :unique => true
   end
 end

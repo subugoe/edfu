@@ -1,0 +1,31 @@
+<h1>Edfulog</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Uid</th>
+        <th>Log-Level</th>
+        <th>Type</th>
+        <th>Hinweis</th>
+        <th>Spalte (Tabelle)</th>
+        <th>Im Original</th>
+        <th>Geändert</th>
+      <!--  <th></th> -->
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @edfulogs.each do |edfulog| %>
+        <tr>
+            <td><%= edfulog.uid %></td>
+            <td><%= edfulog.level %></td>
+            <td><%= edfulog.edfutype %></td>
+            <td><%= edfulog.text %></td>
+            <td><%= edfulog.column %></td>
+            <td><%= edfulog.old %></td>
+            <td><%= edfulog.new %></td>
+           <!-- <td><%= link_to 'Einzelsicht', edfulog %></td> -->
+        </tr>
+    <% end %>
+    </tbody>
+</table>

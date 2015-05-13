@@ -1,32 +1,64 @@
 Rails.application.routes.draw do
 
-  devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
+  get 'errors/file_not_found'
+
+  get 'errors/unprocessable'
+
+  get 'errors/internal_server_error'
+
+  get 'edfu_status/status'
+
+  get 'edfu_log/status'
+
+  devise_for :users
+  # devise_for :admin_users, ActiveAdmin::Devise.config
+  # ActiveAdmin.routes(self)
 
   #resources :uploads
 
-  resources :stellen
+  resources :stellen, only: [:index, :show]
 
-  resources :wb_berlins
+  resources :wbsberlin, only: [:index, :show]
 
-  resources :worte
+  resources :worte, only: [:index, :show]
 
-  resources :goetter
+  resources :goetter, only: [:index, :show]
 
-  resources :orte
+  resources :orte, only: [:index, :show]
 
-  resources :formulare
+  resources :formulare, only: [:index, :show]
+
+  resources :edfulogs, only: [:index, :show]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
 
-  root 'uploads#new'
+  #root 'uploads#new'
 
-  get 'uploads/', to: 'uploads#new'
-  post 'uploads/', to: 'uploads#create'
+  authenticate do
+    root 'uploads#new'
+    get 'uploads/', to: 'uploads#new'
+    post 'uploads/', to: 'uploads#create'
+    get 'uploads/new/', to: 'uploads#new'
+  end
 
-  get 'uploads/new/', to: 'uploads#new'
+  # match '/403', to: 'errors#not_authenticated', via: :all
+  match '/404', to: 'errors#file_not_found', via: :all
+  match '/422', to: 'errors#unprocessable', via: :all
+  match '/500', to: 'errors#internal_server_error', via: :all
+
+  # match '/403', to: 'uploads#new', via: :all
+  # match '/404', to: 'uploads#new', via: :all
+  # match '/422', to: 'uploads#new', via: :all
+  # match '/500', to: 'uploads#new', via: :all
+
+  #resources :uploads, only: [:new, :create]
+
+  #get 'uploads/', to: 'uploads#new'
+  #post 'uploads/', to: 'uploads#create'
+  #
+  #get 'uploads/new/', to: 'uploads#new'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase

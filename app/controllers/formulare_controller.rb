@@ -1,10 +1,14 @@
 class FormulareController < ApplicationController
+
   before_action :set_formular, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
   # GET /formulare
   # GET /formulare.json
   def index
-    @formulare = Formular.all
+    @formulare = Formular.all #.limit(100)
+
+
   end
 
   # GET /formulare/1

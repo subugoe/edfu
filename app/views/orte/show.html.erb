@@ -1,38 +1,35 @@
+<h1>Ort</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Uid:</strong>
-  <%= @ort.uid %>
+    <strong>Uid:</strong>
+    <%= @ort.uid %>
 </p>
 
 <p>
-  <strong>Stelle:</strong>
-  <%= @ort.stelle %>
+    <strong>Transliteration:</strong>
+    <%= @ort.transliteration %>
 </p>
 
 <p>
-  <strong>Transliteration:</strong>
-  <%= @ort.transliteration %>
+    <strong>Ort:</strong>
+    <%= @ort.ort %>
 </p>
 
 <p>
-  <strong>Transliteration nosuffix:</strong>
-  <%= @ort.transliteration_nosuffix %>
+    <strong>Lokalisation:</strong>
+    <%= @ort.lokalisation %>
 </p>
 
 <p>
-  <strong>Ort:</strong>
-  <%= @ort.ort %>
+    <strong>Stellen:</strong>
+    <%= raw @ort.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
 </p>
 
 <p>
-  <strong>Lokalisation:</strong>
-  <%= @ort.lokalisation %>
+    <strong>Anmerkung:</strong>
+    <%= @ort.anmerkung %>
 </p>
 
-<p>
-  <strong>Anmerkung:</strong>
-  <%= @ort.anmerkung %>
-</p>
-
-<%= link_to 'Back', orte_path %>
+<%= link_to 'Zurück zur Liste', orte_path %>

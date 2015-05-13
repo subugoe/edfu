@@ -6,13 +6,9 @@ one:
   transliteration_nosuffix: MyString
   uebersetzung: MyString
   texttyp: MyString
-  photo: MyString
-  photo_pfad: MyString
-  photo_kommentar: MyString
   szeneID: MyString
-  literatur: MyString
   band: MyString
-  seitenzeile: MyString
+  seitezeile: MyString
 
 two:
   uid: MyString
@@ -20,10 +16,6 @@ two:
   transliteration_nosuffix: MyString
   uebersetzung: MyString
   texttyp: MyString
-  photo: MyString
-  photo_pfad: MyString
-  photo_kommentar: MyString
   szeneID: MyString
-  literatur: MyString
   band: MyString
-  seitenzeile: MyString
+  seitezeile: MyString

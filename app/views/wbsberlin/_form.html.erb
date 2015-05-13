@@ -1,0 +1,45 @@
+<%= form_for(@wbberlin) do |f| %>
+  <% if @wbberlin.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@wbberlin.errors.count, "error") %> prohibited this wbberlin from being saved:</h2>
+
+      <ul>
+      <% @wbberlin.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uid %><br>
+    <%= f.text_field :uid %>
+  </div>
+  <div class="field">
+    <%= f.label :band %><br>
+    <%= f.text_field :band %>
+  </div>
+  <div class="field">
+    <%= f.label :seite_start %><br>
+    <%= f.text_field :seite_start %>
+  </div>
+  <div class="field">
+    <%= f.label :seite_stop %><br>
+    <%= f.text_field :seite_stop %>
+  </div>
+  <div class="field">
+    <%= f.label :zeile_start %><br>
+    <%= f.text_field :zeile_start %>
+  </div>
+  <div class="field">
+    <%= f.label :zeile_stop %><br>
+    <%= f.text_field :zeile_stop %>
+  </div>
+  <div class="field">
+    <%= f.label :wort_id %><br>
+    <%= f.text_field :wort_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

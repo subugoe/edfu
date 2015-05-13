@@ -1,10 +1,12 @@
 class OrteController < ApplicationController
+
   before_action :set_ort, only: [:show, :edit, :update, :destroy]
+  before_filter :authenticate_user!
 
   # GET /orte
   # GET /orte.json
   def index
-    @orte = Ort.all
+    @orte = Ort.all #.limit(100)
   end
 
   # GET /orte/1

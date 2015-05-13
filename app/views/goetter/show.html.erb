@@ -1,3 +1,5 @@
+<h1>Gott</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -8,11 +10,6 @@
 <p>
   <strong>Transliteration:</strong>
   <%= @gott.transliteration %>
-</p>
-
-<p>
-  <strong>Transliteration nosuffix:</strong>
-  <%= @gott.transliteration_nosuffix %>
 </p>
 
 <p>
@@ -36,13 +33,8 @@
 </p>
 
 <p>
-  <strong>Band:</strong>
-  <%= @gott.band %>
-</p>
-
-<p>
-  <strong>Seitezeile:</strong>
-  <%= @gott.seitezeile %>
+    <strong>Stelle:</strong>
+    <%= raw @gott.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
 </p>
 
 <p>
@@ -50,4 +42,4 @@
   <%= @gott.anmerkung %>
 </p>
 
-<%= link_to 'Back', goetter_path %>
+<%= link_to 'Zurück zur Liste', goetter_path %>

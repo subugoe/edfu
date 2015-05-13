@@ -2,8 +2,6 @@ class CreateUploads < ActiveRecord::Migration
   def change
     create_table :uploads do |t|
 
-      # todo add email for notification
-
       t.string :formular
       t.string :ort
       t.string :gott
@@ -11,7 +9,7 @@ class CreateUploads < ActiveRecord::Migration
 
       t.string :email
 
-      t.timestamps
+      #t.timestamps
     end
   end
 end

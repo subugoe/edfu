@@ -1,3 +1,5 @@
+<h1>Formular</h1>
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -27,17 +29,17 @@
 
 <p>
   <strong>Photo:</strong>
-  <%= @formular.photo %>
+  <%= @formular.photos.collect { |photo| photo.name } %>
 </p>
 
 <p>
   <strong>Photo pfad:</strong>
-  <%= @formular.photo_pfad %>
+  <%= @formular.photos.collect { |photo| photo.pfad } %>
 </p>
 
 <p>
   <strong>Photo kommentar:</strong>
-  <%= @formular.photo_kommentar %>
+  <%= @formular.photos.collect { |photo| photo.kommentar } %>
 </p>
 
 <p>
@@ -47,17 +49,12 @@
 
 <p>
   <strong>Literatur:</strong>
-  <%= @formular.literatur %>
+  <%= @formular.literaturen.collect { |lit| "#{lit.beschreibung} : #{lit.detail}" } %>
 </p>
 
 <p>
-  <strong>Band:</strong>
-  <%= @formular.band %>
+    <strong>Stelle:</strong>
+    <%= raw @formular.stellen.collect { |stelle| link_to stelle.bandseitezeile, stelle}.join(" - ")%>
 </p>
 
-<p>
-  <strong>Seitezeile:</strong>
-  <%= @formular.seitezeile %>
-</p>
-
-<%= link_to 'Back', formulare_path %>
+<%= link_to 'Zurück zur Liste', formulare_path %>

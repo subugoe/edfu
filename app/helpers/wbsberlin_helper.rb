@@ -1,0 +1,2 @@
+module WbsberlinHelper
+end

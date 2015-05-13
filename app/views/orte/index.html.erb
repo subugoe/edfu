@@ -4,12 +4,11 @@
   <thead>
     <tr>
       <th>Uid</th>
-      <th>Stelle</th>
       <th>Transliteration</th>
-      <th>Transliteration nosuffix</th>
       <th>Ort</th>
       <th>Lokalisation</th>
       <th>Anmerkung</th>
+      <th>Bandseitezeile</th>
       <th></th>
     </tr>
   </thead>
@@ -18,13 +17,12 @@
     <% @orte.each do |ort| %>
       <tr>
         <td><%= ort.uid %></td>
-        <td><%= ort.stelle %></td>
         <td><%= ort.transliteration %></td>
-        <td><%= ort.transliteration_nosuffix %></td>
         <td><%= ort.ort %></td>
         <td><%= ort.lokalisation %></td>
         <td><%= ort.anmerkung %></td>
-        <td><%= link_to 'Show', ort %></td>
+        <td><%= ort.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td>
+        <td><%= link_to 'Einzelsicht', ort %></td>
       </tr>
     <% end %>
   </tbody>

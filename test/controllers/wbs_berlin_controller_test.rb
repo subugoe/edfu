@@ -17,7 +17,7 @@ class WbsBerlinControllerTest < ActionController::TestCase
   end
 
   test "should create wb_berlin" do
-    assert_difference('WbBerlin.count') do
+    assert_difference('Wbberlin.count') do
       post :create, wb_berlin: { band: @wb_berlin.band, seite_start: @wb_berlin.seite_start, seite_stop: @wb_berlin.seite_stop, uid: @wb_berlin.uid, wort_id: @wb_berlin.wort_id, zeile_start: @wb_berlin.zeile_start, zeile_stop: @wb_berlin.zeile_stop }
     end
 
@@ -40,7 +40,7 @@ class WbsBerlinControllerTest < ActionController::TestCase
   end
 
   test "should destroy wb_berlin" do
-    assert_difference('WbBerlin.count', -1) do
+    assert_difference('Wbberlin.count', -1) do
       delete :destroy, id: @wb_berlin
     end
 

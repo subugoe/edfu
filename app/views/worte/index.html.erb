@@ -1,35 +1,42 @@
 <h1>Worte</h1>
 
 <table class="table">
-  <thead>
+    <thead>
     <tr>
-      <th>Uid</th>
-      <th>Transliteration</th>
-      <th>Transliteration nosuffix</th>
-      <th>Uebersetzung</th>
-      <th>Hieroglyph</th>
-      <th>Weiteres</th>
-      <th>Belegstellenedfu</th>
-      <th>Belegstellenwb</th>
-      <th>Anmerkung</th>
-      <th></th>
+        <th>Uid</th>
+        <th>Transliteration</th>
+        <th>Transliteration nosuffix</th>
+        <th>Uebersetzung</th>
+        <th>Hieroglyph</th>
+        <th>Weiteres</th>
+        <th>Belegstellenedfu</th>
+        <!-- todo handle stellen -->
+        <th>Belegstellenwb</th>
+        <th>WB_Berlin</th>
+        <th>Anmerkung</th>
+        <th>Bandseitezeile</th>
+        <th></th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <% @worte.each do |wort| %>
-      <tr>
-        <td><%= wort.uid %></td>
-        <td><%= wort.transliteration %></td>
-        <td><%= wort.transliteration_nosuffix %></td>
-        <td><%= wort.uebersetzung %></td>
-        <td><%= wort.hieroglyph %></td>
-        <td><%= wort.weiteres %></td>
-        <td><%= wort.belegstellenEdfu %></td>
-        <td><%= wort.belegstellenWb %></td>
-        <td><%= wort.anmerkung %></td>
-        <td><%= link_to 'Show', wort %></td>
-      </tr>
+        <tr>
+            <td><%= wort.uid %></td>
+            <td><%= wort.transliteration %></td>
+            <td><%= wort.transliteration_nosuffix %></td>
+            <td><%= wort.uebersetzung %></td>
+            <td><%= wort.hieroglyph %></td>
+            <td><%= wort.weiteres %></td>
+            <td><%= wort.belegstellenEdfu %></td>
+            <!-- todo handle stellen -->
+            <td><%= wort.belegstellenWb %></td>
+            <td><%= wort.wbberlin.id %></td>
+            <!-- todo link -->
+            <td><%= wort.anmerkung %></td>
+            <td><%= wort.stellen.collect { |stelle| "#{stelle.bandseitezeile}" } %></td>
+            <td><%= link_to 'Einzelsicht', wort %></td>
+        </tr>
     <% end %>
-  </tbody>
+    </tbody>
 </table>
