@@ -16,10 +16,10 @@ class UploadsController < ApplicationController
   # todo add email for notification
   # todo add worker queue/thread for async processing
 
-  #SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
-  #SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT']
-  SOLR_DOMAIN = "127.0.0.1"
-  SOLR_PORT   = "8983"
+  SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
+  SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT']
+  #SOLR_DOMAIN = "127.0.0.1"
+  #SOLR_PORT   = "8983"
 
 
   SOLR_CONN   = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
