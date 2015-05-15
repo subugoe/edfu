@@ -1,2 +1,0 @@
-export SOLR_ADDR=127.0.0.1
-export EDFU_SOLR_PORT=8983
