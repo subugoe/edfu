@@ -16,14 +16,6 @@ class UploadsController < ApplicationController
   # todo add email for notification
   # todo add worker queue/thread for async processing
 
-  SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR'] || "127.0.0.1"
-  SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT'] || "8983"
-  #SOLR_DOMAIN = "127.0.0.1"
-  #SOLR_PORT   = "8983"
-
-
-  SOLR_CONN   = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
-
 
   MAX_BATCH_SIZE = 500
 
@@ -314,6 +306,7 @@ class UploadsController < ApplicationController
   def process_files
 
     @solr_batch = Array.new
+    @solr_interface = EdfuSolrInterface.new
 
     Benchmark.bm(7) do |x|
       x.report("processing:") {
@@ -325,7 +318,8 @@ class UploadsController < ApplicationController
 
         puts "cleanupSolr"
         x.report("cleanupSolr:") {
-          cleanupSolr
+          #cleanupSolr
+          EdfuSolrInterface.cleanupSolr
         }
 
         puts "process_szene"
@@ -602,8 +596,7 @@ class UploadsController < ApplicationController
 
   def saveFormular
 
-
-    async.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @formular_batch.size > 0
@@ -698,7 +691,7 @@ class UploadsController < ApplicationController
 
   def saveOrt
 
-    async.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @ort_batch.size > 0
@@ -813,7 +806,7 @@ class UploadsController < ApplicationController
 
   def saveGott
 
-    async.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @gott_batch.size > 0
@@ -941,19 +934,19 @@ class UploadsController < ApplicationController
 
 
       if @wort_batch.size == max_batch_size
-        saveWord
+        saveWort
       end
 
     end
 
-    saveWord
+    saveWort
 
   end
 
 
-  def saveWord
+  def saveWort
 
-    async.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @wort_batch.size > 0
@@ -982,7 +975,7 @@ class UploadsController < ApplicationController
 
     }
 
-    async.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     Szene.import @szene_batch if @szene_batch.size > 0
