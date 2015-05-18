@@ -399,64 +399,11 @@ class UploadsController < ApplicationController
 
   end
 
-  def cleanupSolr
-
-    SOLR_CONN.update :data => '<delete><query>*:*</query></delete>'
-    SOLR_CONN.update :data => '<commit/>'
-
-  end
-
-  # def updateSolr(solr_batch)
-  #
-  #   if (solr_batch != nil && solr_batch.size > 0)
-  #     add_to_solr(solr_batch)
-  #     solr_batch.clear
-  #   end
-  #
-  #   # if @gott_solr_batch != nil && @gott_solr_batch.size > 0
-  #   #   add_to_solr(@gott_solr_batch)
-  #   #   @gott_solr_batch.clear
-  #   # end
-  #   #
-  #   # if @ort_solr_batch != nil && @ort_solr_batch.size > 0
-  #   #   add_to_solr(@ort_solr_batch)
-  #   #   @ort_solr_batch.clear
-  #   # end
-  #   #
-  #   # if @formular_solr_batch != nil && @formular_solr_batch.size > 0
-  #   #   add_to_solr(@formular_solr_batch)
-  #   #   @formular_solr_batch.clear
-  #   # end
-  #   #
-  #   # if @szene_solr_batch != nil && @szene_solr_batch.size > 0
-  #   #   add_to_solr(@szene_solr_batch)
-  #   #   @szene_solr_batch.clear
-  #   # end
-  #   #
-  #   # if @stelle_solr_batch != nil && @stelle_solr_batch.size > 0
-  #   #   add_to_solr(@stelle_solr_batch)
-  #   #   @stelle_solr_batch.clear
-  #   # end
-  #
-  # end
-
-
-  def add_to_solr(solr_string_array)
-
-    if (solr_string_array != nil && solr_string_array.size > 0)
-      SOLR_CONN.add (solr_string_array)
-      SOLR_CONN.commit
-      solr_string_array.clear
-    end
-
-
-  end
-
 
   def process_formular
 
-    max_batch_size            = 500
-    i                         = 0
+    max_batch_size = 500
+    i              = 0
 
     @formular_batch           = Array.new
     @photo_batch              = Array.new
