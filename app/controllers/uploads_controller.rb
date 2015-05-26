@@ -32,8 +32,8 @@ class UploadsController < ApplicationController
 
     @status = EdfuStatus.create(email: current_user.email, status: "running", message: "Aktueller Import in Arbeit, bitte warten Sie.")
 
-    @uploaddir        = "data/upload"
-    @uploadversiondir = "data/upload/versions/#{@status.id}"
+    @uploaddir        = "public/upload"
+    @uploadversiondir = "public/upload/versions/#{@status.id}"
 
     FileUtils.mkdir_p(@uploaddir)
     FileUtils.mkdir_p(@uploadversiondir)
