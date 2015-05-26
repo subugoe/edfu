@@ -7,42 +7,25 @@ db:
     - POSTGRESQL_PASS=postgres
   ports:
     - "5432:5432"
-  #volumes_from:
-  #  - storage
 
 
-solr:   # change this and create your own solr image
+solr:
   image: makuk66/docker-solr:4.10.4
   #mem_limit: 2000m
-  #command: /bin/bash -c '/opt/solr/bin/solr -e cloud; echo hit return to quit; read'
-  # hostname: solr
-  #domainname: localdomain
   ports:
     - "8983:8983"
   volumes:
     - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
   environment:
     - JAVA_OPTS="-server -Xms512M -Xmx1792M -XX:MaxPermSize=768M"
-    #- RACK_ENV=development
-    #- PORT=3000
-    #- SESSION_SECRET=
-    #- DEBUG=true
-
-
-#nginx:
-#  image: nginx
-#  ports: 80:80
 
 web:
   build: .
   command: bundle exec puma  -t 5:5 -p 3000 -e development  --preload # -w 3 # --control tcp://0.0.0.0:9293 --control-token foo
-  #command: bundle exec puma  -t 5:5 -p 3000 -e production
-  #command: bundle exec rails server -p 3000 -b 0.0.0.0
   #mem_limit: 2000m
-  hostname: edfu
   volumes:
     - .:/edfu
-    - /opt/edfu/data/upload:edfu/data/upload
+    #- /opt/edfu/data/upload:edfu/data/upload
   ports:
     - "80:3000"
     - "3000:3000"
@@ -56,7 +39,6 @@ web:
 #    - /var/lib/docker/storage
 #  command: true
 
-
 #haproxy:
 #  build: .
 #  command: .
@@ -66,3 +48,6 @@ web:
 #  ports:
 #    - "80:80"
 
+#nginx:
+#  image: nginx
+#  ports: 80:80
