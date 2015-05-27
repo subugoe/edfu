@@ -16,11 +16,6 @@ class UploadsController < ApplicationController
   # todo add email for notification
   # todo add worker queue/thread for async processing
 
-  SOLR_DOMAIN = ENV['EDFU_SOLR_ADDR'] || ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR']
-  SOLR_PORT   = ENV['EDFU_SOLR_PORT'] || ENV['SOLR_PORT_8983_TCP_PORT']
-  #SOLR_DOMAIN = "127.0.0.1"
-  #SOLR_PORT   = "8983"
-  SOLR_CONN   = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
 
   MAX_BATCH_SIZE = 500
 
@@ -310,12 +305,21 @@ class UploadsController < ApplicationController
 
   def process_files
 
+    @solr_batch = Array.new
+    @solr_interface = EdfuSolrInterface.new
+
     Benchmark.bm(7) do |x|
       x.report("processing:") {
 
         puts "deleteDB"
         x.report("deleteDB:") {
           deleteDB
+        }
+
+        puts "cleanupSolr"
+        x.report("cleanupSolr:") {
+          #cleanupSolr
+          EdfuSolrInterface.cleanupSolr
         }
 
         puts "process_szene"
@@ -357,15 +361,15 @@ class UploadsController < ApplicationController
         }
 
 
-        puts "cleanupSolr"
-        x.report("cleanupSolr:") {
-          cleanupSolr
-        }
+        # puts "cleanupSolr"
+        # x.report("cleanupSolr:") {
+        #   cleanupSolr
+        # }
 
-        puts "updateSolr"
-        x.report("updateSolr:") {
-          updateSolr
-        }
+        # puts "updateSolr"
+        # x.report("updateSolr:") {
+        #   updateSolr
+        # }
 
       }
     end
@@ -395,64 +399,11 @@ class UploadsController < ApplicationController
 
   end
 
-  def cleanupSolr
-
-    SOLR_CONN.update :data => '<delete><query>*:*</query></delete>'
-    SOLR_CONN.update :data => '<commit/>'
-
-  end
-
-  def updateSolr
-
-    if (@word_solr_batch != nil && @word_solr_batch.size > 0)
-      add_to_solr(@word_solr_batch)
-      @word_solr_batch.clear
-    end
-
-    if @gott_solr_batch != nil && @gott_solr_batch.size > 0
-      add_to_solr(@gott_solr_batch)
-      @gott_solr_batch.clear
-    end
-
-    if @ort_solr_batch != nil && @ort_solr_batch.size > 0
-      add_to_solr(@ort_solr_batch)
-      @ort_solr_batch.clear
-    end
-
-    if @formular_solr_batch != nil && @formular_solr_batch.size > 0
-      add_to_solr(@formular_solr_batch)
-      @formular_solr_batch.clear
-    end
-
-    if @szene_solr_batch != nil && @szene_solr_batch.size > 0
-      add_to_solr(@szene_solr_batch)
-      @szene_solr_batch.clear
-    end
-
-    if @stelle_solr_batch != nil && @stelle_solr_batch.size > 0
-      add_to_solr(@stelle_solr_batch)
-      @stelle_solr_batch.clear
-    end
-
-  end
-
-
-  def add_to_solr(solr_string_array)
-
-    SOLR_CONN.add (solr_string_array)
-    SOLR_CONN.commit
-
-  end
-
 
   def process_formular
 
-
     max_batch_size = 500
-    n              = 50000
     i              = 0
-
-    @formular_solr_batch = Array.new
 
     @formular_batch           = Array.new
     @photo_batch              = Array.new
@@ -460,7 +411,6 @@ class UploadsController < ApplicationController
     @formular_photo_batch     = Array.new
     @formular_literatur_batch = Array.new
     @stelle_szene_batch       = Array.new if @stelle_szene_batch == nil
-
 
     @formular_excel.each do |row|
 
@@ -571,28 +521,13 @@ class UploadsController < ApplicationController
 
       @formular_batch << f
 
-      @formular_solr_batch << f.to_solr_string
-      @formular_solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
+      @solr_batch << f.to_solr_string
+      @solr_batch += f.stellen.collect { |stelle| stelle.to_solr_string }
 
       # --- check batch size and write to db if max_size reached
 
       if @formular_batch.size == max_batch_size
-
-        Formular.import @formular_batch
-        @formular_batch.clear
-
-        FormularePhotos.import @formular_photo_batch
-        @formular_photo_batch.clear
-
-        FormulareLiteraturen.import @formular_literatur_batch
-        @formular_literatur_batch.clear
-
-
-        Photo.import @photo_batch
-        @photo_batch.clear
-
-        Literatur.import @literatur_batch
-        @literatur_batch.clear
+        saveFormular
       end
 
     end
@@ -600,12 +535,41 @@ class UploadsController < ApplicationController
 
     # --- write batches to db
 
-    Photo.import @photo_batch if @photo_batch.size > 0
-    Literatur.import @literatur_batch if @literatur_batch.size > 0
-    FormularePhotos.import @formular_photo_batch if @formular_photo_batch.size > 0
-    FormulareLiteraturen.import @formular_literatur_batch if @formular_literatur_batch.size > 0
-    Formular.import @formular_batch if @formular_batch.size > 0
+    saveFormular
 
+
+  end
+
+
+  def saveFormular
+
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    @solr_batch.clear
+
+    if @formular_batch.size > 0
+      Formular.import @formular_batch
+      @formular_batch.clear
+    end
+
+    if @formular_photo_batch.size > 0
+      FormularePhotos.import @formular_photo_batch
+      @formular_photo_batch.clear
+    end
+
+    if @formular_literatur_batch.size > 0
+      FormulareLiteraturen.import @formular_literatur_batch
+      @formular_literatur_batch.clear
+    end
+
+    if @photo_batch.size > 0
+      Photo.import @photo_batch
+      @photo_batch.clear
+    end
+
+    if @literatur_batch.size > 0
+      Literatur.import @literatur_batch
+      @literatur_batch.clear
+    end
 
   end
 
@@ -616,7 +580,6 @@ class UploadsController < ApplicationController
     i                   = 0
     max_batch_size      = 500
     @ort_batch          = Array.new
-    @ort_solr_batch     = Array.new
 
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
@@ -659,19 +622,29 @@ class UploadsController < ApplicationController
       @ort_batch << o
 
 
-      @ort_solr_batch << o.to_solr_string
-      @ort_solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
+      @solr_batch << o.to_solr_string
+      @solr_batch += o.stellen.collect { |stelle| stelle.to_solr_string }
 
       if @ort_batch.size == max_batch_size
-
-        Ort.import @ort_batch
-        @ort_batch.clear
+        saveOrt
       end
 
     end
 
-    Ort.import @ort_batch if @ort_batch.size > 0
-    @ort_batch.clear
+    saveOrt
+
+  end
+
+
+  def saveOrt
+
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    @solr_batch.clear
+
+    if @ort_batch.size > 0
+      Ort.import @ort_batch
+      @ort_batch.clear
+    end
 
   end
 
@@ -682,7 +655,7 @@ class UploadsController < ApplicationController
     i                   = 0
     max_batch_size      = 500
     @gott_batch         = Array.new
-    @gott_solr_batch    = Array.new
+
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
 
 
@@ -763,22 +736,33 @@ class UploadsController < ApplicationController
 
       @gott_batch << g
 
-      @gott_solr_batch << g.to_solr_string
-      @gott_solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
+      @solr_batch << g.to_solr_string
+      @solr_batch += g.stellen.collect { |stelle| stelle.to_solr_string }
 
 
       if @gott_batch.size == max_batch_size
-
-        Gott.import @gott_batch
-        @gott_batch.clear
+        saveGott
       end
 
     end
 
-    Gott.import @gott_batch if @gott_batch.size > 0
-    @gott_batch.clear
+    saveGott
 
   end
+
+
+  def saveGott
+
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    @solr_batch.clear
+
+    if @gott_batch.size > 0
+      Gott.import @gott_batch
+      @gott_batch.clear
+    end
+
+  end
+
 
   # todo move to Wort-Model/Helper (WL.xls)
   def process_wort
@@ -789,7 +773,6 @@ class UploadsController < ApplicationController
 
     max_batch_size      = 500
     @wort_batch         = Array.new
-    @word_solr_batch    = Array.new
     @wbberlin_batch     = Array.new
 
     # @stelle_batch             = Array.new if @stelle_batch == nil
@@ -892,26 +875,39 @@ class UploadsController < ApplicationController
       @wort_batch << w
       @wbberlin_batch << w.wbberlin
 
-      @word_solr_batch << w.to_solr_string
-      @word_solr_batch << w.wbberlin.to_solr_string
-      @word_solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
+      @solr_batch << w.to_solr_string
+      @solr_batch << w.wbberlin.to_solr_string
+      @solr_batch += w.stellen.collect { |stelle| stelle.to_solr_string }
 
 
       if @wort_batch.size == max_batch_size
-
-        Wort.import @wort_batch
-        @wort_batch.clear
+        saveWort
       end
 
     end
 
-    Wort.import @wort_batch if @wort_batch.size > 0
-    @wort_batch.clear
-
-    Wbberlin.import @wbberlin_batch if @wbberlin_batch.size > 0
-    @wbberlin_batch.clear
+    saveWort
 
   end
+
+
+  def saveWort
+
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    @solr_batch.clear
+
+    if @wort_batch.size > 0
+      Wort.import @wort_batch
+      @wort_batch.clear
+    end
+
+    if @wbberlin_batch.size > 0
+      Wbberlin.import @wbberlin_batch
+      @wbberlin_batch.clear
+    end
+
+  end
+
 
   def save_szenen
 
@@ -921,11 +917,13 @@ class UploadsController < ApplicationController
     Szene.szenen.each { |key, value_array|
       value_array.each { |szene|
         @szene_batch << szene
-        @szene_solr_batch << szene.to_solr_string
+        @solr_batch << szene.to_solr_string
       }
 
     }
 
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    @solr_batch.clear
 
     Szene.import @szene_batch if @szene_batch.size > 0
     @szene_batch.clear
@@ -946,16 +944,12 @@ class UploadsController < ApplicationController
 
     @stelle_batch = Array.new
 
-
     Stelle.stellen.each { |stelle|
-
       @stelle_batch << stelle
-
     }
 
     Stelle.import @stelle_batch if @stelle_batch.size > 0
     @stelle_batch.clear
-
 
   end
 

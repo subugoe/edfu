@@ -18,9 +18,10 @@
 	    * boot2docker ip
 * without Docker (for local tests)
     * customise the 'host' parameter to 'localhost' (in config/database.yml)
-  $ cd <to_project_root>
-  $ source localEnv
-  $ rake db:drop db:create db:migrate create_default_user RAILS_ENV='development'
-  $ bundle exec puma  -t 5:5 -p 3000 -e development  --preload
+    * $ cd <to_project_root>
+    * start the local Postgres Server
+    * start the local Solr Server
+    * $ rake db:drop db:create db:migrate create_default_user RAILS_ENV='development'
+    * $ bundle exec puma  -t 5:5 -p 3000 -e development  --preload
 * Request the site
 	    * http://...ip...:3000
