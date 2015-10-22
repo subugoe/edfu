@@ -33,8 +33,7 @@ lib/assets
 lib/tasks
 
 
-#log/
-*.log
+log/*.log
 *log*
 
 
