@@ -1,9 +1,12 @@
 class EdfuSolrInterface
-  include Celluloid
+  #include Celluloid
 
   config          = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
   SOLR_CONNECTION = RSolr.connect :url => config['solr_endpoint']
 
+  #SOLR_DOMAIN = ENV['EDFU_SOLR_1_PORT_8983_TCP_ADDR'] || "127.0.0.1"
+  #SOLR_PORT   = ENV['SOLR_PORT_8983_TCP_PORT'] || "8983"
+  #SOLR_CONNECTION   = RSolr.connect :url => "http://#{SOLR_DOMAIN}:#{SOLR_PORT}/solr/collection1"
 
   def self.cleanupSolr
 
