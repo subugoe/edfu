@@ -22,4 +22,5 @@ puts "\nStart the containers (docker-compose up -d)"
 `docker-compose up -d`
 
 puts "\nRun database migrations (docker-compose run  web  rake ...'"
-`docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development' `
+#`docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='production' `
+`docker-compose run web rake db:drop db:create db:migrate create_default_user RAILS_ENV='development' `

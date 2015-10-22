@@ -17,7 +17,7 @@ class UploadsController < ApplicationController
   # todo add worker queue/thread for async processing
 
 
-  MAX_BATCH_SIZE = 500
+  MAX_BATCH_SIZE = 100
 
 
   # GET /uploads/new
@@ -402,7 +402,7 @@ class UploadsController < ApplicationController
 
   def process_formular
 
-    max_batch_size = 500
+    max_batch_size = MAX_BATCH_SIZE
     i              = 0
 
     @formular_batch           = Array.new
@@ -578,7 +578,7 @@ class UploadsController < ApplicationController
   def process_ort
 
     i                   = 0
-    max_batch_size      = 500
+    max_batch_size      = MAX_BATCH_SIZE
     @ort_batch          = Array.new
 
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
@@ -653,7 +653,7 @@ class UploadsController < ApplicationController
   def process_gott
 
     i                   = 0
-    max_batch_size      = 500
+    max_batch_size      = MAX_BATCH_SIZE
     @gott_batch         = Array.new
 
     @stelle_szene_batch = Array.new if @stelle_szene_batch == nil
@@ -771,7 +771,7 @@ class UploadsController < ApplicationController
     i        = 0
     uniqueId = false
 
-    max_batch_size      = 500
+    max_batch_size      = MAX_BATCH_SIZE
     @wort_batch         = Array.new
     @wbberlin_batch     = Array.new
 

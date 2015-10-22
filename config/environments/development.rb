@@ -40,4 +40,7 @@ Rails.application.configure do
   #config.log_level = :debug
   config.log_level = :info
   #config.log_level = :error
+
+
+
 end

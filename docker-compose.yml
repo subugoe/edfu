@@ -9,19 +9,21 @@ db:
     - "5432:5432"
 
 
-solr:
-  image: makuk66/docker-solr:4.10.4
-  #mem_limit: 2000m
-  ports:
-    - "8983:8983"
-  volumes:
-    - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
-  environment:
-    - JAVA_OPTS="-server -Xms512M -Xmx1792M -XX:MaxPermSize=768M"
+#solr:
+#  image: makuk66/docker-solr:4.10.4
+#  #mem_limit: 2000m
+#  ports:
+#    - "8983:8983"
+#  volumes:
+#    - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
+#  environment:
+#    - JAVA_OPTS="-server -Xms512M -Xmx1792M -XX:MaxPermSize=768M"
 
 web:
   build: .
-  command: bundle exec puma  -t 5:5 -p 3000 -e development  --preload # -w 3 # --control tcp://0.0.0.0:9293 --control-token foo
+  #command: bundle exec puma  -t 5:5 -p 3000 -e production  --preload # -w 3 # --control tcp://0.0.0.0:9293 --control-token foo
+  command: bundle exec puma  -t 5:5 -p 3000 -e development  --preload # -b '0.0.0.0' -w 3 # --control tcp://0.0.0.0:9293 --control-token foo
+  
   #mem_limit: 2000m
   volumes:
     - .:/edfu
@@ -31,7 +33,7 @@ web:
     - "3000:3000"
   links:
     - db:db
-    - solr:solr
+#   - solr:solr
 
 #storage:
 #  image: busybox

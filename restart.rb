@@ -12,4 +12,4 @@ puts "\ndocker-compose build web"
 `docker-compose build web`
 
 puts "\ndocker-compose start web"
-`docker-compose up -d`
+`docker-compose up -d web`
