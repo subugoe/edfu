@@ -360,7 +360,7 @@ class UploadsController < ApplicationController
           save_szenen
         }
 
-        
+
 
       }
     end

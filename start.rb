@@ -3,9 +3,6 @@
 # use this script if you start the containers for the first time; then use restart.rb
 
 require 'fileutils'
-require 'socket'
-
-adr = IPSocket.getaddress(Socket.gethostname)
 
 
 if File.exist?("temp/pids/server.pid")
@@ -13,7 +10,7 @@ if File.exist?("temp/pids/server.pid")
 end
 
 
-if (adr == "134.76.19.143" || adr == "141.5.103.93")
+if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
 
   puts "\nStop running containers (docker-compose stop)"
   `docker-compose stop web db`
@@ -46,11 +43,9 @@ end
 
 
 puts "\nRun database migrations (docker-compose run  web  rake ...'"
-if (adr == "134.76.19.143")
-  puts "prod"
+if (ENV['DOCKER_ENV'] == "production")
   `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='production'`
 else
-  puts "dev"
   `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development'`
 end
 

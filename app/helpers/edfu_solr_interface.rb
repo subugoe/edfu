@@ -1,11 +1,8 @@
-require 'socket'
-
 class EdfuSolrInterface
   include Celluloid
 
 
-  adr = IPSocket.getaddress(Socket.gethostname)
-  if (adr == "134.76.19.143" || adr == "141.5.103.93")
+  if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
     config        = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
     solr_endpoint = config['solr_endpoint']
   else
