@@ -23,8 +23,8 @@ development:
 
 test:
   <<: *defaults
-  solr_endpoint: "http://adw-pub.tc.sub.uni-goettingen.de/edfu/#/"
+  solr_endpoint: ""
 
 production:
   <<: *defaults
-  solr_endpoint: ""
+  solr_endpoint: "http://adw-pub.tc.sub.uni-goettingen.de/edfu/#/"
