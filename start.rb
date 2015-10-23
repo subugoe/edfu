@@ -12,7 +12,7 @@ end
 
 if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
 
-  puts "with DOCKER_ENV"
+  puts "\nwith DOCKER_ENV"
 
   puts "\nStop running containers (docker-compose stop)"
   `docker-compose stop web db`
@@ -29,7 +29,7 @@ if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
 
 else
 
-  puts "local"
+  puts "\nlocal"
 
   puts "\nStop running containers (docker-compose stop)"
   `docker-compose stop`

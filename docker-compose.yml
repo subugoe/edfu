@@ -18,6 +18,7 @@ solr:
     - ./config/solr/schema.xml:/opt/solr/example/solr/collection1/conf/schema.xml
   environment:
     - JAVA_OPTS="-server -Xms512M -Xmx1792M -XX:MaxPermSize=768M"
+    - DOCKER_ENV="{{DOCKER_ENV}}"
 
 web:
   build: .
