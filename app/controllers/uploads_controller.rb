@@ -319,7 +319,8 @@ class UploadsController < ApplicationController
         puts "cleanupSolr"
         x.report("cleanupSolr:") {
           #cleanupSolr
-          EdfuSolrInterface.cleanupSolr
+          #EdfuSolrInterface.cleanupSolr
+          @solr_interface.cleanupSolr
         }
 
         puts "process_szene"
