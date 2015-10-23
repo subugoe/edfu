@@ -12,6 +12,8 @@ end
 
 if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
 
+  puts "with DOCKER_ENV"
+
   puts "\nStop running containers (docker-compose stop)"
   `docker-compose stop web db`
 
@@ -26,6 +28,8 @@ if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
 
 
 else
+
+  puts "local"
 
   puts "\nStop running containers (docker-compose stop)"
   `docker-compose stop`
@@ -42,10 +46,12 @@ else
 end
 
 
-puts "\nRun database migrations (docker-compose run  web  rake ...'"
+
 if (ENV['DOCKER_ENV'] == "production")
+  puts "\nRun database migrations (docker-compose run  web  rake ... production'"
   `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='production'`
 else
+  puts "\nRun database migrations (docker-compose run  web  rake ... development'"
   `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development'`
 end
 
