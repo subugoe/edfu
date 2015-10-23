@@ -25,3 +25,10 @@
     * $ bundle exec puma  -t 5:5 -p 3000 -e development  --preload
 * Request the site
 	    * http://...ip...:3000
+* Jenkins
+    * Jenkins sets an environment variable DOCKER_ENV whit value 'production' or 'development'
+    * depending on the value of the DOCKER_ENV the Docker Container will be created
+        * for the local env a solr container will be started
+        * the dev and prod hosts use a hosted solr
+    * the solr endpoint ist currently defined in the edfu_config.yml
+        * this could also be done via an env variable set by Jenkins
