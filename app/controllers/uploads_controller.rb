@@ -534,8 +534,8 @@ class UploadsController < ApplicationController
 
   def saveFormular
 
-    #@solr_interface.async.add_to_solr(@solr_batch.clone)
-    @solr_interface.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    #@solr_interface.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @formular_batch.size > 0
@@ -630,8 +630,8 @@ class UploadsController < ApplicationController
 
   def saveOrt
 
-    #@solr_interface.async.add_to_solr(@solr_batch.clone)
-    @solr_interface.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    #@solr_interface.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @ort_batch.size > 0
@@ -746,8 +746,8 @@ class UploadsController < ApplicationController
 
   def saveGott
 
-    #@solr_interface.async.add_to_solr(@solr_batch.clone)
-    @solr_interface.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    #@solr_interface.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @gott_batch.size > 0
@@ -887,8 +887,8 @@ class UploadsController < ApplicationController
 
   def saveWort
 
-    #@solr_interface.async.add_to_solr(@solr_batch.clone)
-    @solr_interface.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    #@solr_interface.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     if @wort_batch.size > 0
@@ -917,8 +917,8 @@ class UploadsController < ApplicationController
 
     }
 
-    #@solr_interface.async.add_to_solr(@solr_batch.clone)
-    @solr_interface.add_to_solr(@solr_batch.clone)
+    @solr_interface.async.add_to_solr(@solr_batch.clone)
+    #@solr_interface.add_to_solr(@solr_batch.clone)
     @solr_batch.clear
 
     Szene.import @szene_batch if @szene_batch.size > 0
