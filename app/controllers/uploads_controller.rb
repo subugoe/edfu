@@ -360,16 +360,7 @@ class UploadsController < ApplicationController
           save_szenen
         }
 
-
-        # puts "cleanupSolr"
-        # x.report("cleanupSolr:") {
-        #   cleanupSolr
-        # }
-
-        # puts "updateSolr"
-        # x.report("updateSolr:") {
-        #   updateSolr
-        # }
+        
 
       }
     end
