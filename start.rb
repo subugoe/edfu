@@ -16,8 +16,8 @@ if (env == "production")
   puts "run production environment"
   file    = "compose_prod.yml"
   service = "web db"
-elsif (env == "development environment")
-  puts "run development"
+elsif (env == "development")
+  puts "run development environment"
   file    = "compose_dev.yml"
   service = "web db"
 else
