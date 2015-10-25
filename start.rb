@@ -24,7 +24,7 @@ elsif (env == "development")
   puts "run development environment"
   file    = "compose_dev.yml"
   service = "web db"
-elsif (env == "LOCAL")
+elsif (env == "local")
   puts "run local environment"
   file    = "compose_local.yml"
   service = ""
