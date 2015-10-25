@@ -29,7 +29,7 @@ default: &default
   username: postgres
   password: postgres
   #host: localhost   # for local execution
-  host: db         # for docker (variable is the name of the database service in the docker-compose.yml)
+  host: db         # for docker (variable is the name of the database service in the compose_default.yml)
   port: 5432
 
 development:
