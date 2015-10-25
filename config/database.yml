@@ -46,4 +46,6 @@ test:
 
 production:
   <<: *default
+  encoding: unicode
   database: edfudb_prod
+  pool: 15
