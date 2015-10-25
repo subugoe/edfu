@@ -9,8 +9,9 @@ if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
-if (ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil || ARGV[0] == "" || ARGV[0] == nil)
+if ((ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil) && (ARGV[0] == "" || ARGV[0] == nil))
   puts "Execution Aborded, you need an environment (see the following examples for usage without curly brackets)\n  ruby start.rb {local | development | production} \n    or set the Environment variable DOCKER_ENV \n  export DOCKER_ENV={local | development | production}"
+  System.exit 1
 end
 
 env = ENV['DOCKER_ENV'] || 'local'
