@@ -9,12 +9,12 @@ if File.exist?("temp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
-if ((ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil) && (ARGV[0] == "" || ARGV[0] == nil))
-  puts "Execution Aborded, you need an environment (see the following examples for usage without curly brackets)\n  ruby start.rb {local | development | production} \n    or set the Environment variable DOCKER_ENV \n  export DOCKER_ENV={local | development | production}"
+if (ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil)
+  puts "Execution Aborded, DOCKER_ENV environment variable required (see the following examples for usage without curly brackets)\n  set the Environment variable DOCKER_ENV \n  export DOCKER_ENV={ development | production | local} \n  ruby start.rb "
   System.exit 1
 end
 
-env = ENV['DOCKER_ENV'] || 'local'
+env = ENV['DOCKER_ENV']
 
 if (env == "production")
   puts "run production environment"
@@ -24,10 +24,13 @@ elsif (env == "development")
   puts "run development environment"
   file    = "compose_dev.yml"
   service = "web db"
-else
+elsif (env == "LOCAL")
   puts "run local environment"
   file    = "compose_local.yml"
   service = ""
+else
+  puts "Execution Aborded, DOCKER_ENV environment variable is not set to { development | production | local}.\nSet the environment variable DOCKER_ENV\n  export DOCKER_ENV={ development | production | local} \n  ruby start.rb"
+  System.exit 1
 end
 
 puts "\nStop running containers (docker-compose stop)"
