@@ -10,49 +10,36 @@ if File.exist?("temp/pids/server.pid")
 end
 
 
-if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
+env = ENV['DOCKER_ENV'] || 'local'
 
-  puts "\nwith DOCKER_ENV"
-
-  puts "\nStop running containers (docker-compose stop)"
-  `docker-compose stop web db`
-
-  puts "\nRemove the containers (docker-compose rm ...)"
-  `docker-compose rm --force web db`
-
-  puts "\nBuild the containers (docker-compose build ...)"
-  `docker-compose build  --no-cache web db`
-
-  puts "\nStart the containers (docker-compose up -d)"
-  `docker-compose up -d web db`
-
-
+if (env == "production")
+  puts "run production environment"
+  file    = "compose_prod.yml"
+  service = "web db"
+elsif (env == "development environment")
+  puts "run development"
+  file    = "compose_dev.yml"
+  service = "web db"
 else
-
-  puts "\nlocal"
-
-  puts "\nStop running containers (docker-compose stop)"
-  `docker-compose stop`
-
-  puts "\nRemove the containers (docker-compose rm ...)"
-  `docker-compose rm --force`
-
-  puts "\nBuild the containers (docker-compose build ...)"
-  `docker-compose build  --no-cache`
-
-  puts "\nStart the containers (docker-compose up -d)"
-  `docker-compose up -d`
-
+  puts "run local environment"
+  file    = "compose_local.yml"
+  service = ""
 end
 
+puts "\nStop running containers (docker-compose stop)"
+`docker-compose -f #{file} stop #{service}`
 
+puts "\nRemove the containers (docker-compose rm ...)"
+`docker-compose -f #{file} rm --force #{service}`
 
-if (ENV['DOCKER_ENV'] == "production")
-  puts "\nRun database migrations (docker-compose run  web  rake ... production'"
-  `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='production'`
-else
-  puts "\nRun database migrations (docker-compose run  web  rake ... development'"
-  `docker-compose run  web  rake db:drop db:create db:migrate create_default_user RAILS_ENV='development'`
-end
+puts "\nBuild the containers (docker-compose build ...)"
+`docker-compose -f #{file} build   #{service}`
+
+puts "\nStart the containers (docker-compose up -d)"
+`docker-compose -f #{file} up -d  #{service}`
+
+puts "\nRun database migrations (docker-compose run  web  rake ... "
+`docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
+
 
 
