@@ -20,14 +20,17 @@ if (env == "production")
   puts "run production environment"
   file    = "compose_prod.yml"
   service = "web db"
+
 elsif (env == "development")
   puts "run development environment"
   file    = "compose_dev.yml"
   service = "web db"
+
 elsif (env == "local")
   puts "run local environment"
   file    = "compose_local.yml"
   service = ""
+
 else
   puts "Execution Aborded, DOCKER_ENV environment variable is not set to { development | production | local}.\nSet the environment variable DOCKER_ENV\n  export DOCKER_ENV={ development | production | local} \n  ruby start.rb"
   System.exit 1

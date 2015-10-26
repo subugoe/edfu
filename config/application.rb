@@ -31,5 +31,7 @@ module Edfu
       "[#{datetime}] #{Edfulog.separator} [#{severity}] #{Edfulog.separator} #{msg}"
     }
 
+    config.assets.precompile =  ['*.js', '*.css', '*.css.erb', 'noise.png', 'logo.png']
+
   end
 end
