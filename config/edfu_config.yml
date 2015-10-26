@@ -19,12 +19,9 @@ defaults: &defaults
 
 development:
   <<: *defaults
-  solr_endpoint: "http://adw-dev.tc.sub.uni-goettingen.de/solr/edfu"
 
 test:
   <<: *defaults
-  solr_endpoint: ""
 
 production:
   <<: *defaults
-  solr_endpoint: "http://adw-pub.tc.sub.uni-goettingen.de/edfu/#/"
