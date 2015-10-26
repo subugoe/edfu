@@ -20,7 +20,6 @@ if (env == "production")
   puts "run production environment"
   file    = "compose_prod.yml"
   service = "web db"
-  precompile = true
 elsif (env == "development")
   puts "run development environment"
   file    = "compose_dev.yml"
@@ -47,10 +46,7 @@ puts "\nStart the containers (docker-compose up -d)"
 `docker-compose -f #{file} up -d  #{service}`
 
 puts "\nRun database migrations (docker-compose run  web  rake ... "
-if (precompile == true)
-  `docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user assets:precompile`
-else
-  `docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
-end
+`docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
+
 
 

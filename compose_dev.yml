@@ -5,7 +5,7 @@ web:
   links:
     - db:db
   environment:
-    - solr=http://adw-pub.tc.sub.uni-goettingen.de/edfu/#/
+    - solr=http://adw-dev.tc.sub.uni-goettingen.de/solr/edfu
     - DOCKER_ENV=development
     - RAILS_ENV=development
 
