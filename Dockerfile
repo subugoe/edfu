@@ -1,4 +1,4 @@
-FROM rails
+FROM rails:latest
 
 RUN mkdir /edfu
 WORKDIR /edfu
