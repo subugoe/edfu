@@ -8,7 +8,7 @@ source 'https://rubygems.org'
 gem 'roo', '~> 1.13.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 4.2.1'
+gem 'rails' #, '~> 4.2.4'
 
 # Use jdbcsqlite3 as the database for Active Record
 # gem 'activerecord-jdbcsqlite3-adapter',  group: :development
@@ -27,16 +27,20 @@ gem 'puma', '~> 2.11.2' #, group: :production
 gem 'activerecord-import', '~> 0.7.0'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.3'
+gem 'sass-rails', '~> 5.0', '>= 5.0.4'
+
 # Use Uglifier as compressor for JavaScript assets
 gem 'closure-compiler'
 # Use CoffeeScript for .js.coffee assets and views
 gem 'coffee-rails', '~> 4.0.0'
 
+gem 'json', '~> 1.8', '>= 1.8.3'
+
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # alternativ javascript lib's (therubyrhino or therubyracer)
 # gem 'therubyrhino', '~> 2.0.4'
 gem 'therubyracer', '~> 0.12.1'
+gem 'execjs'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -60,19 +64,22 @@ gem 'progress_bar'
 gem 'devise'
 gem 'bcrypt', '~> 3.1.5'
 
-gem 'bootstrap-sass', '~> 3.3.3'
+gem 'bootstrap-sass', '~> 3.3', '>= 3.3.5.1'
 
 # gem 'autoprefixer-rails'
 gem 'autoprefixer-rails', '~> 5.0.0.1'
 
 gem 'bootstrap_form'
 
-gem 'jquery-datatables-rails', '~> 3.1.0'
+#gem 'jquery-datatables-rails', '~> 3.1.0'
+gem 'jquery-datatables-rails', '~> 3.3'
 
 # support for cuncurrent processing
 gem 'celluloid'
 
+# This gem will configure your application to serve static assets so that you do not need to do this manually in a config file
 gem 'rails_12factor', group: :production
+
 gem 'newrelic_rpm'
 
 
