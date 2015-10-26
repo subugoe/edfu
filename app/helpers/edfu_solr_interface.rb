@@ -4,7 +4,7 @@ class EdfuSolrInterface
   def initialize
     if (ENV['DOCKER_ENV'] == "production" || ENV['DOCKER_ENV'] == "development")
       puts "on remote host"
-      config        = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[Rails.env]
+      config        = YAML.load_file(Rails.root.join('config', 'edfu_config.yml'))[ENV['DOCKER_ENV']]
       @solr_endpoint = config['solr_endpoint']
     else
       puts "on local host"
