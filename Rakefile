@@ -17,8 +17,7 @@ task :create_default_user do
         password: user['user_password'],
         password_confirmation: user['user_password'])
 
-    path = "#{File.dirname(__FILE__)}/data/upload"
-    FileUtils.rm_rf("#{path}")
-
   end
+  path = "#{File.dirname(__FILE__)}/data/upload"
+  FileUtils.rm_rf("#{path}")
 end
