@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/rails/sprockets-rails.git
+  revision: 93a45b1c463a063ec7cf4d160107b67aa3db7a1a
+  specs:
+    sprockets-rails (3.0.0.beta3)
+      actionpack (>= 4.0)
+      activesupport (>= 4.0)
+      sprockets (>= 3.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -39,7 +48,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     arel (6.0.3)
-    autoprefixer-rails (5.0.0.3)
+    autoprefixer-rails (6.0.3)
       execjs
       json
     bcrypt (3.1.10)
@@ -65,6 +74,7 @@ GEM
       timers (>= 4.1.1)
     celluloid-supervision (0.20.5)
       timers (>= 4.1.1)
+    chunky_png (1.3.5)
     closure-compiler (1.1.11)
     coffee-rails (4.0.1)
       coffee-script (>= 2.2.0)
@@ -73,6 +83,20 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1.1)
+    compass (1.0.3)
+      chunky_png (~> 1.2)
+      compass-core (~> 1.0.2)
+      compass-import-once (~> 1.0.5)
+      rb-fsevent (>= 0.9.3)
+      rb-inotify (>= 0.9)
+      sass (>= 3.3.13, < 3.5)
+    compass-core (1.0.3)
+      multi_json (~> 1.0)
+      sass (>= 3.3.0, < 3.5)
+    compass-import-once (1.0.5)
+      sass (>= 3.2, < 3.5)
+    compass-rails (2.0.1)
+      compass (~> 1.0.0)
     connection_pool (2.2.0)
     devise (3.5.2)
       bcrypt (~> 3.0)
@@ -83,6 +107,7 @@ GEM
       warden (~> 1.2.3)
     erubis (2.7.0)
     execjs (2.6.0)
+    ffi (1.9.10)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     highline (1.7.8)
@@ -100,8 +125,6 @@ GEM
       rails-dom-testing (~> 1.0)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    jruby-jars (1.7.22)
-    jruby-rack (1.1.19)
     json (1.8.3)
     libv8 (3.16.14.13)
     loofah (2.0.3)
@@ -112,13 +135,16 @@ GEM
     mini_magick (3.8.1)
       subexec (~> 0.2.1)
     mini_portile (0.6.2)
-    minitest (5.8.1)
+    minitest (5.8.2)
     multi_json (1.11.2)
     newrelic_rpm (3.14.0.305)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     options (2.3.2)
     orm_adapter (0.5.0)
+    passenger (5.0.21)
+      rack
+      rake (>= 0.8.1)
     pg (0.18.3)
     progress_bar (1.0.5)
       highline (~> 1.6)
@@ -158,6 +184,9 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
+    rb-fsevent (0.9.6)
+    rb-inotify (0.9.5)
+      ffi (>= 0.5.0)
     rdoc (4.2.0)
     redis (3.2.1)
     redis-namespace (1.5.2)
@@ -183,7 +212,7 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
-    sidekiq (3.5.1)
+    sidekiq (3.5.2)
       celluloid (~> 0.17.2)
       connection_pool (~> 2.2, >= 2.2.0)
       json (~> 1.0)
@@ -193,10 +222,6 @@ GEM
       ruby-ole (>= 1.0)
     sprockets (3.4.0)
       rack (> 1, < 3)
-    sprockets-rails (2.3.3)
-      actionpack (>= 3.0)
-      activesupport (>= 3.0)
-      sprockets (>= 2.8, < 4.0)
     subexec (0.2.3)
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
@@ -210,11 +235,9 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    warbler (1.4.9)
-      jruby-jars (>= 1.5.6, < 2.0)
-      jruby-rack (>= 1.1.1, < 1.3)
-      rake (>= 0.9.6)
-      rubyzip (>= 0.9, < 1.2)
+    uglifier (2.7.2)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     warden (1.2.3)
       rack (>= 1.0)
 
@@ -223,13 +246,14 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-import (~> 0.7.0)
-  autoprefixer-rails (~> 5.0.0.1)
+  autoprefixer-rails
   bcrypt (~> 3.1.5)
-  bootstrap-sass (~> 3.3, >= 3.3.5.1)
+  bootstrap-sass
   bootstrap_form
   celluloid
   closure-compiler
   coffee-rails (~> 4.0.0)
+  compass-rails
   devise
   execjs
   jbuilder (~> 2.0)
@@ -238,6 +262,7 @@ DEPENDENCIES
   json (~> 1.8, >= 1.8.3)
   mini_magick (~> 3.8.1)
   newrelic_rpm
+  passenger
   pg (~> 0.18.1)
   progress_bar
   puma (~> 2.11.2)
@@ -248,6 +273,7 @@ DEPENDENCIES
   sass-rails (~> 5.0, >= 5.0.4)
   sdoc (~> 0.4.0)
   sidekiq
-  therubyracer (~> 0.12.1)
+  sprockets-rails!
+  therubyracer
   turbolinks
-  warbler
+  uglifier
