@@ -72,8 +72,6 @@ puts "\nRemove the containers (docker-compose rm ...)"
 puts "\nBuild the containers (docker-compose build ...)"
 `docker-compose -f #{file} build   #{service}`
 
-puts "\nRun database migrations (docker-compose run  web  rake ... "
-`docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
 
 if (ENV['RAILS_ENV'] == 'production')
   puts "\nPrecompile assets"
@@ -85,6 +83,9 @@ else
   `docker-compose -f #{file} up -d  #{service}`
 end
 
+sleep(2)
+puts "\nRun database migrations (docker-compose run  web  rake ... "
+`docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
 
 
 
