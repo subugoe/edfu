@@ -14,10 +14,11 @@
 // "bootstrap-sprockets" must be imported before "bootstrap" and "bootstrap/variables"
 /*
  *= require rails_bootstrap_forms
- *= require_self
- *= require_tree .
  */
 @import "bootstrap-sprockets";
+@import "bootstrap";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
 
 $navbar-default-bg: #ac001e;
 $text-color: #222;
