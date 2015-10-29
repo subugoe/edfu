@@ -16,7 +16,7 @@ gem 'rails' #, '~> 4.2.4'
 # gem 'sqlite3'
 # gem 'jdbc-sqlite3'
 # gem 'sqlite3'
-gem 'pg', '~> 0.18.1'
+gem 'pg'
 
 
 # for spreadsheet processing
