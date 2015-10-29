@@ -2,6 +2,7 @@
 #
 # use this script if you start the containers for the first time; then use restart.rb
 
+require 'yaml'
 require 'fileutils'
 
 
@@ -34,6 +35,32 @@ elsif (env == "local")
 else
   puts "Execution Aborded, DOCKER_ENV environment variable is not set to { development | production | local}.\nSet the environment variable DOCKER_ENV\n  export DOCKER_ENV={ development | production | local} \n  ruby start.rb"
   System.exit 1
+end
+
+if (ENV['RAILS_ENV'] == 'production')
+
+  puts "\nGenerate Secret Key"
+  initialized = false
+  str         = `docker-compose -f compose_prod.yml  run  web  rake secret`
+
+  key=""
+
+  str.each_line do |line|
+    if (!line.strip.empty? && !line.strip.include?(" "))
+      key         = line.strip
+      initialized = true
+    end
+  end
+
+  if (!initialized)
+    key="fd5d687ce80d9aa20729071487049e0989f861aa596a1b11cd864fd9b76e8ae6f3dccf904e1713bc40ac52045f4be82a7d0df4d27c3e53c27e3520494991c0f9"
+  end
+
+  config_file = './config/secrets.yml'
+  config = YAML::load_file(config_file)
+  config['production']['secret_key_base'] = key
+  File.open(config_file, 'w') {|f| f.write config.to_yaml }
+
 end
 
 puts "\nStop running containers (docker-compose stop)"
