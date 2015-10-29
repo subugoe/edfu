@@ -6,7 +6,7 @@ require 'yaml'
 require 'fileutils'
 
 
-if File.exist?("temp/pids/server.pid")
+if File.exist?("tmp/pids/server.pid")
   `rm tmp/pids/server.pid`
 end
 
