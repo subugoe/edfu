@@ -4,11 +4,9 @@ source 'https://rubygems.org'
 #ruby "2.2.2"
 
 
-# for spreadsheet processing
-gem 'roo', '~> 1.13.2'
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails' #, '~> 4.2.4'
+
 
 # Use jdbcsqlite3 as the database for Active Record
 # gem 'activerecord-jdbcsqlite3-adapter',  group: :development
@@ -20,27 +18,23 @@ gem 'rails' #, '~> 4.2.4'
 # gem 'sqlite3'
 gem 'pg', '~> 0.18.1'
 
+
+# for spreadsheet processing
+gem 'roo', '~> 1.13.2'
+
+
 # gem 'puma'
-gem 'puma', '~> 2.11.2' #, group: :production
+gem 'puma', '~> 2.11.2'
 
 # supports batchimport
 gem 'activerecord-import', '~> 0.7.0'
 
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0', '>= 5.0.4'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'closure-compiler'
-# Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0'
 
 gem 'json', '~> 1.8', '>= 1.8.3'
 
-# See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# alternativ javascript lib's (therubyrhino or therubyracer)
-# gem 'therubyrhino', '~> 2.0.4'
-gem 'therubyracer', '~> 0.12.1'
-gem 'execjs'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -48,10 +42,8 @@ gem 'jquery-rails'
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0', group: :doc
 
-gem 'warbler'
+#gem 'warbler'
 
 # gem 'sunspot_rails'
 # gem 'sunspot_solr'
@@ -64,10 +56,10 @@ gem 'progress_bar'
 gem 'devise'
 gem 'bcrypt', '~> 3.1.5'
 
-gem 'bootstrap-sass', '~> 3.3', '>= 3.3.5.1'
+gem 'bootstrap-sass' #, '~> 3.3', '>= 3.3.5.1'
 
 # gem 'autoprefixer-rails'
-gem 'autoprefixer-rails', '~> 5.0.0.1'
+gem 'autoprefixer-rails' #, '~> 5.0.0.1'
 
 gem 'bootstrap_form'
 
@@ -76,9 +68,6 @@ gem 'jquery-datatables-rails', '~> 3.3'
 
 # support for cuncurrent processing
 gem 'celluloid'
-
-# This gem will configure your application to serve static assets so that you do not need to do this manually in a config file
-gem 'rails_12factor', group: :production
 
 gem 'newrelic_rpm'
 
@@ -92,3 +81,44 @@ gem 'mini_magick', '~> 3.8.1'
 
 # for background processing (queuing)
 gem 'sidekiq'
+
+
+# bundle exec rake doc:rails generates the API under doc/api.
+gem 'sdoc', '~> 0.4.0', group: :doc
+
+
+gem 'sprockets-rails', github: 'rails/sprockets-rails'
+
+# This gem will configure your application to serve static assets so that you do not need to do this manually in a config file
+gem 'rails_12factor'
+
+# passenger app server
+gem "passenger"
+
+
+##########################
+# Use SCSS for stylesheets
+group :assets do
+
+  # Use SCSS for stylesheets
+  gem 'sass-rails', '~> 5.0', '>= 5.0.4'
+
+  # Use CoffeeScript for .js.coffee assets and views
+  gem 'coffee-rails', '~> 4.0.0'
+
+  gem 'uglifier'
+
+  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
+  # alternativ javascript lib's (therubyrhino or therubyracer)
+  # gem 'therubyrhino', '~> 2.0.4'
+  gem 'therubyracer', platforms: :ruby
+
+  gem 'execjs'
+
+  gem 'compass-rails'
+
+end
+
+
+
+
