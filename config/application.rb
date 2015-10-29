@@ -1,6 +1,6 @@
 require File.expand_path('../boot', __FILE__)
-
 require 'rails/all'
+#require 'sprockets/railtie'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -30,8 +30,6 @@ module Edfu
       # original_formatter.call(severity, datetime, progname, msg.dump)
       "[#{datetime}] #{Edfulog.separator} [#{severity}] #{Edfulog.separator} #{msg}"
     }
-
-    config.assets.precompile =  ['*.js', '*.css', '*.css.erb', 'noise.png', 'logo.png']
 
   end
 end
