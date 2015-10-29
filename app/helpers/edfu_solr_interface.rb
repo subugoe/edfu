@@ -1,3 +1,5 @@
+require 'celluloid/current'
+
 class EdfuSolrInterface
   include Celluloid
 

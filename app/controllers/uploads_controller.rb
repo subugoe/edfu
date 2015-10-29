@@ -5,6 +5,7 @@ require 'securerandom'
 require 'benchmark'
 require 'csv'
 require 'fileutils'
+require 'celluloid/current'
 
 class UploadsController < ApplicationController
   include VerifyFormularHelper, VerifyOrtHelper, VerifyGottHelper, VerifyWortHelper, EdfuDataMappings, Celluloid
