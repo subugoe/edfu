@@ -11,7 +11,7 @@ if File.exist?("temp/pids/server.pid")
 end
 
 if (ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil)
-  puts "Execution Aborded, DOCKER_ENV environment variable required (see the following examples for usage without curly brackets)\n  set the Environment variable DOCKER_ENV \n  export DOCKER_ENV={ development | production | local} \n  ruby start.rb "
+  puts "Execution aborted! DOCKER_ENV environment variable required: export DOCKER_ENV={ development | production | local}"
   System.exit 1
 end
 
@@ -72,8 +72,16 @@ puts "\nRemove the containers (docker-compose rm ...)"
 puts "\nBuild the containers (docker-compose build ...)"
 `docker-compose -f #{file} build   #{service}`
 
-puts "\nStart the containers (docker-compose up -d)"
-`docker-compose -f #{file} up -d  #{service}`
+if (ENV['RAILS_ENV'] == 'production')
+  puts "\nPrecompile assets"
+  `docker-compose -f #{file}  run  web  rake assets:precompile`
+  puts "\nStart the containers (docker-compose up -d)"
+  `docker-compose -f #{file} up -d  #{service}`
+else
+  puts "\nStart the containers (docker-compose up -d)"
+  `docker-compose -f #{file} up -d  #{service}`
+end
+
 
 puts "\nRun database migrations (docker-compose run  web  rake ... "
 `docker-compose -f #{file} run  web  rake db:drop db:create db:migrate create_default_user`
