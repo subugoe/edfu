@@ -10,7 +10,8 @@ db:
 
 web:
   build: .
-  command: bundle exec puma  -t 5:5 -p 3000 --preload
+  #command: bundle exec puma  -t 5:5 -p 3000 --preload
+  command: bundle exec passenger start --port 3000 # --log-file my.log
   #mem_limit: 2000m
   volumes:
     - .:/edfu
