@@ -32,6 +32,7 @@ public/uploads/*
 lib/assets
 lib/tasks
 
+public/assets/*
 
 log/*.log
 *log*
