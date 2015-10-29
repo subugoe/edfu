@@ -2,8 +2,8 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require File.expand_path('../config/application', __FILE__)
+require File.expand_path('../app/models/user', __FILE__)
 
-puts __FILE__
 
 #require 'warbler'
 
@@ -16,11 +16,13 @@ task :create_default_user do
   config['users'].each do |user|
 
     User.create(
-        email: user['user_name'],
-        password: user['user_password'],
-        password_confirmation: user['user_password'])
+        email:                 user['user_name'],
+        password:              user['user_password'],
+        password_confirmation: user['user_password']
+    )
 
   end
   path = "#{File.dirname(__FILE__)}/data/upload"
+  puts path
   FileUtils.rm_rf("#{path}")
 end
