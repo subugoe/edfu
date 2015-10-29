@@ -2,10 +2,13 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require File.expand_path('../config/application', __FILE__)
-require 'warbler'
+
+puts __FILE__
+
+#require 'warbler'
 
 Rails.application.load_tasks
-Warbler::Task.new
+#Warbler::Task.new
 
 desc "create a default user"
 task :create_default_user do
