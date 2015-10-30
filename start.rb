@@ -75,11 +75,6 @@ puts "\nBuild the containers (docker-compose build ...)"
 `docker-compose -f #{file} build   #{service}`
 
 
-puts "\nRun database migrations (docker-compose run  web  rake ... "
-`docker-compose -f #{file} run  web  rake db:create`
-`docker-compose -f #{file} run  web  rake db:migrate`
-`docker-compose -f #{file} run  web  rake edfu:create_default_user`
-
 
 if (ENV['RAILS_ENV'] == 'production')
   puts "\nPrecompile assets"
@@ -92,7 +87,10 @@ else
 end
 
 
-
+puts "\nRun database migrations (docker-compose run  web  rake ... "
+`docker-compose -f #{file} run  web  rake db:create`
+`docker-compose -f #{file} run  web  rake db:migrate`
+`docker-compose -f #{file} run  web  rake edfu:create_default_user`
 
 
 
