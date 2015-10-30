@@ -30,7 +30,7 @@ public/uploads/*
 
 
 lib/assets
-lib/tasks
+# lib/tasks
 
 public/assets/*
 

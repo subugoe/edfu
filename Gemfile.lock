@@ -263,7 +263,7 @@ DEPENDENCIES
   mini_magick (~> 3.8.1)
   newrelic_rpm
   passenger
-  pg (~> 0.18.1)
+  pg
   progress_bar
   puma (~> 2.11.2)
   rails
