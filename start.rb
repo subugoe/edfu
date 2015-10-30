@@ -16,6 +16,8 @@ if (ENV['DOCKER_ENV'] == "" || ENV['DOCKER_ENV'] == nil)
 end
 
 env = ENV['DOCKER_ENV']
+file = ""
+service = ""
 
 if (env == "production")
   puts "run production environment"
