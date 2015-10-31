@@ -86,6 +86,8 @@ else
   `docker-compose -f #{file} up -d  #{service}`
 end
 
+puts "sleep..."
+sleep(90)
 
 puts "\nRun database migrations (docker-compose run  web  rake ... "
 `docker-compose -f #{file} run  web  rake db:create`
