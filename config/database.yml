@@ -28,9 +28,11 @@ default: &default
   pool: 15
   username: postgres
   password: postgres
+  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+  port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
   #host: localhost   # for local execution
-  host: db         # for docker (variable is the name of the database service in the compose_default.yml)
-  port: 5432
+  #host: db         # for docker (variable is the name of the database service in the compose_default.yml)
+  #port: 5432
 
 development:
   <<: *default
