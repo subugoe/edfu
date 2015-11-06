@@ -100,7 +100,7 @@ end
 
 if (!(env_var == ""))
   puts "\nask if database is alive"
-  `docker-compose -f #{file} run web bash check.sh #{env_var}"`
+  `docker-compose -f #{file} run web bash check.sh #{env_var}`
 else
   puts "sleep..."
   sleep(90)
