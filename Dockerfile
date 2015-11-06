@@ -1,5 +1,7 @@
 FROM rails:latest
 
+RUN apt-get update && apt-get install -y netcat
+
 RUN mkdir /edfu
 WORKDIR /edfu
 
