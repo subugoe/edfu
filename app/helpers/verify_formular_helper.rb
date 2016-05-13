@@ -47,10 +47,10 @@ module VerifyFormularHelper
     if uid == 3416
       seitezeile = "011, 09 - 012, 01"
     end
-    if uid == 9583
+    if uid == 9664 # vorher 9583
       seitezeile = "078, 14 / Kol. 1"
     end
-    if uid == 9584
+    if uid == 9665 # vorher 9584
       seitezeile = "078, 14 / Kol. 2"
     end
 
@@ -119,7 +119,7 @@ module VerifyFormularHelper
     elsif seitezeile.index(',') != nil # ohne leerzeichen  bsp: 008, 08-09
       parts = seitezeile.split(',') # ["008", " 08-09"]
       seite = (parts[0]).to_i # 008
-      if parts[1].index('-') != nil
+      if (parts[1] != nil) and (parts[1].index('-') != nil)
         zeilen = parts[1].split('-') # ["08","09"]
         result = [[seite, (zeilen[0]).to_i], [seite, (zeilen[1]).to_i]] # [[008,08],[008,09]]
       else
