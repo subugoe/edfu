@@ -12,4 +12,4 @@ RUN bundle install
 
 ADD . /edfu
 
-EXPOSE 3000
+#EXPOSE 3000
