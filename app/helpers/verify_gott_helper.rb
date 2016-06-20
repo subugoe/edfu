@@ -51,8 +51,6 @@ module VerifyGottHelper
     elsif seitezeile == '33,14 33,14'
       # 5791
       seitezeile = '33, 14'
-    elsif uid == 6335
-      band = 'VII' # 7'
     elsif seitezeile == '331,6 und 332,1'
       # 6420
       seitezeile = '331, 6 - 332, 1'
@@ -86,10 +84,7 @@ module VerifyGottHelper
     elsif seitezeile == '018; 009'
       # 8939
       seitezeile = '018, 009'
-    elsif uid == 9165
-      band = 'V' # '5'
-    elsif uid == 7740
-      band = 'VII' # 'VIi'
+
     end
 
 

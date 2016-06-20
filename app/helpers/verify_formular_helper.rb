@@ -44,15 +44,6 @@ module VerifyFormularHelper
 
     ## Sonderfälle
     szOriginal  = seitezeile
-    if uid == 3416
-      seitezeile = "011, 09 - 012, 01"
-    end
-    if uid == 9664 # vorher 9583
-      seitezeile = "078, 14 / Kol. 1"
-    end
-    if uid == 9665 # vorher 9584
-      seitezeile = "078, 14 / Kol. 2"
-    end
 
 
     if seitezeile.index('nach ') == 0
@@ -277,10 +268,6 @@ module VerifyFormularHelper
 
     #elif Photo == '103, 105, 111, 112, 2372, 2387, 2560 ( 103 - 105, 2387 - 2390, E XIV, pl. DCLXXIV )*':
 
-    # 10021
-    if uid == 10102 # vorher 10021
-      photo = '103, 105, 111, 112, 2372, 2387, 2560 ( 103, 104, 105, 2387, 2388, 2389, 2390, E. XIV, pl. DCLXXIV )*'
-    end
 
     # 9741-9773
     if photo.match(/\( 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447, 2448, 2449, 2450, 2451 \(E. VIII, 96, 3 - 99, 3\)\)\*/)
@@ -289,17 +276,6 @@ module VerifyFormularHelper
       #photo_kommentar = 'E. VIII, 96, 3 - 99, 3'
     end
 
-    # 8399, 9011, 9012
-    if uid == 8479 or uid == 9091 or uid == 9092   # vorher 8399  or 9011   or  9012
-      photo = '3813, 3814, 3815, 3816, 3817, 3818, 3819, 3820, 3821, 3822, 3823, 3824, 3825, 3826, 3827, 3828, 3829, 3830, 3831, 3832, 3833, 3834, 3835, 3836, 3837, 3838'
-      #photo_kommentar = 'E. VII, 252, 5'
-    end
-
-    # 9950
-    if uid == 10031 # vorher 9950
-      photo = photo.gsub(/\(E VIII, 122, 5 - 124, 18\)/, '')
-      #photo_kommentar = 'E VIII, 122, 5 - 124, 18'
-    end
 
     # 5629-5650, 6135
     photo = photo.gsub(/E. E. /, 'E. ')
@@ -355,14 +331,7 @@ module VerifyFormularHelper
       pfad      = ''
       kommentar = ''
 
-      if uid == 9643 # vorher 9562
-        if bildString.match('VIII')
-          m15       = re15.match(bildString)
-          kommentar = m15[1]
-        else
-          kommentar = ''
-        end
-      end
+
 
       if  re6.match(bildString)
 
@@ -383,33 +352,7 @@ module VerifyFormularHelper
 
         m14        = re14.match(bildString)
 
-        if m14 and uid < 9000
-          # 6344-6356
-          bildString = m14[1] + m14[3]
-          kommentar  = m14[2] # todo check this
 
-        elsif uid == 9915 # vorher 9834
-          bildString = '3911 )*'
-          kommentar  = 'E. VIII, 108, nach 3'
-
-        elsif uid == 10032 # vorher  9951
-          bildString = '2374, 2375, 2376 )*'
-          kommentar  = 'E VIII, 122, 5 - 124, 18'
-
-        elsif uid == 9643 and bildString.match('VIII') # vorher 9562
-          # hinter schließenden klammer weiter
-          bildString = bildString[(bildString.index(')') + 1)..-1]
-          klammern   = false
-
-        elsif uid == 9752 # vorher 9671
-          kommentar  = 'E. VIII, 87, 5'
-          bildString = '141, 142, E. XIV, pl. DCLXIX, DCLXX )*'
-
-        elsif uid == 9951 # vorher 9870
-          kommentar  = 'E. VIII, 111, 16'
-          bildString = '114, 115, 116, 117)*'
-
-        end
 
       elsif re8.match(bildString)
         # Klammer zu
@@ -510,10 +453,6 @@ module VerifyFormularHelper
           bildString = bildString[(re13.match(bildString)[0]).length..-1]
         end
 
-        if uid == 9991 and bildString.match('103')  # vorher 9910
-          kommentar  = 'E. VIII, 118, 7'
-          bildString = ''
-        end
 
 
         typ  = photoTypDict[typ]['name']
