@@ -250,11 +250,11 @@
 		<fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
 			<analyzer type="index">
 				<tokenizer class="solr.WhitespaceTokenizerFactory"/>
-				<filter class="solr.LowerCaseFilterFactory"/>
+				<!-- <filter class="solr.LowerCaseFilterFactory"/> -->
 			</analyzer>
 			<analyzer type="query">
 				<tokenizer class="solr.WhitespaceTokenizerFactory"/>
-				<filter class="solr.LowerCaseFilterFactory"/>
+				<!-- <filter class="solr.LowerCaseFilterFactory"/> -->
 			</analyzer>
 		</fieldType>
 
@@ -265,14 +265,14 @@
 				<filter class="solr.WordDelimiterFilterFactory" generateWordParts="1"
 					generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"
 					preserveOriginal="1" splitOnCaseChange="0"/>
-				<filter class="solr.LowerCaseFilterFactory"/>
+				<!-- <filter class="solr.LowerCaseFilterFactory"/> -->
 			</analyzer>
 			<analyzer type="query">
 				<tokenizer class="solr.WhitespaceTokenizerFactory"/>
 				<filter class="solr.WordDelimiterFilterFactory" generateWordParts="1"
 					generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"
 					preserveOriginal="1" splitOnCaseChange="0"/>
-				<filter class="solr.LowerCaseFilterFactory"/>
+				<!-- <filter class="solr.LowerCaseFilterFactory"/> -->
 			</analyzer>
 		</fieldType>
 
