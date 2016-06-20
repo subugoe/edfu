@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 class Literatur < ActiveRecord::Base
   extend EdfuModelHelper
