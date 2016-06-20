@@ -2,11 +2,9 @@ db:
   image: postgres:9.4
   # build: ./postgres
   #mem_limit: 1000m
-  environment:
-    - POSTGRESQL_USER=postgres
-    - POSTGRESQL_PASS=postgres
   ports:
     - "5432:5432"
+  env_file: docker.env
 
 web:
   build: .
